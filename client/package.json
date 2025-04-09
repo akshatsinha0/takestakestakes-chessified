@@ -9,6 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "engines": {
+  "node": ">=20.12.2"
+},
   "dependencies": {
     "@types/three": "^0.175.0",
     "react": "^19.0.0",
