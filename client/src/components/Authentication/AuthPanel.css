@@ -1,0 +1,117 @@
+.auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+  .auth-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .auth-panel {
+    width: 100%;
+    max-width: 480px;
+    background-color: var(--primary-light);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    padding: 2rem;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .auth-overlay.visible .auth-panel {
+    transform: scale(1);
+    opacity: 1;
+  }
+  
+  .close-auth {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    z-index: 10;
+  }
+  
+  .close-auth:hover {
+    color: var(--accent);
+  }
+  
+  .auth-tabs {
+    display: flex;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .auth-tab {
+    flex: 1;
+    padding: 1rem;
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+  
+  .auth-tab:hover {
+    color: var(--accent);
+  }
+  
+  .auth-tab.active {
+    color: var(--accent);
+    border-bottom: 3px solid var(--accent);
+  }
+  
+  .auth-content {
+    animation: fadeIn 0.3s ease;
+  }
+  
+.auth-panel {
+  
+  max-height: 90vh; 
+  max-width: 480px;
+  width: 95%; 
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-content {
+
+  overflow-y: auto; 
+  max-height: calc(90vh - 120px);
+  padding-right: 5px; 
+}
+
+
+.auth-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.auth-content::-webkit-scrollbar-thumb {
+  background-color: rgba(212, 141, 59, 0.5);
+  border-radius: 3px;
+}
+
+.auth-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}

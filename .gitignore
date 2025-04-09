@@ -1,1 +1,21 @@
 .qodo 
+
+# Node modules
+node_modules/
+client/node_modules/
+
+# Build artifacts
+client/dist/
+dist/
+
+# Environment files
+.env
+*.env.local
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# TypeScript build info
+*.tsbuildinfo
