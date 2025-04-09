@@ -14,7 +14,11 @@ function App() {
 
   return (
     <div className="app">
-      <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        toggleSidebar={toggleSidebar} 
+        openLogin={() => openAuth('login')} 
+      />
       <MainLayout 
         toggleSidebar={toggleSidebar} 
         openLogin={() => openAuth('login')} 

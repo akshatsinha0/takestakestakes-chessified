@@ -3,6 +3,7 @@ import './MainLayout.css';
 import centralBoard from '../../assets/CentralBoardImage.png';
 import logo from '../../assets/WebsiteLogo.png';
 import FAQSection from '../FAQ/FAQSection';
+import NetworkBackground from '../NetworkBackground/NetworkBackground';
 
 interface MainLayoutProps {
   toggleSidebar: () => void;
@@ -36,6 +37,9 @@ const MainLayout = ({ toggleSidebar, openLogin, openSignup }: MainLayoutProps) =
   
   return (
     <div className="main-layout">
+      {/* Neural Network Background */}
+      <NetworkBackground />
+      
       <header className="header">
         <div className="header-left">
           <button className="menu-button" onClick={toggleSidebar} aria-label="Menu">

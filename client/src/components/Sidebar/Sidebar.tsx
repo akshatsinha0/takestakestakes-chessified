@@ -9,9 +9,10 @@ import membersLogo from '../../assets/MembersLogo.png';
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
+  openLogin: () => void; // Add new prop for opening login modal
 }
 
-const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
+const Sidebar = ({ isOpen, toggleSidebar, openLogin }: SidebarProps) => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   
   // Close sidebar when clicking outside
@@ -42,6 +43,12 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
       document.body.style.overflow = 'auto';
     };
   }, [isOpen]);
+
+  // Handle sign in click - close sidebar and open login modal
+  const handleSignInClick = () => {
+    toggleSidebar(); // Close the sidebar first
+    openLogin();     // Then open the login modal
+  };
 
   return (
     <>
@@ -97,7 +104,7 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
         
         <div className="sidebar-footer">
           <p>Already a member?</p>
-          <button className="sidebar-login">Sign In</button>
+          <button className="sidebar-login" onClick={handleSignInClick}>Sign In</button>
         </div>
       </aside>
     </>
