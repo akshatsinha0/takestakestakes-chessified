@@ -1,6 +1,6 @@
 [build]
   base = "client"
-  command = "cd client && pnpm install --no-frozen-lockfile && pnpm build"
+  command = "cd client && npm install && npm run build"
   publish = "dist"
 
 [[redirects]]
