@@ -6,10 +6,14 @@ export default defineConfig({
   plugins: [react()],
   build: {
     sourcemap: true,
+    outDir: '../dist',
+    emptyOutDir: true,
     commonjsOptions: {
-      transformMixedEsModules: true,
+    transformMixedEsModules: true,
     }
   },
+  root: './client',
+  publicDir: './client/public',
   optimizeDeps: {
     include: ['three']
   }

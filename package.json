@@ -8,17 +8,22 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "three": "^0.164.1",
+    "vite": "^5.2.8"
   },
   "devDependencies": {
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.2",
+    "@types/three": "^0.164.1",
+    "typescript": "^5.4.5",
     "typescript-plugin-css-modules": "^5.1.0"
   }
 }
