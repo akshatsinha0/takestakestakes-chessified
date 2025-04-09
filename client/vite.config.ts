@@ -1,20 +1,16 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  root: '.', // Root directory containing index.html
+  publicDir: './client/public', // Directory for static assets
   build: {
-    sourcemap: true,
-    outDir: '../dist',
-    emptyOutDir: true,
-    commonjsOptions: {
-    transformMixedEsModules: true,
-    }
+    outDir: 'dist', // Output directory within the client folder
+    sourcemap: true, // Enable source maps for debugging production builds
+    emptyOutDir: true // Clear output directory before building
   },
-  root: './client',
-  publicDir: './client/public',
   optimizeDeps: {
-    include: ['three']
+    include: ['three'] // Pre-bundle Three.js for faster builds
   }
-})
+});
