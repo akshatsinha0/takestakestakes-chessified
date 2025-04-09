@@ -1,7 +1,7 @@
 [build]
-  base = ""
-  command = "cd client && npx pnpm install --no-frozen-lockfile && npx pnpm build"
-  publish = "client/dist"
+  base = "client"
+  command = "cd client && pnpm install --no-frozen-lockfile && pnpm build"
+  publish = "dist"
 
 [[redirects]]
   from = "/*"
@@ -10,4 +10,5 @@
 
 [build.environment]
   NODE_VERSION = "20.12.2"
+  PNPM_VERSION = "9.0.0"
   NPM_FLAGS = "--no-audit --no-fund"
