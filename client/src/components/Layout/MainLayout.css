@@ -275,6 +275,10 @@
   animation: 
     typewriter 2.5s steps(17) 0.5s forwards,
     blink 0.75s step-end infinite;
+  /* width: auto;
+  display: inline-block;
+  white-space: nowrap; 
+  overflow: visible;  */
 }
 
 @keyframes typewriter {
