@@ -1,2 +1,5 @@
 <!-- # .nvmrc
 18.19.0 # Match your local Node.js version -->
+node-linker=hoisted
+shamefully-hoist=true
+strict-peer-dependencies=false
