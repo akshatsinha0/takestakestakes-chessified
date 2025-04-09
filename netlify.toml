@@ -1,7 +1,7 @@
 [build]
   base = "client"
-  command = "pnpm run build"
-  publish = "client"
+  command = "pnpm install --no-frozen-lockfile && pnpm run build"
+  publish = "dist"
 
 [[redirects]]
   from = "/*"
