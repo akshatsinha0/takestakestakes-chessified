@@ -26,7 +26,7 @@ const NetworkBackground = () => {
   const mouse = useRef(new THREE.Vector2());
   
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (typeof window === 'undefined' || !containerRef.current) return;
     
     // Scene setup
     const scene = new THREE.Scene();
