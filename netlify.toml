@@ -1,3 +1,8 @@
+[build]
+  base = "client"
+  command = "npx pnpm install --no-frozen-lockfile && npx pnpm build"
+  publish = "dist"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
