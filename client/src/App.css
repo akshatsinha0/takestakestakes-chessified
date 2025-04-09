@@ -110,3 +110,13 @@ body {
     --header-height: 60px;
   }
 }
+
+* {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+#root {
+  overflow-x: hidden;
+  width: 100%;
+}
