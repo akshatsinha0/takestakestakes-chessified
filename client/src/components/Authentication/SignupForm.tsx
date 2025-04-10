@@ -1,12 +1,18 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Forms.css';
 import googleLogo from '../../assets/GoogleLogo.png';
 import facebookLogo from '../../assets/FacebookLogo.png';
 import visibilityOn from '../../assets/VisibilityON.png';
 import visibilityOff from '../../assets/VisibilityOFF.png';
 import PasswordGenerator from './PasswordGenerator';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
-const SignupForm = () => {
+const SignupForm = ({ onClose }: { onClose: () => void }) => {
+  const navigate = useNavigate();
+  const { signup } = useAuth();
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -18,6 +24,7 @@ const SignupForm = () => {
   const [showPasswordGenerator, setShowPasswordGenerator] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -27,10 +34,35 @@ const SignupForm = () => {
     }));
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Signup attempt:', formData);
-    // Handle signup logic here
+    
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords don't match");
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Simulating API call for signup
+      await signup(formData);
+      
+      // Success notification
+      toast.success("Account created successfully!");
+      
+      // Close the auth modal
+      onClose();
+      
+      // Navigate to dashboard
+      navigate('/dashboard');
+    } catch (error) {
+      toast.error("Failed to create account. Please try again.");
+      console.error('Signup error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleGeneratedPassword = (password: string) => {
@@ -146,8 +178,12 @@ const SignupForm = () => {
         </label>
       </div>
       
-      <button type="submit" className="submit-button">
-        Begin Your Journey
+      <button 
+        type="submit" 
+        className="submit-button"
+        disabled={isLoading}
+      >
+        {isLoading ? "Creating Account..." : "Begin Your Journey"}
       </button>
       
       <div className="social-login">

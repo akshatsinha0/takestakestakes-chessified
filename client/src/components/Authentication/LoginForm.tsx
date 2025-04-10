@@ -1,11 +1,17 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Forms.css';
 import googleLogo from '../../assets/GoogleLogo.png';
 import facebookLogo from '../../assets/FacebookLogo.png';
 import visibilityOn from '../../assets/VisibilityON.png';
 import visibilityOff from '../../assets/VisibilityOFF.png';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
-const LoginForm = () => {
+const LoginForm = ({ onClose }: { onClose: () => void }) => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -13,6 +19,7 @@ const LoginForm = () => {
   });
   
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -22,10 +29,28 @@ const LoginForm = () => {
     }));
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', formData);
-    // Handle login logic here
+    setIsLoading(true);
+    
+    try {
+      // Simulating API call for login
+      await login(formData);
+      
+      // Success notification
+      toast.success("Welcome back, Grandmaster!");
+      
+      // Close the auth modal
+      onClose();
+      
+      // Navigate to dashboard
+      navigate('/dashboard');
+    } catch (error) {
+      toast.error("Invalid email or password. Please try again.");
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -88,8 +113,12 @@ const LoginForm = () => {
         </a>
       </div>
       
-      <button type="submit" className="submit-button">
-        Enter the Arena
+      <button 
+        type="submit" 
+        className="submit-button"
+        disabled={isLoading}
+      >
+        {isLoading ? "Logging in..." : "Enter the Arena"}
       </button>
       
       <div className="social-login">

@@ -1,0 +1,268 @@
+/* ChessboardSection.css - Fixed version */
+.chessboard-section {
+  width: 100%;
+  padding: 1.5rem;
+  background-color: var(--primary);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin-bottom: 2rem;
+  overflow: hidden; /* Contains the board within the section */
+}
+
+.board-and-players-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  max-width: 100%;
+}
+
+.chessboard-container {
+  width: 60%; /* Reduced from 80% to prevent overflow */
+  aspect-ratio: 1/1;
+  max-width: 600px; /* More reasonable max-width */
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--primary-dark);
+  padding: 0.5rem; /* Reduced padding */
+}
+
+.players-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 40%; /* Increased from 20% */
+  min-width: 200px;
+  margin-top: 0.5rem;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--primary-light);
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.player-info:hover {
+  transform: translateY(-2px);
+}
+
+.player-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: #566573;
+  overflow: hidden;
+  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--accent);
+}
+
+.player-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.player-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text-light);
+}
+
+.player-rating {
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+
+.timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: var(--primary-light);
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.opponent-timer, .player-timer {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: monospace;
+  color: var(--text-light);
+}
+
+.vs-indicator {
+  font-size: 0.8rem;
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .board-and-players-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .chessboard-container {
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .players-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+  }
+  
+  .player-info {
+    width: 48%;
+  }
+  
+  .timer-container {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    order: -1;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .chessboard-section {
+    padding: 1rem;
+  }
+  
+  .chessboard-container {
+    max-width: 400px;
+  }
+  
+  .player-info {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .chessboard-container {
+    max-width: 320px;
+  }
+}
+
+/* Main layout adjustments */
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 75% 25%; /* Increased chessboard area from previous 70/30 split */
+  gap: 1rem;
+  width: 100%;
+  max-width: 1600px;
+  padding: 1rem;
+  margin: 0 auto;
+}
+
+/* Chessboard section with theater mode */
+.chessboard-section {
+  width: 100%;
+  padding: 1.5rem;
+  background-color: rgba(19, 29, 46, 0.8); /* Darker background for theater mode */
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.board-and-players-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  max-width: 100%;
+}
+
+/* Larger chessboard */
+.chessboard-container {
+  width: 68%; /* Increased from 60% */
+  aspect-ratio: 1/1;
+  max-width: 650px; /* Increased from previous 600px */
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5); /* Enhanced shadow for theater effect */
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--primary-dark);
+  padding: 0.5rem;
+}
+
+/* Theater mode specific styling */
+.theater-mode {
+  position: relative;
+  background-color: #111a29;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Adjust sidebar to be more compact */
+.players-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* Reduced from 1rem */
+  width: 32%; /* Reduced slightly from 40% */
+  min-width: 180px;
+  margin-top: 0;
+}
+
+/* Make game options more compact */
+.game-options {
+  padding: 1rem;
+}
+
+.game-option {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .dashboard-content {
+    grid-template-columns: 70% 30%;
+  }
+  
+  .chessboard-container {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .board-and-players-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .chessboard-container {
+    width: 100%;
+    max-width: 550px;
+  }
+  
+  .players-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+}

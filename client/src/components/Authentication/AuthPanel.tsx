@@ -53,7 +53,10 @@ const AuthPanel = ({ mode, closePanel, switchMode }: AuthPanelProps) => {
         </div>
         
         <div className="auth-content">
-          {mode === 'login' ? <LoginForm /> : <SignupForm />}
+          {mode === 'login' ? 
+            <LoginForm onClose={handleClose} /> : 
+            <SignupForm onClose={handleClose} />
+          }
         </div>
       </div>
     </div>

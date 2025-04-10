@@ -1,0 +1,106 @@
+.game-options {
+    padding: 1.5rem;
+    background-color: var(--primary);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    color: var(--text-light);
+  }
+  
+  .game-options h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--text-light);
+  }
+  
+  .options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .game-option {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 12px;
+    background-color: var(--primary-light);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .game-option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .option-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    margin-right: 1rem;
+  }
+  
+  .option-icon .material-icons {
+    font-size: 2rem;
+    color: var(--text-dark);
+  }
+  
+  .option-content {
+    flex: 1;
+  }
+  
+  .option-content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: var(--text-light);
+  }
+  
+  .option-content p {
+    font-size: 0.9rem;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  @media (max-width: 768px) {
+    .game-options {
+      padding: 1rem;
+    }
+    
+    .game-option {
+      padding: 0.75rem;
+    }
+    
+    .option-icon {
+      width: 40px;
+      height: 40px;
+    }
+    
+    .option-content h3 {
+      font-size: 1.1rem;
+    }
+    
+    .option-content p {
+      font-size: 0.8rem;
+    }
+  }
+  
+  /* GameOptions.css */
+.icon-image {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+}
