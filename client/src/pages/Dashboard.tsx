@@ -6,15 +6,15 @@ import GameOptions from '../components/GameOptions/GameOptions';
 import './Dashboard.css';
 const Dashboard: React.FC = () => {
   // User details would typically come from your authentication context/state
-  const userDetails = {
-    username: 'CosmosCorona10',
-    rating: 1850,
-    avatarUrl: '/path/to/avatar.jpg'
-  };
+  // const userDetails = {
+  //   username: 'CosmosCorona10',
+  //   rating: 1850,
+  //   avatarUrl: '/path/to/avatar.jpg'
+  // };
   
   return (
     <DashboardLayout>
-      <Header user={userDetails} />
+      <Header /> {/* Remove user prop */}
       <div className="dashboard-content">
         <ChessboardSection />
         <GameOptions />

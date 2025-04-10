@@ -514,3 +514,332 @@
     height: 32px;
   }
 }
+
+/* Add these styles to your Header.css file */
+
+/* Enhanced Dropdown Menu Styling */
+.enhanced-dropdown {
+  margin-top: 10px !important;
+}
+
+.enhanced-dropdown .MuiPaper-root {
+  background-color: #1a2c42 !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  width: 280px;
+  box-shadow: 
+    0 12px 28px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    inset 0 0 15px rgba(212, 141, 59, 0.03) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Dropdown Container */
+.dropdown-container {
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #d48d3b, #e5a356, #d48d3b);
+  z-index: 1;
+}
+
+/* Dropdown Header */
+.dropdown-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  background-color: rgba(26, 44, 66, 0.7);
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-header::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: url('/subtle-chess-pattern.png');
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.user-avatar-large {
+  margin-right: 15px;
+  position: relative;
+}
+
+.user-avatar-large .MuiAvatar-root {
+  width: 50px;
+  height: 50px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 15px rgba(212, 141, 59, 0.3);
+  background-color: #2a4361;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.user-avatar-large:hover .MuiAvatar-root {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(212, 141, 59, 0.5);
+}
+
+.avatar-fallback {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #2a4361;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.4rem;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 15px rgba(212, 141, 59, 0.3);
+}
+
+.user-details-expanded {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-fullname {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-light);
+  letter-spacing: 0.5px;
+}
+
+.user-rating-expanded {
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.rating-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-right: 5px;
+  letter-spacing: 0.5px;
+}
+
+.rating-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+/* Dropdown Items */
+.dropdown-item {
+  padding: 12px 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  transition: all 0.2s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dropdown-item:hover::before {
+  background-color: var(--accent);
+}
+
+.menu-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  margin-right: 16px;
+  background-color: rgba(42, 67, 97, 0.5);
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover .menu-icon-wrapper {
+  background-color: rgba(212, 141, 59, 0.15);
+  transform: translateY(-2px);
+}
+
+.menu-icon {
+  color: var(--text-light);
+  font-size: 20px !important;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover .menu-icon {
+  color: var(--accent);
+  transform: scale(1.1);
+}
+
+.menu-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-light);
+  letter-spacing: 0.3px;
+  flex-grow: 1;
+}
+
+.menu-indicator {
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s ease;
+}
+
+.chess-piece {
+  font-size: 1.2rem;
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(212, 141, 59, 0.5);
+}
+
+.dropdown-item:hover .menu-indicator {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Logout Item Special Styling */
+.logout-item {
+  margin-bottom: 6px;
+}
+
+.menu-icon-wrapper.logout {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.logout-item:hover .menu-icon-wrapper {
+  background-color: rgba(244, 67, 54, 0.2);
+}
+
+.logout-item .menu-icon {
+  color: #f44336;
+}
+
+.logout-item .menu-text {
+  color: #f44336;
+}
+
+.logout-item .chess-piece {
+  color: #f44336;
+  text-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
+}
+
+.logout-item:hover::before {
+  background-color: #f44336;
+}
+
+/* Dividers */
+.dropdown-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+  margin: 8px 0;
+}
+
+/* Stats Footer */
+.dropdown-footer {
+  padding: 12px 20px;
+  background-color: rgba(26, 44, 66, 0.7);
+}
+
+.user-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.5px;
+  margin-top: 3px;
+}
+
+/* Animation for dropdown entry */
+@keyframes dropdownSlideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.enhanced-dropdown .MuiPaper-root {
+  animation: dropdownSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Item hover effect - chess piece indicator animation */
+@keyframes pieceFloat {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+
+.dropdown-item:hover .chess-piece {
+  animation: pieceFloat 1.5s ease infinite;
+}
+
+/* Special hover state for the avatar in header */
+.user-avatar-large::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(212, 141, 59, 0.4) 0%, transparent 70%);
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.user-avatar-large:hover::before {
+  opacity: 1;
+}

@@ -1,10 +1,11 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface User {
   id: string;
   username: string;
   email: string;
   rating: number;
+  avatarUrl? : string;
 }
 
 interface AuthContextType {
@@ -26,8 +27,24 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Initialize state from localStorage if available
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('user') !== null;
+  });
+
+  // Update localStorage whenever auth state changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  }, [user]);
 
   // Simulated login function - replace with actual API call in production
   const login = async (credentials: any) => {
@@ -37,14 +54,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Demo user
         const demoUser = {
           id: 'user123',
-          username: credentials.email.split('@')[0],
-          email: credentials.email,
+          username: credentials.email?.split('@')[0] || 'CosmosCorona10',
+          email: credentials.email || 'player@chess.com',
           rating: 1850,
         };
         
         setUser(demoUser);
         setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(demoUser));
         resolve();
       }, 1000);
     });
@@ -58,14 +74,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Create new user
         const newUser = {
           id: 'user' + Math.floor(Math.random() * 1000),
-          username: userData.username,
-          email: userData.email,
+          username: userData.username || 'ChessPlayer',
+          email: userData.email || 'player@chess.com',
           rating: 1200, // Default rating for new users
         };
         
         setUser(newUser);
         setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(newUser));
         resolve();
       }, 1000);
     });
@@ -74,7 +89,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('user');
   };
 
   return (

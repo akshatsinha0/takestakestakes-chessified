@@ -1,7 +1,6 @@
-// import { ReactNode } from 'react';
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -12,15 +11,32 @@ import AuthPanel from './components/Authentication/AuthPanel';
 import Dashboard from './pages/Dashboard';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Protected route component to ensure only authenticated users can access
-const ProtectedRoute = ({ children }: { children: React.ReactElement  }) => {
+// Protected route component with useEffect for navigation
+const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
   
-  return children;
+  return isAuthenticated ? children : null;
+};
+
+// Public route that redirects authenticated users to dashboard
+const PublicRoute = ({ children }: { children: React.ReactElement }) => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+  
+  return !isAuthenticated ? children : null;
 };
 
 function AppContent() {
@@ -31,13 +47,6 @@ function AppContent() {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const openAuth = (mode: 'login' | 'signup') => setAuthMode(mode);
   const closeAuth = () => setAuthMode(null);
-  
-  // Auto-redirect to dashboard if already authenticated
-  useEffect(() => {
-    if (isAuthenticated && window.location.pathname === '/') {
-      window.location.href = '/dashboard';
-    }
-  }, [isAuthenticated]);
 
   return (
     <div className="app">
@@ -55,10 +64,12 @@ function AppContent() {
       />
       
       <Routes>
-        {/* Home route with landing page */}
+        {/* Home route with conditional rendering */}
         <Route 
           path="/" 
           element={
+            isAuthenticated ? 
+            <Navigate to="/dashboard" replace /> : 
             <>
               <Sidebar 
                 isOpen={sidebarOpen} 
