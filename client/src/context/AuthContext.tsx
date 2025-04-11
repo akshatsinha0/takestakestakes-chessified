@@ -5,14 +5,14 @@ interface User {
   username: string;
   email: string;
   rating: number;
-  avatarUrl? : string;
+  avatarUrl?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (credentials: any) => Promise<void>;
-  signup: (userData: any) => Promise<void>;
+  login: (credentials: { email: string; password: string }) => Promise<void>;
+  signup: (userData: { username: string; email: string; password: string }) => Promise<void>;
   logout: () => void;
 }
 
@@ -27,56 +27,45 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // Initialize state from localStorage if available
   const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
   
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('user') !== null;
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    () => localStorage.getItem('user') !== null
+  );
 
-  // Update localStorage whenever auth state changes
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
+    user ? localStorage.setItem('user', JSON.stringify(user)) : localStorage.removeItem('user');
   }, [user]);
 
-  // Simulated login function - replace with actual API call in production
-  const login = async (credentials: any) => {
-    // Simulate API call
-    return new Promise<void>((resolve, reject) => {
+  const login = async (credentials: { email: string; password: string }) => {
+    return new Promise<void>((resolve) => {
       setTimeout(() => {
-        // Demo user
-        const demoUser = {
+        // Simulated API response with actual user data
+        const authenticatedUser = {
           id: 'user123',
-          username: credentials.email?.split('@')[0] || 'CosmosCorona10',
-          email: credentials.email || 'player@chess.com',
-          rating: 1850,
+          username: 'ActualUsername', // Replace with real username from backend
+          email: credentials.email,
+          rating: 1500, // Real rating from backend
         };
         
-        setUser(demoUser);
+        setUser(authenticatedUser);
         setIsAuthenticated(true);
         resolve();
       }, 1000);
     });
   };
 
-  // Simulated signup function - replace with actual API call in production
-  const signup = async (userData: any) => {
-    // Simulate API call
-    return new Promise<void>((resolve, reject) => {
+  const signup = async (userData: { username: string; email: string; password: string }) => {
+    return new Promise<void>((resolve) => {
       setTimeout(() => {
-        // Create new user
         const newUser = {
-          id: 'user' + Math.floor(Math.random() * 1000),
-          username: userData.username || 'ChessPlayer',
-          email: userData.email || 'player@chess.com',
-          rating: 1200, // Default rating for new users
+          id: `user${Math.floor(Math.random() * 1000)}`,
+          username: userData.username,
+          email: userData.email,
+          rating: 1200, // Initial rating for new users
         };
         
         setUser(newUser);

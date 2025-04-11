@@ -1,3 +1,4 @@
+import { useAuth } from '../../context/AuthContext';
 import React, { useState, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
@@ -24,6 +25,7 @@ interface ChessMove {
 }
 
 const ChessboardSection: React.FC = () => {
+  const { user } = useAuth();
   const [game, setGame] = useState(new Chess());
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
@@ -35,9 +37,9 @@ const ChessboardSection: React.FC = () => {
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
   const [gameStatus, setGameStatus] = useState<string>('');
   const [opening, setOpening] = useState<string>("Opening");
-  const [playerRating, setPlayerRating] = useState(1845);
-  const [ratingChange, setRatingChange] = useState(8);
-  const [opponent, setOpponent] = useState("c0ld_b00t3r");
+  // const [playerRating, setPlayerRating] = useState(1845);
+  // const [ratingChange, setRatingChange] = useState(8);
+  // const [opponent, setOpponent] = useState("c0ld_b00t3r");
   
   // Game statistics
   const [gameResult, setGameResult] = useState<{
@@ -256,8 +258,8 @@ const ChessboardSection: React.FC = () => {
                   <img src="/path/to/user-avatar.png" alt="You" />
                 </div>
                 <div className="player-details">
-                  <div className="player-name">CosmosCorona10</div>
-                  <div className="player-rating">1850</div>
+                  <div className="player-name">{user?.username || 'Guest'}</div>
+                  <div className="player-rating">{user?.rating}</div>
                 </div>
               </div>
             </div>
@@ -370,16 +372,16 @@ const ChessboardSection: React.FC = () => {
                   <div className="game-result">
                     <div className="status-header">{gameStatus}</div>
                     <div className="result-details">
-                      CosmosCorona10 ({playerRating}) won by resignation ({gameResult.time})
+                      {user?.username} ({user?.rating}) won by resignation ({gameResult.time})
                     </div>
                     <div className="rating-change">
-                      Your new Bullet rating is {playerRating} (+{ratingChange}).
+                    {gameResult.winner === 'user' && `New rating: ${user?.rating}`}
                     </div>
                   </div>
                   
                   <div className="opponent-feedback">
                     <div className="feedback-question">
-                      Was {opponent} a good sport?
+                      Was your opponent a good sport?
                     </div>
                     <div className="feedback-buttons">
                       <button className="feedback-btn like"><FontAwesomeIcon icon={faThumbsUp} /></button>
