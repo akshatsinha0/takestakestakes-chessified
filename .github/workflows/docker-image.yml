@@ -19,7 +19,7 @@ jobs:
         with:
           registry: docker.io
           username: 00akshatsinha00
-          password: ${{ secrets.docker.password }}
+          password: MikhailFischer42
           ecr: false
 
       - name: Build the Docker image
