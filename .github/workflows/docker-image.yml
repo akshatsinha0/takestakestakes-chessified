@@ -18,8 +18,8 @@ jobs:
         uses: docker/login-action@v3.4.0
         with:
           
-          username: ${{ secrets.DOCKER_PASSWORD }}
-          password: MikhailFischer42
+          username: 00akshatsinha00
+          password: ${{ secrets.DOCKER_PASSWORD }}
           ecr: false
 
       - name: Build the Docker image
