@@ -1,15 +1,13 @@
+# .github/workflows/docker-image.yml
 name: Docker Image CI
 
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,11 +19,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build the Docker image
-        run: |
-          docker build \
-            client \
-            --file client/Dockerfile \
-            --tag 00akshatsinha00/myapp
+        working-directory: client
+        run: docker build . --file Dockerfile --tag 00akshatsinha00/myapp
 
       - name: Push the Docker image
         run: docker push 00akshatsinha00/myapp
