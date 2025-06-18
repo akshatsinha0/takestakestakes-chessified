@@ -19,6 +19,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
+    "@supabase/supabase-js": "^2.39.0",
     "@types/three": "^0.175.0",
     "chess.js": "^1.2.0",
     "react": "^19.0.0",
