@@ -194,7 +194,7 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
         </div>
       </div>
       {showPasswordGenerator && (
-        <PasswordGenerator onGenerate={handleGeneratedPassword} onClose={() => setShowPasswordGenerator(false)} />
+        <PasswordGenerator onSelectPassword={handleGeneratedPassword} onClose={() => setShowPasswordGenerator(false)} />
       )}
     </form>
   );

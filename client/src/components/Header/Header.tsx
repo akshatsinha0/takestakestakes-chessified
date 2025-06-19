@@ -70,8 +70,8 @@ const Header: React.FC = () => {
     setAnchorEl(null);
   };
 
-  const getInitial = (name: string) => {
-    return name.charAt(0).toUpperCase();
+  const getInitial = (name: string | undefined) => {
+    return name?.charAt(0).toUpperCase() || 'G';
   };
 
   const handleLogout = () => {
@@ -203,16 +203,16 @@ const Header: React.FC = () => {
                   <>
                     <div className="dropdown-header">
                       <div className="user-avatar-large">
-                        {user.avatarUrl ? (
-                          <Avatar src={user.avatarUrl} alt={user.username} />
+                        {user?.avatarUrl ? (
+                          <Avatar src={user.avatarUrl} alt={user.username || 'User'} />
                         ) : (
-                          <div className="avatar-fallback">{user.username.charAt(0)}</div>
+                          <div className="avatar-fallback">{user?.username?.charAt(0) || 'U'}</div>
                         )}
                       </div>
                       <div className="user-details-expanded">
-                        <span className="user-fullname">{user.username}</span>
+                        <span className="user-fullname">{user?.username || 'User'}</span>
                         <span className="user-rating-expanded">
-                          <span className="rating-value">{user.rating}</span>
+                          <span className="rating-value">{user?.rating || 1200}</span>
                           <span className="rating-label">ELO</span>
                         </span>
                       </div>

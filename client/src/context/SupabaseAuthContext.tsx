@@ -14,7 +14,7 @@ interface SupabaseAuthContextType {
   signInWithGoogle: () => Promise<{ data: any; error: AuthError | null }>
   signInWithFacebook: () => Promise<{ data: any; error: AuthError | null }>
   signOut: () => Promise<void>
-  updateProfile: (updates: Partial<Profile>) => Promise<{ data: any; error: any }>
+  updateProfile: (updates: Partial<Profile>) => Promise<{ data: any; error: any } | { error: string; data?: undefined }>
 }
 
 const SupabaseAuthContext = createContext<SupabaseAuthContextType | undefined>(undefined)

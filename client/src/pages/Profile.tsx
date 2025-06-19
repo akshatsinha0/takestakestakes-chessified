@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getProfile } from '../utils/profileApi';
+import { Navigate } from 'react-router-dom';
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
@@ -8,11 +9,15 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.id) {
-      getProfile(user.id).then(setProfile).finally(() => setLoading(false));
+    if (!user) {
+      setLoading(false);
+      return;
     }
+
+    getProfile(user.id).then(setProfile).finally(() => setLoading(false));
   }, [user]);
 
+  if (!user) return <Navigate to="/" />;
   if (loading) return <div className="profile-page">Loading...</div>;
   if (!profile) return <div className="profile-page">Profile not found.</div>;
 

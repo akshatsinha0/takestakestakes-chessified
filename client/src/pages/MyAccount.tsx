@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getProfile, updateProfile } from '../utils/profileApi';
 import styles from './MyAccount.module.css';
+import { Navigate } from 'react-router-dom';
 
 const MyAccount: React.FC = () => {
   const { user } = useAuth();
@@ -12,15 +13,20 @@ const MyAccount: React.FC = () => {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    if (user?.id) {
-      getProfile(user.id).then((p) => {
-        setProfile(p);
-        setUsername(p.username);
-      }).finally(() => setLoading(false));
+    if (!user) {
+      setLoading(false);
+      return;
     }
+
+    getProfile(user.id).then((p) => {
+      setProfile(p);
+      setUsername(p.username);
+    }).finally(() => setLoading(false));
   }, [user]);
 
   const handleSave = async () => {
+    if (!user) return;
+    
     setSaving(true);
     await updateProfile(user.id, { username });
     setSuccess(true);
@@ -28,6 +34,7 @@ const MyAccount: React.FC = () => {
     setTimeout(() => setSuccess(false), 2000);
   };
 
+  if (!user) return <Navigate to="/" />;
   if (loading) return <div className={styles['account-page']}>Loading...</div>;
   if (!profile) return <div className={styles['account-page']}>Account not found.</div>;
 
