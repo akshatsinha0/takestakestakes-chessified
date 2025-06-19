@@ -9,7 +9,7 @@ import PasswordGenerator from './PasswordGenerator';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import { useEffect } from 'react';
-import { supabase } from '../lib/supabase'; // or wherever your supabase client is
+import { supabase } from '../../lib/supabase';
 
 const SignupForm = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate();
@@ -77,8 +77,8 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
     const url = new URL(window.location.href);
     const type = url.searchParams.get('type');
     if (type === 'signup' || type === 'magiclink') {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
+      supabase.auth.getSession().then(({ data }: { data: { session: any } }) => {
+        if (data.session) {
           navigate('/dashboard');
         }
       });
@@ -93,8 +93,8 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
     if (hash.includes('access_token') && hash.includes('type=signup')) {
       // Wait a tick for Supabase to process the session
       setTimeout(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          if (session) {
+        supabase.auth.getSession().then(({ data }: { data: { session: any } }) => {
+          if (data.session) {
             navigate('/dashboard');
           }
         });
