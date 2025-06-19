@@ -8,6 +8,7 @@ import visibilityOff from '../../assets/VisibilityOFF.png';
 import PasswordGenerator from './PasswordGenerator';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
+import { createClient } from '@supabase/supabase-js';
 
 const SignupForm = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate();
