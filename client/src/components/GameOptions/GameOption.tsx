@@ -14,9 +14,10 @@ interface GameOptionProps {
   description: string;
   icon: string;
   color: string;
+  onClick?: () => void;
 }
 
-const GameOption: React.FC<GameOptionProps> = ({ title, description, icon, color }) => {
+const GameOption: React.FC<GameOptionProps> = ({ title, description, icon, color, onClick }) => {
   // Map icon names to imported assets
   const getIconSrc = (iconName: string) => {
     switch (iconName) {
@@ -30,7 +31,7 @@ const GameOption: React.FC<GameOptionProps> = ({ title, description, icon, color
   };
 
   return (
-    <div className="game-option">
+    <div className="game-option" onClick={onClick}>
       <div className="option-icon" style={{ backgroundColor: color }}>
         <img src={getIconSrc(icon)} alt={title} className="icon-image" />
       </div>

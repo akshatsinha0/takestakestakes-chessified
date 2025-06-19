@@ -1,10 +1,12 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
+import { createProfile, getProfile } from '../utils/profileApi';
 
 interface User {
   id: string;
-  username: string;
   email: string;
-  rating: number;
+  username?: string;
+  rating?: number;
   avatarUrl?: string;
 }
 
@@ -12,8 +14,8 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (credentials: { email: string; password: string }) => Promise<void>;
-  signup: (userData: { username: string; email: string; password: string }) => Promise<void>;
-  logout: () => void;
+  signup: (userData: { email: string; password: string; username: string }) => Promise<any>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,61 +23,118 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   login: async () => {},
   signup: async () => {},
-  logout: () => {},
+  logout: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
-  
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    () => localStorage.getItem('user') !== null
-  );
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    user ? localStorage.setItem('user', JSON.stringify(user)) : localStorage.removeItem('user');
-  }, [user]);
-
-  const login = async (credentials: { email: string; password: string }) => {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        // Simulated API response with actual user data
-        const authenticatedUser = {
-          id: 'user123',
-          username: 'ActualUsername', // Replace with real username from backend
-          email: credentials.email,
-          rating: 1500, // Real rating from backend
-        };
-        
-        setUser(authenticatedUser);
+    // Get initial session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        let profile = await getProfile(session.user.id).catch(() => null);
+        if (!profile) {
+          // Use a generic username instead of email prefix
+          await createProfile({ id: session.user.id, username: 'User' });
+          profile = await getProfile(session.user.id).catch(() => null);
+        }
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          username: profile?.username || 'User',
+          rating: profile?.rating,
+          avatarUrl: profile?.avatar_url,
+        });
         setIsAuthenticated(true);
-        resolve();
-      }, 1000);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
     });
+    // Listen for auth state changes
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        let profile = await getProfile(session.user.id).catch(() => null);
+        if (!profile) {
+          // Use a generic username instead of email prefix
+          await createProfile({ id: session.user.id, username: 'User' });
+          profile = await getProfile(session.user.id).catch(() => null);
+        }
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          username: profile?.username || 'User',
+          rating: profile?.rating,
+          avatarUrl: profile?.avatar_url,
+        });
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    });
+    return () => { listener?.subscription.unsubscribe(); };
+  }, []);
+
+  const login = async ({ email, password }: { email: string; password: string }) => {
+    console.log('Login: starting signInWithPassword');
+    const { error, data } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      console.error('Login: error from supabase', error);
+      throw error;
+    }
+    if (data.user) {
+      console.log('Login: got user', data.user);
+      let profile = await getProfile(data.user.id).catch((e) => {
+        console.error('Login: getProfile failed', e);
+        return null;
+      });
+      if (!profile) {
+        console.log('Login: creating profile for user');
+        await createProfile({ id: data.user.id, username: 'User' });
+        profile = await getProfile(data.user.id).catch((e) => {
+          console.error('Login: getProfile after create failed', e);
+          return null;
+        });
+      }
+      console.log('Login: setting user in context', profile);
+      setUser({
+        id: data.user.id,
+        email: data.user.email || '',
+        username: profile?.username || 'User',
+        rating: profile?.rating,
+        avatarUrl: profile?.avatar_url,
+      });
+      setIsAuthenticated(true);
+    }
+    console.log('Login: finished');
   };
 
-  const signup = async (userData: { username: string; email: string; password: string }) => {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        const newUser = {
-          id: `user${Math.floor(Math.random() * 1000)}`,
-          username: userData.username,
-          email: userData.email,
-          rating: 1200, // Initial rating for new users
-        };
-        
-        setUser(newUser);
-        setIsAuthenticated(true);
-        resolve();
-      }, 1000);
-    });
+  const signup = async ({ email, password, username }: { email: string; password: string; username: string }) => {
+    const { error, data } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+    // Only create profile if session is present (auto-confirmed)
+    if (data.session && data.user) {
+      await createProfile({ id: data.user.id, username });
+      setUser({
+        id: data.user.id,
+        email: data.user.email || '',
+        username,
+        rating: 1200,
+      });
+      setIsAuthenticated(true);
+    }
+    // Return the result so the form can check for session and show the right message
+    return data;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    console.log('Logout: signing out from Supabase');
+    await supabase.auth.signOut();
     setUser(null);
     setIsAuthenticated(false);
   };

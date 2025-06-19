@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 
 const LoginForm = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -31,25 +31,23 @@ const LoginForm = ({ onClose }: { onClose: () => void }) => {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isAuthenticated) {
+      toast.info('You are already logged in.');
+      return;
+    }
     setIsLoading(true);
-    
+    console.log('LoginForm: attempting login...');
     try {
-      // Simulating API call for login
-      await login(formData);
-      
-      // Success notification
+      await login({ email: formData.email, password: formData.password });
       toast.success("Welcome back, Grandmaster!");
-      
-      // Close the auth modal
       onClose();
-      
-      // Navigate to dashboard
       navigate('/dashboard');
-    } catch (error) {
-      toast.error("Invalid email or password. Please try again.");
+    } catch (error: any) {
+      toast.error(error.message || "Invalid email or password. Please try again.");
       console.error('Login error:', error);
     } finally {
       setIsLoading(false);
+      console.log('LoginForm: login finished');
     }
   };
   

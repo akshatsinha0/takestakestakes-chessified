@@ -25,6 +25,7 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCheckEmail, setShowCheckEmail] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -36,29 +37,24 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords don't match");
       return;
     }
-    
     setIsLoading(true);
-    
+    setShowCheckEmail(false);
     try {
-      // Simulating API call for signup
-      await signup(formData);
-      
-      // Success notification
-      toast.success("Account created successfully!");
-      
-      // Close the auth modal
-      onClose();
-      
-      // Navigate to dashboard
-      navigate('/dashboard');
-    } catch (error) {
-      toast.error("Failed to create account. Please try again.");
+      const result = await signup({ email: formData.email, password: formData.password, username: formData.username });
+      // If signup returns a session, redirect. If not, show check email message.
+      if (result && result.session) {
+        toast.success("Account created successfully!");
+        onClose();
+        navigate('/dashboard');
+      } else {
+        setShowCheckEmail(true);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create account. Please try again.");
       console.error('Signup error:', error);
     } finally {
       setIsLoading(false);
@@ -77,7 +73,11 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
       <h2 className="form-title">Join the Grandmasters</h2>
-      
+      {showCheckEmail && (
+        <div style={{ color: 'var(--accent)', marginBottom: 12 }}>
+          Check your email to confirm your account before logging in.
+        </div>
+      )}
       <div className="form-group">
         <label htmlFor="username">Username</label>
         <input
@@ -90,7 +90,6 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
           required
         />
       </div>
-      
       <div className="form-group">
         <label htmlFor="signup-email">Email</label>
         <input
@@ -103,7 +102,6 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
           required
         />
       </div>
-      
       <div className="form-group">
         <label htmlFor="signup-password">Password</label>
         <div className="password-input-container">
@@ -137,7 +135,6 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
           </button>
         </div>
       </div>
-      
       <div className="form-group">
         <label htmlFor="confirm-password">Confirm Password</label>
         <div className="password-input-container">
@@ -164,7 +161,6 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
           </button>
         </div>
       </div>
-      
       <div className="form-options">
         <label className="checkbox-label">
           <input
@@ -177,7 +173,6 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
           <span>I agree to the <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a></span>
         </label>
       </div>
-      
       <button 
         type="submit" 
         className="submit-button"
@@ -185,7 +180,6 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
       >
         {isLoading ? "Creating Account..." : "Begin Your Journey"}
       </button>
-      
       <div className="social-login">
         <p>Or sign up with</p>
         <div className="social-buttons">
@@ -199,12 +193,8 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
           </button>
         </div>
       </div>
-      
       {showPasswordGenerator && (
-        <PasswordGenerator 
-          onClose={() => setShowPasswordGenerator(false)}
-          onSelectPassword={handleGeneratedPassword}
-        />
+        <PasswordGenerator onGenerate={handleGeneratedPassword} onClose={() => setShowPasswordGenerator(false)} />
       )}
     </form>
   );

@@ -9,6 +9,9 @@ import Sidebar from './components/Sidebar/Sidebar';
 import MainLayout from './components/Layout/MainLayout';
 import AuthPanel from './components/Authentication/AuthPanel';
 import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
+import MyAccount from './pages/MyAccount';
+import Settings from './pages/Settings';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Protected route component with useEffect for navigation
@@ -101,6 +104,15 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
+        
+        {/* Protected profile route */}
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        
+        {/* Protected account route */}
+        <Route path="/account" element={<ProtectedRoute><MyAccount /></ProtectedRoute>} />
+        
+        {/* Protected settings route */}
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         
         {/* Fallback route for any unmatched paths */}
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -11,6 +11,7 @@ import {
   KeyboardArrowDown,
   Person as PersonIcon
 } from '@mui/icons-material';
+import { getAllProfiles } from '../../utils/profileApi';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -21,6 +22,9 @@ const Header: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [animationDirection, setAnimationDirection] = useState('right');
   const indicatorRef = useRef<HTMLDivElement>(null);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
   
   const open = Boolean(anchorEl);
   
@@ -76,10 +80,57 @@ const Header: React.FC = () => {
     navigate('/');
   };
 
+  const handleUserDropdown = async () => {
+    setUserDropdownOpen((prev) => !prev);
+    if (!userDropdownOpen) {
+      setLoadingUsers(true);
+      try {
+        const users = await getAllProfiles();
+        setAllUsers(users);
+      } catch (e) {
+        setAllUsers([]);
+      }
+      setLoadingUsers(false);
+    }
+  };
+
   return (
     <header className="header">
       <div className="header-container">
         <div className="header-left">
+          <div className="user-list-trigger" onClick={handleUserDropdown} tabIndex={0} style={{ marginRight: '1.2rem', position: 'relative' }}>
+            <span className="user-list-icon">👥</span>
+            <span className="user-list-label">Users</span>
+            <span className="dropdown-arrow">▼</span>
+            {userDropdownOpen && (
+              <div className="user-list-dropdown">
+                <div className="user-list-title">All Players</div>
+                {loadingUsers ? (
+                  <div className="user-list-loading">Loading...</div>
+                ) : (
+                  <div className="user-list-scroll">
+                    {allUsers.length === 0 && <div className="user-list-empty">No users found.</div>}
+                    {allUsers.map((u) => (
+                      <div className="user-list-item" key={u.id}>
+                        <div className="user-list-avatar">
+                          {u.avatar_url ? (
+                            <img src={u.avatar_url} alt={u.username} />
+                          ) : (
+                            <span className="avatar-fallback">{u.username?.charAt(0)?.toUpperCase() || 'U'}</span>
+                          )}
+                          <span className={`user-status-dot offline`}></span>
+                        </div>
+                        <div className="user-list-info">
+                          <span className="user-list-username">{u.username}</span>
+                          <span className="user-list-rating">{u.rating || 1200}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
           <div className="logo">
             <h1 className="logo-text">TakesTakesTakes</h1>
           </div>
@@ -171,7 +222,7 @@ const Header: React.FC = () => {
                   </>
                 )}
                 
-                <MenuItem onClick={handleClose} className="dropdown-item profile-item">
+                <MenuItem onClick={() => { handleClose(); navigate('/profile'); }} className="dropdown-item profile-item">
                   <div className="menu-icon-wrapper">
                     <AccountCircle className="menu-icon" />
                   </div>
@@ -181,7 +232,7 @@ const Header: React.FC = () => {
                   </div>
                 </MenuItem>
                 
-                <MenuItem onClick={handleClose} className="dropdown-item account-item">
+                <MenuItem onClick={() => { handleClose(); navigate('/account'); }} className="dropdown-item account-item">
                   <div className="menu-icon-wrapper">
                     <PersonIcon className="menu-icon" />
                   </div>
@@ -191,7 +242,7 @@ const Header: React.FC = () => {
                   </div>
                 </MenuItem>
                 
-                <MenuItem onClick={handleClose} className="dropdown-item settings-item">
+                <MenuItem onClick={() => { handleClose(); navigate('/settings'); }} className="dropdown-item settings-item">
                   <div className="menu-icon-wrapper">
                     <Settings className="menu-icon" />
                   </div>

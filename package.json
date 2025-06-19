@@ -8,12 +8,12 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@supabase/supabase-js": "^2.50.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "three": "^0.164.1",
