@@ -1,4 +1,4 @@
-import { supabase } from '../supabaseClient';
+import { supabase } from '../lib/supabase';
 
 export async function createProfile({ id, username }: { id: string; username: string }) {
   const { error } = await supabase.from('profiles').insert([
