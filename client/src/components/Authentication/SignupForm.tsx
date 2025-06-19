@@ -58,7 +58,12 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
         setShowCheckEmail(true);
       }
     } catch (error: any) {
-      toast.error(error.message || "Failed to create account. Please try again.");
+      if (error.message && error.message.toLowerCase().includes('already registered')) {
+        setEmailError('An account is registered with this email');
+      } else {
+        setEmailError('');
+        toast.error(error.message || "Failed to create account. Please try again.");
+      }
       console.error('Signup error:', error);
     } finally {
       setIsLoading(false);
@@ -72,18 +77,6 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
       confirmPassword: password
     }));
     setShowPasswordGenerator(false);
-  };
-
-  const checkEmailExists = async (email: string) => {
-    if (!email) return;
-    // Query Supabase auth.users table via RPC or REST API (Supabase does not allow direct client-side access to auth.users)
-    // Instead, try to sign up with a dummy password and catch the error
-    const { error } = await supabase.auth.signUp({ email, password: 'dummy-password' });
-    if (error && error.message.toLowerCase().includes('already registered')) {
-      setEmailError('An account is registered with this email');
-    } else {
-      setEmailError('');
-    }
   };
 
   const handleGoogleSignup = async () => {
@@ -164,7 +157,6 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
           name="email"
           value={formData.email}
           onChange={handleChange}
-          onBlur={() => checkEmailExists(formData.email)}
           placeholder="youremail@example.com"
           required
           ref={emailInputRef}
