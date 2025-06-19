@@ -94,14 +94,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return null;
       });
       if (!profile) {
-        console.log('Login: creating profile for user');
-        await createProfile({ id: data.user.id, username: 'User' });
+        // Prompt for username or auto-generate a unique one
+        let baseUsername = data.user.email?.split('@')[0] || 'User';
+        let username = baseUsername;
+        let suffix = 1;
+        // Ensure username is unique
+        while (true) {
+          const { data: existing } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('username', username)
+            .single();
+          if (!existing) break;
+          username = `${baseUsername}${suffix}`;
+          suffix++;
+        }
+        await createProfile({ id: data.user.id, username });
         profile = await getProfile(data.user.id).catch((e) => {
           console.error('Login: getProfile after create failed', e);
           return null;
         });
       }
-      console.log('Login: setting user in context', profile);
       setUser({
         id: data.user.id,
         email: data.user.email || '',
@@ -119,6 +132,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (error) throw error;
     // Only create profile if session is present (auto-confirmed)
     if (data.session && data.user) {
+      // Check if username is taken
+      const { data: existing, error: existingError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('username', username)
+        .single();
+      if (existing) {
+        throw new Error('Username already taken');
+      }
       await createProfile({ id: data.user.id, username });
       setUser({
         id: data.user.id,
