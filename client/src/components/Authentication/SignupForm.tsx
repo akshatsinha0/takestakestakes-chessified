@@ -8,6 +8,8 @@ import visibilityOff from '../../assets/VisibilityOFF.png';
 import PasswordGenerator from './PasswordGenerator';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { supabase } from '../lib/supabase'; // or wherever your supabase client is
 
 const SignupForm = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate();
@@ -69,6 +71,36 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
     }));
     setShowPasswordGenerator(false);
   };
+
+  useEffect(() => {
+    // Check for confirmation or magic link in URL
+    const url = new URL(window.location.href);
+    const type = url.searchParams.get('type');
+    if (type === 'signup' || type === 'magiclink') {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          navigate('/dashboard');
+        }
+      });
+    }
+  }, [navigate]);
+  
+  useEffect(() => {
+    // Supabase will automatically detect the session in the URL hash and store it
+    // But you may want to redirect to dashboard after confirmation
+    const url = new URL(window.location.href);
+    const hash = url.hash;
+    if (hash.includes('access_token') && hash.includes('type=signup')) {
+      // Wait a tick for Supabase to process the session
+      setTimeout(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session) {
+            navigate('/dashboard');
+          }
+        });
+      }, 500);
+    }
+  }, [navigate]);
   
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
