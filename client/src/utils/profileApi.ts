@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase';
 
 export async function createProfile({ id, username }: { id: string; username: string }) {
-  const { error } = await supabase.from('profiles').insert([
+  const { error } = await supabase.from('profiles').upsert([
     { id, username, rating: 1200 }
   ]);
   if (error) throw error;

@@ -21,7 +21,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    storageKey: 'sb-takestakestakes-auth-token',
   },
   realtime: {
     params: {

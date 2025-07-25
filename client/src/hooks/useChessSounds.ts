@@ -1,10 +1,15 @@
 import { useEffect } from 'react';
 
+import moveSoundUrl from '../assets/Sounds/piece-movement.mp3';
+import captureSoundUrl from '../assets/Sounds/capture.mp3';
+import castleSoundUrl from '../assets/Sounds/castle.mp3';
+import checkSoundUrl from '../assets/Sounds/move-check.mp3';
+
 const soundFiles = {
-  move: '/assets/Sounds/piece-movement.mp3',
-  capture: '/assets/Sounds/capture.mp3',
-  castle: '/assets/Sounds/castle.mp3',
-  check: '/assets/Sounds/move-check.mp3'
+  move: moveSoundUrl,
+  capture: captureSoundUrl,
+  castle: castleSoundUrl,
+  check: checkSoundUrl
 };
 
 const useChessSounds = () => {

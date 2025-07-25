@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useSupabaseAuthContext } from '../context/SupabaseAuthContext';
 import { getProfile, updateProfile } from '../utils/profileApi';
 import styles from './MyAccount.module.css';
 import { Navigate } from 'react-router-dom';
 
 const MyAccount: React.FC = () => {
-  const { user } = useAuth();
+  const { user, profile: authProfile, loading: authLoading } = useSupabaseAuthContext();
   const [profile, setProfile] = useState<any>(null);
   const [username, setUsername] = useState('');
   const [saving, setSaving] = useState(false);
@@ -18,11 +18,18 @@ const MyAccount: React.FC = () => {
       return;
     }
 
-    getProfile(user.id).then((p) => {
-      setProfile(p);
-      setUsername(p.username);
-    }).finally(() => setLoading(false));
-  }, [user]);
+    // Use profile from auth context if available, otherwise fetch it
+    if (authProfile) {
+      setProfile(authProfile);
+      setUsername(authProfile.username || '');
+      setLoading(false);
+    } else {
+      getProfile(user.id).then((p) => {
+        setProfile(p);
+        setUsername(p.username || '');
+      }).finally(() => setLoading(false));
+    }
+  }, [user, authProfile]);
 
   const handleSave = async () => {
     if (!user) return;

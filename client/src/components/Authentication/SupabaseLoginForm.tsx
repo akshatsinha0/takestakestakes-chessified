@@ -33,22 +33,50 @@ const SupabaseLoginForm = ({ onClose }: { onClose: () => void }) => {
     e.preventDefault()
     setIsLoading(true)
     
+    // Add timeout to prevent hanging
+    const timeoutId = setTimeout(() => {
+      setIsLoading(false)
+      toast.error('Login timeout. Please clear browser data and try again.')
+    }, 15000) // 15 second timeout
+    
     try {
+      console.log('Login form: Starting login process')
+      
+      // Add a small delay to prevent rapid successive attempts
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
       const { data, error } = await signIn(formData.email, formData.password)
       
+      clearTimeout(timeoutId) // Clear timeout on success/error
+      
       if (error) {
-        toast.error(error.message || 'Login failed')
+        console.error('Login form: Login error', error)
+        
+        // Handle specific error types
+        if (error.message?.includes('Invalid login credentials')) {
+          toast.error('Invalid email or password')
+        } else if (error.message?.includes('Too many requests')) {
+          toast.error('Too many login attempts. Please wait a few minutes and try again.')
+        } else if (error.message?.includes('Email not confirmed')) {
+          toast.error('Please check your email and confirm your account first')
+        } else {
+          toast.error(error.message || 'Login failed')
+        }
+        
+        setIsLoading(false)
         return
       }
       
       if (data.user) {
+        console.log('Login form: Login successful')
         toast.success('Welcome back, Grandmaster!')
         onClose()
         navigate('/dashboard')
       }
     } catch (error) {
-      toast.error('An unexpected error occurred')
-      console.error('Login error:', error)
+      clearTimeout(timeoutId)
+      console.error('Login form: Unexpected error', error)
+      toast.error('An unexpected error occurred. Please try clearing your browser data.')
     } finally {
       setIsLoading(false)
     }

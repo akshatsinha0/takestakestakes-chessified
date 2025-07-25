@@ -12,25 +12,30 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import MyAccount from './pages/MyAccount';
 import Settings from './pages/Settings';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { SupabaseAuthProvider, useSupabaseAuthContext } from './context/SupabaseAuthContext';
 
 // Protected route component with useEffect for navigation
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useSupabaseAuthContext();
   const navigate = useNavigate();
   
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       navigate('/', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, loading, navigate]);
+  
+  // Show loading while checking authentication
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   
   return isAuthenticated ? children : null;
 };
 
 // Public route that redirects authenticated users to dashboard
 const PublicRoute = ({ children }: { children: React.ReactElement }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useSupabaseAuthContext();
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -45,7 +50,7 @@ const PublicRoute = ({ children }: { children: React.ReactElement }) => {
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useSupabaseAuthContext();
   
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const openAuth = (mode: 'login' | 'signup') => setAuthMode(mode);
@@ -124,9 +129,9 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <AuthProvider>
+      <SupabaseAuthProvider>
         <AppContent />
-      </AuthProvider>
+      </SupabaseAuthProvider>
     </Router>
   );
 }

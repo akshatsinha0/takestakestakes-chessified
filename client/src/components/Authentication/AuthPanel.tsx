@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './AuthPanel.css';
-import LoginForm from './LoginForm';
-import SignupForm from './SignupForm';
+import SupabaseLoginForm from './SupabaseLoginForm';
+import SupabaseSignupForm from './SupabaseSignupForm';
 
 interface AuthPanelProps {
   mode: 'login' | 'signup';
@@ -54,8 +54,8 @@ const AuthPanel = ({ mode, closePanel, switchMode }: AuthPanelProps) => {
         
         <div className="auth-content">
           {mode === 'login' ? 
-            <LoginForm onClose={handleClose} /> : 
-            <SignupForm onClose={handleClose} />
+            <SupabaseLoginForm onClose={handleClose} /> : 
+            <SupabaseSignupForm onClose={handleClose} />
           }
         </div>
       </div>

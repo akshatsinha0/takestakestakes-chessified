@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useSupabaseAuthContext } from '../context/SupabaseAuthContext';
 import { getProfile } from '../utils/profileApi';
 import { Navigate } from 'react-router-dom';
+import './Profile.css';
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, profile: authProfile, loading: authLoading } = useSupabaseAuthContext();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -14,8 +15,14 @@ const Profile: React.FC = () => {
       return;
     }
 
-    getProfile(user.id).then(setProfile).finally(() => setLoading(false));
-  }, [user]);
+    // Use profile from auth context if available, otherwise fetch it
+    if (authProfile) {
+      setProfile(authProfile);
+      setLoading(false);
+    } else {
+      getProfile(user.id).then(setProfile).finally(() => setLoading(false));
+    }
+  }, [user, authProfile]);
 
   if (!user) return <Navigate to="/" />;
   if (loading) return <div className="profile-page">Loading...</div>;

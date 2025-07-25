@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import './Header.css';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext';
 import { Avatar, Menu, MenuItem, IconButton, Badge, Fade } from '@mui/material';
 import { 
   AccountCircle, 
@@ -16,7 +16,7 @@ import { getAllProfiles } from '../../utils/profileApi';
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, profile, signOut } = useSupabaseAuthContext();
   const [activeTab, setActiveTab] = useState('/play');
   const [prevTab, setPrevTab] = useState<string | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -74,9 +74,9 @@ const Header: React.FC = () => {
     return name?.charAt(0).toUpperCase() || 'G';
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     handleClose();
-    logout();
+    await signOut();
     navigate('/');
   };
 
@@ -161,19 +161,19 @@ const Header: React.FC = () => {
           <div className="user-section">
             <div className="user-profile" onClick={handleMenu}>
               <div className="avatar-container">
-                {user?.avatarUrl ? (
-                  <Avatar src={user.avatarUrl} alt={user.username} className="user-avatar" />
+                {profile?.avatar_url ? (
+                  <Avatar src={profile.avatar_url} alt={profile.username} className="user-avatar" />
                 ) : (
                   <div className="avatar">
-                    {user ? getInitial(user.username) : 'G'}
+                    {profile ? getInitial(profile.username) : 'G'}
                     <div className="online-status"></div>
                   </div>
                 )}
               </div>
               
               <div className="user-info">
-                <span className="username">{user?.username || 'Guest'}</span>
-                {user && <span className="rating">{user.rating}</span>}
+                <span className="username">{profile?.username || 'Guest'}</span>
+                {profile && <span className="rating">{profile.rating}</span>}
               </div>
               
               <KeyboardArrowDown className="dropdown-arrow" />
@@ -203,16 +203,16 @@ const Header: React.FC = () => {
                   <>
                     <div className="dropdown-header">
                       <div className="user-avatar-large">
-                        {user?.avatarUrl ? (
-                          <Avatar src={user.avatarUrl} alt={user.username || 'User'} />
+                        {profile?.avatar_url ? (
+                          <Avatar src={profile.avatar_url} alt={profile.username || 'User'} />
                         ) : (
-                          <div className="avatar-fallback">{user?.username?.charAt(0) || 'U'}</div>
+                          <div className="avatar-fallback">{profile?.username?.charAt(0) || 'U'}</div>
                         )}
                       </div>
                       <div className="user-details-expanded">
-                        <span className="user-fullname">{user?.username || 'User'}</span>
+                        <span className="user-fullname">{profile?.username || 'User'}</span>
                         <span className="user-rating-expanded">
-                          <span className="rating-value">{user?.rating || 1200}</span>
+                          <span className="rating-value">{profile?.rating || 1200}</span>
                           <span className="rating-label">ELO</span>
                         </span>
                       </div>

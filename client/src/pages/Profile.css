@@ -1,0 +1,78 @@
+.profile-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 3rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.profile-avatar {
+  margin-bottom: 2rem;
+}
+
+.profile-avatar img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 3rem;
+  font-weight: bold;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-info h2 {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.profile-email {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.profile-rating {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.profile-rating span {
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+/* Loading and error states */
+.profile-page > div {
+  color: white;
+  font-size: 1.2rem;
+  text-align: center;
+}
