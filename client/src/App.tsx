@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import MyAccount from './pages/MyAccount';
 import Settings from './pages/Settings';
+import Game from './pages/Game';
 import { SupabaseAuthProvider, useSupabaseAuthContext } from './context/SupabaseAuthContext';
 
 // Protected route component with useEffect for navigation
@@ -118,6 +119,9 @@ function AppContent() {
         
         {/* Protected settings route */}
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        
+        {/* Protected game route */}
+        <Route path="/game/:gameId" element={<ProtectedRoute><Game /></ProtectedRoute>} />
         
         {/* Fallback route for any unmatched paths */}
         <Route path="*" element={<Navigate to="/" replace />} />

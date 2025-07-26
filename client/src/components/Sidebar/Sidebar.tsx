@@ -9,13 +9,12 @@ import membersLogo from '../../assets/MembersLogo.png';
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
-  openLogin: () => void; // Add new prop for opening login modal
+  openLogin: () => void;
 }
 
 const Sidebar = ({ isOpen, toggleSidebar, openLogin }: SidebarProps) => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   
-  // Close sidebar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (isOpen && 
@@ -31,7 +30,6 @@ const Sidebar = ({ isOpen, toggleSidebar, openLogin }: SidebarProps) => {
     };
   }, [isOpen, toggleSidebar]);
 
-  // Lock body scroll when sidebar is open (mobile)
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -44,10 +42,9 @@ const Sidebar = ({ isOpen, toggleSidebar, openLogin }: SidebarProps) => {
     };
   }, [isOpen]);
 
-  // Handle sign in click - close sidebar and open login modal
   const handleSignInClick = () => {
-    toggleSidebar(); // Close the sidebar first
-    openLogin();     // Then open the login modal
+    toggleSidebar();
+    openLogin();
   };
 
   return (

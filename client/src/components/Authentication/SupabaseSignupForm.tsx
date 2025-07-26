@@ -37,13 +37,11 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords don't match")
       return
     }
     
-    // Validate username
     if (formData.username.length < 3) {
       toast.error("Username must be at least 3 characters long")
       return

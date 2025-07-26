@@ -9,9 +9,12 @@ import {
   Settings, 
   ExitToApp, 
   KeyboardArrowDown,
-  Person as PersonIcon
+  Person as PersonIcon,
+  History as HistoryIcon
 } from '@mui/icons-material';
 import { getAllProfiles } from '../../utils/profileApi';
+import ChallengeModal from '../ChallengeModal/ChallengeModal';
+import GameHistory from '../GameHistory/GameHistory';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -25,10 +28,11 @@ const Header: React.FC = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [challengeTarget, setChallengeTarget] = useState<any>(null);
+  const [showGameHistory, setShowGameHistory] = useState(false);
   
   const open = Boolean(anchorEl);
   
-  // Navigation items
   const navItems = [
     { name: 'Play', path: '/play' },
     { name: 'Puzzles', path: '/puzzles' },
@@ -37,7 +41,6 @@ const Header: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Set active tab based on current location
     const path = location.pathname;
     if (path !== activeTab) {
       setPrevTab(activeTab);
@@ -49,7 +52,6 @@ const Header: React.FC = () => {
   }, [location, activeTab]);
   
   useEffect(() => {
-    // Animate the active indicator
     if (indicatorRef.current) {
       const activeElement = document.querySelector(`.nav-item[data-path="${activeTab}"]`);
       if (activeElement) {
@@ -124,6 +126,15 @@ const Header: React.FC = () => {
                           <span className="user-list-username">{u.username}</span>
                           <span className="user-list-rating">{u.rating || 1200}</span>
                         </div>
+                        {u.id !== user?.id && (
+                          <button className="challenge-btn" onClick={(e) => {
+                            e.stopPropagation();
+                            setChallengeTarget(u);
+                            setUserDropdownOpen(false);
+                          }}>
+                            Challenge
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -242,6 +253,16 @@ const Header: React.FC = () => {
                   </div>
                 </MenuItem>
                 
+                <MenuItem onClick={() => { handleClose(); setShowGameHistory(true); }} className="dropdown-item history-item">
+                  <div className="menu-icon-wrapper">
+                    <HistoryIcon className="menu-icon" />
+                  </div>
+                  <div className="menu-text">Game History</div>
+                  <div className="menu-indicator">
+                    <span className="chess-piece">♞</span>
+                  </div>
+                </MenuItem>
+                
                 <MenuItem onClick={() => { handleClose(); navigate('/settings'); }} className="dropdown-item settings-item">
                   <div className="menu-icon-wrapper">
                     <Settings className="menu-icon" />
@@ -300,6 +321,15 @@ const Header: React.FC = () => {
           </IconButton>
         </div>
       </div>
+      {challengeTarget && (
+        <ChallengeModal
+          targetUser={challengeTarget}
+          onClose={() => setChallengeTarget(null)}
+        />
+      )}
+      {showGameHistory && (
+        <GameHistory onClose={() => setShowGameHistory(false)} />
+      )}
     </header>
   );
 };

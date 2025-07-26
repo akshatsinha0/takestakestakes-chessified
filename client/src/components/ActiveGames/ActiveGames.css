@@ -1,0 +1,122 @@
+.active-games{
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.2);
+border-radius:12px;
+padding:1.5rem;
+margin-bottom:2rem;
+}
+
+.active-games h3{
+color:white;
+margin:0 0 1rem 0;
+font-size:1.2rem;
+}
+
+.active-games-loading{
+color:rgba(255,255,255,0.7);
+text-align:center;
+padding:1rem;
+}
+
+.games-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+gap:1rem;
+}
+
+.active-game-card{
+background:rgba(255,255,255,0.1);
+border:1px solid rgba(255,255,255,0.2);
+border-radius:8px;
+padding:1rem;
+cursor:pointer;
+transition:all 0.3s;
+position:relative;
+}
+
+.active-game-card:hover{
+background:rgba(255,255,255,0.15);
+border-color:rgba(255,255,255,0.4);
+transform:translateY(-2px);
+box-shadow:0 5px 15px rgba(0,0,0,0.3);
+}
+
+.game-status{
+display:flex;
+align-items:center;
+gap:0.5rem;
+margin-bottom:0.8rem;
+}
+
+.status-indicator{
+width:8px;
+height:8px;
+border-radius:50%;
+}
+
+.status-indicator.waiting{
+background:#ffa500;
+animation:pulse 2s infinite;
+}
+
+.status-indicator.in_progress{
+background:#4caf50;
+}
+
+@keyframes pulse{
+0%{opacity:1;}
+50%{opacity:0.5;}
+100%{opacity:1;}
+}
+
+.game-status{
+color:rgba(255,255,255,0.8);
+font-size:0.9rem;
+}
+
+.game-opponent{
+color:white;
+font-size:1.1rem;
+font-weight:bold;
+margin-bottom:0.8rem;
+}
+
+.game-details{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:0.5rem;
+}
+
+.my-color{
+color:rgba(255,255,255,0.7);
+font-size:0.9rem;
+}
+
+.time-control{
+background:rgba(255,165,0,0.2);
+color:#ffa500;
+padding:0.2rem 0.5rem;
+border-radius:4px;
+font-size:0.8rem;
+font-weight:bold;
+}
+
+.your-turn{
+position:absolute;
+top:0.5rem;
+right:0.5rem;
+background:rgba(76,175,80,0.3);
+color:#4caf50;
+padding:0.2rem 0.5rem;
+border-radius:4px;
+font-size:0.7rem;
+font-weight:bold;
+animation:glow 2s infinite;
+}
+
+@keyframes glow{
+0%{box-shadow:0 0 5px rgba(76,175,80,0.5);}
+50%{box-shadow:0 0 15px rgba(76,175,80,0.8);}
+100%{box-shadow:0 0 5px rgba(76,175,80,0.5);}
+}

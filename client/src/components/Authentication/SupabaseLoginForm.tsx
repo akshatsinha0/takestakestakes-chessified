@@ -33,26 +33,22 @@ const SupabaseLoginForm = ({ onClose }: { onClose: () => void }) => {
     e.preventDefault()
     setIsLoading(true)
     
-    // Add timeout to prevent hanging
     const timeoutId = setTimeout(() => {
       setIsLoading(false)
       toast.error('Login timeout. Please clear browser data and try again.')
-    }, 15000) // 15 second timeout
+    }, 15000)
     
     try {
       console.log('Login form: Starting login process')
       
-      // Add a small delay to prevent rapid successive attempts
       await new Promise(resolve => setTimeout(resolve, 500))
       
       const { data, error } = await signIn(formData.email, formData.password)
       
-      clearTimeout(timeoutId) // Clear timeout on success/error
+      clearTimeout(timeoutId)
       
       if (error) {
         console.error('Login form: Login error', error)
-        
-        // Handle specific error types
         if (error.message?.includes('Invalid login credentials')) {
           toast.error('Invalid email or password')
         } else if (error.message?.includes('Too many requests')) {

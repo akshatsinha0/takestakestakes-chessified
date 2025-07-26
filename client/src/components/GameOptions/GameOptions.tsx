@@ -40,7 +40,7 @@ const TIME_FORMATS = [
   },
 ];
 
-const GameOptions: React.FC = () => {
+const GameOptions: React.FC<{ onPlayYourself?: () => void }> = ({ onPlayYourself }) => {
   const [showTimeModal, setShowTimeModal] = useState(false);
   const [showCustom, setShowCustom] = useState(false);
   const [customHour, setCustomHour] = useState(0);
@@ -55,7 +55,6 @@ const GameOptions: React.FC = () => {
   const handleTimeSelect = (label: string) => {
     setShowTimeModal(false);
     setShowCustom(false);
-    // TODO: Start game with selected time format
     alert(`Selected: ${label}`);
   };
 
@@ -97,6 +96,14 @@ const GameOptions: React.FC = () => {
           description: 'Find fun new ways to play chess',
           icon: 'dice',
           color: '#4caf50',
+        },
+        // New Play Yourself option
+        {
+          id: 'play-yourself',
+          title: 'Play Yourself',
+          description: 'Practice by playing both sides',
+          icon: 'focus-mode-icon', // Use an existing icon or add a new one
+          color: '#d48d3b',
         }].map(option => (
           <GameOption
             key={option.id}
@@ -104,7 +111,10 @@ const GameOptions: React.FC = () => {
             description={option.description}
             icon={option.icon}
             color={option.color}
-            onClick={() => handleOptionClick(option.id)}
+            onClick={() => {
+              if (option.id === 'play-yourself' && onPlayYourself) onPlayYourself();
+              else handleOptionClick(option.id);
+            }}
           />
         ))}
       </div>

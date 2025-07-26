@@ -13,18 +13,24 @@ import {
   faThumbsUp, faThumbsDown, faTrophy, faInfoCircle,
   faPlus as faAdd, faHistory
 } from '@fortawesome/free-solid-svg-icons';
+import { supabase } from '../../lib/supabase';
 
 interface ChessMove {
-  san: string; // Standard Algebraic Notation (e.g., "e4")
-  time: number; // Time in seconds
-  piece: string; // Piece that moved
-  from: string; // Starting square
-  to: string; // Ending square
-  captured?: string; // Piece that was captured, if any
-  color: 'w' | 'b'; // Color of the piece that moved
+  san: string;
+  time: number;
+  piece: string;
+  from: string;
+  to: string;
+  captured?: string;
+  color: 'w' | 'b';
 }
 
-const ChessboardSection: React.FC = () => {
+interface ChessboardSectionProps {
+  playYourselfMode?: boolean;
+  onExitPlayYourself?: () => void;
+}
+
+const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode = false, onExitPlayYourself }) => {
   const { user } = useAuth();
   const [game, setGame] = useState(new Chess());
   const [isTheaterMode, setIsTheaterMode] = useState(false);
@@ -32,16 +38,10 @@ const ChessboardSection: React.FC = () => {
   const [isBoardFlipped, setIsBoardFlipped] = useState(false);
   const { playMove, playCapture, playCastle, playCheck } = useChessSounds();
 
-  // Move history tracking
   const [moves, setMoves] = useState<ChessMove[]>([]);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
   const [gameStatus, setGameStatus] = useState<string>('');
   const [opening, setOpening] = useState<string>("Opening");
-  // const [playerRating, setPlayerRating] = useState(1845);
-  // const [ratingChange, setRatingChange] = useState(8);
-  // const [opponent, setOpponent] = useState("c0ld_b00t3r");
-  
-  // Game statistics
   const [gameResult, setGameResult] = useState<{
     winner: string | null;
     method: string;
@@ -52,45 +52,37 @@ const ChessboardSection: React.FC = () => {
     time: ''
   });
 
-  // Time tracking
   const moveStartTime = useRef(performance.now());
   const movesContainerRef = useRef<HTMLDivElement>(null);
 
-  // UI controls
   const [showEvaluation, setShowEvaluation] = useState(true);
   const [showLines, setShowLines] = useState(true);
   const [showExplorer, setShowExplorer] = useState(false);
-  
-  // Function to handle making a move
   const makeAMove = (move: any) => {
     const gameCopy = new Chess(game.fen());
     
     try {
-      // Calculate time for this move
       const currentTime = performance.now();
       const timeTaken = (currentTime - moveStartTime.current) / 1000;
-      moveStartTime.current = currentTime; // Reset for next move
+      moveStartTime.current = currentTime;
       
       const result = gameCopy.move(move);
       
-      // Play sound based on move type
       if (result.captured) {
         playCapture();
-      } else if (result.san.includes('O-O')) { // Castling moves
+      } else if (result.san.includes('O-O')) {
         playCastle();
       } else {
         playMove();
       }
 
-      // Check for check after move
       if (gameCopy.isCheck()) {
         playCheck();
       }
 
-      // Record the move
       const newMove: ChessMove = {
         san: result.san,
-        time: Math.round(timeTaken * 10) / 10, // Round to 1 decimal place
+        time: Math.round(timeTaken * 10) / 10,
         piece: result.piece,
         from: result.from,
         to: result.to,
@@ -101,7 +93,6 @@ const ChessboardSection: React.FC = () => {
       setMoves(prevMoves => [...prevMoves, newMove]);
       setCurrentMoveIndex(prevMoves => prevMoves + 1);
 
-      // Check if game is over
       if (gameCopy.isGameOver()) {
         let winner = null;
         let method = '';
@@ -135,27 +126,82 @@ const ChessboardSection: React.FC = () => {
     }
   };
 
-  // Function to handle piece drop
   const onDrop = (sourceSquare: string, targetSquare: string) => {
     const move = makeAMove({
       from: sourceSquare,
       to: targetSquare,
-      promotion: 'q' // Always promote to queen for simplicity
+      promotion: 'q'
     });
 
-    // If move is invalid, return false to revert the piece
     if (move === null) return false;
     return true;
   };
   
-  // Auto-scroll to latest move
   useEffect(() => {
     if (movesContainerRef.current && moves.length > 0) {
       movesContainerRef.current.scrollTop = movesContainerRef.current.scrollHeight;
     }
   }, [moves.length]);
-  
-  // Control handlers
+
+  // Force theater mode if playYourselfMode is true
+  useEffect(() => {
+    if (playYourselfMode) setIsTheaterMode(true);
+  }, [playYourselfMode]);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Handler for submitting the game in Play Yourself mode
+  const handleSubmitPlayYourselfGame = async () => {
+    if (!user) return;
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      let result = 'draw';
+      if (game.isCheckmate()) {
+        result = game.turn() === 'w' ? 'black_wins' : 'white_wins';
+      } else if (game.isDraw() || game.isStalemate() || game.isThreefoldRepetition() || game.isInsufficientMaterial()) {
+        result = 'draw';
+      }
+      const { data: gameData, error: gameError } = await supabase.from('games').insert([
+        {
+          created_by: user.id,
+          opponent_id: user.id,
+          status: 'game_over',
+          result,
+          created_at: new Date().toISOString()
+        }
+      ]).select().single();
+      if (gameError) {
+        setSubmitError(gameError.message || 'Game insert error');
+        setIsSubmitting(false);
+        return;
+      }
+      for (let i = 0; i < moves.length; i++) {
+        const move = moves[i];
+        const { error: moveError } = await supabase.from('moves').insert([
+          {
+            game_id: gameData.id,
+            move_number: i + 1,
+            san: move.san,
+            time_taken: move.time,
+            created_at: new Date().toISOString()
+          }
+        ]);
+        if (moveError) {
+          setSubmitError(moveError.message || 'Move insert error');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      if (onExitPlayYourself) onExitPlayYourself();
+    } catch (err) {
+      setSubmitError(err?.message || 'Failed to save game. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleToggleTheaterMode = () => setIsTheaterMode(!isTheaterMode);
   const handleToggleFocusMode = () => setIsFocusMode(!isFocusMode);
   const handleFlipBoard = () => setIsBoardFlipped(!isBoardFlipped);
@@ -164,7 +210,6 @@ const ChessboardSection: React.FC = () => {
   };
   
   const renderMoveHistory = () => {
-    // Group moves by pairs for display
     const moveRows = [];
     for (let i = 0; i < moves.length; i += 2) {
       const whiteMove = moves[i];
@@ -193,15 +238,14 @@ const ChessboardSection: React.FC = () => {
     return moveRows;
   };
   
-  // Helper to get piece symbols
   const getPieceSymbol = (piece: string, color: 'w' | 'b') => {
     const pieceMap: Record<string, string> = {
-      'p': color === 'w' ? '♙' : '♟', // pawn
-      'n': color === 'w' ? '♘' : '♞', // knight
-      'b': color === 'w' ? '♗' : '♝', // bishop
-      'r': color === 'w' ? '♖' : '♜', // rook
-      'q': color === 'w' ? '♕' : '♛', // queen
-      'k': color === 'w' ? '♔' : '♚'  // king
+      'p': color === 'w' ? '♙' : '♟',
+      'n': color === 'w' ? '♘' : '♞',
+      'b': color === 'w' ? '♗' : '♝',
+      'r': color === 'w' ? '♖' : '♜',
+      'q': color === 'w' ? '♕' : '♛',
+      'k': color === 'w' ? '♔' : '♚'
     };
     
     return pieceMap[piece] || '';
@@ -398,6 +442,18 @@ const ChessboardSection: React.FC = () => {
             </div>
           </div>
         </div>
+        {/* Show Submit Game button only in Play Yourself mode */}
+        {playYourselfMode && (
+          <div style={{ textAlign: 'center', margin: '1.5rem 0' }}>
+            <button className="review-btn" onClick={handleSubmitPlayYourselfGame} disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit Game'}
+            </button>
+            <button className="review-btn" style={{ marginLeft: 12, background: '#444' }} onClick={onExitPlayYourself} disabled={isSubmitting}>
+              Cancel
+            </button>
+            {submitError && <div style={{ color: 'red', marginTop: 8 }}>{submitError}</div>}
+          </div>
+        )}
       </div>
     </div>
   );

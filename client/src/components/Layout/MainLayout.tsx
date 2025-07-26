@@ -16,7 +16,6 @@ const MainLayout = ({ toggleSidebar, openLogin, openSignup }: MainLayoutProps) =
   const [gamesPlayed, setGamesPlayed] = useState(0);
   const [animationComplete, setAnimationComplete] = useState(false);
   
-  // Simulate increasing stats for visual effect
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveUsers(prev => Math.min(prev + Math.floor(Math.random() * 5), 12500));
@@ -26,18 +25,16 @@ const MainLayout = ({ toggleSidebar, openLogin, openSignup }: MainLayoutProps) =
     return () => clearInterval(interval);
   }, []);
   
-  // Control typewriter animation completion with a longer timeout
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimationComplete(true);
-    }, 3000); // Increased from 2500ms to ensure animation completes
+    }, 3000);
     
     return () => clearTimeout(timer);
   }, []);
   
   return (
     <div className="main-layout">
-      {/* Neural Network Background */}
       <NetworkBackground />
       
       <header className="header">

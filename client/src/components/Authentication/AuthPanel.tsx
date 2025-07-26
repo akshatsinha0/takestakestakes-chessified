@@ -13,12 +13,10 @@ const AuthPanel = ({ mode, closePanel, switchMode }: AuthPanelProps) => {
   const [animatedIn, setAnimatedIn] = useState(false);
   
   useEffect(() => {
-    // Trigger animation after component mounts
     setTimeout(() => {
       setAnimatedIn(true);
     }, 10);
     
-    // Handle escape key press
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closePanel();
     };
@@ -29,7 +27,7 @@ const AuthPanel = ({ mode, closePanel, switchMode }: AuthPanelProps) => {
 
   const handleClose = () => {
     setAnimatedIn(false);
-    setTimeout(closePanel, 300); // Wait for animation before removing
+    setTimeout(closePanel, 300);
   };
 
   return (

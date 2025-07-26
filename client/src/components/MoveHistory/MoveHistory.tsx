@@ -3,7 +3,7 @@ import './MoveHistory.css';
 
 interface Move {
   notation: string;
-  time: number; // Time in seconds
+  time: number;
   player: 'white' | 'black';
 }
 
@@ -24,7 +24,6 @@ const MoveHistory: React.FC<MoveHistoryProps> = ({
 }) => {
   const movesContainerRef = useRef<HTMLDivElement>(null);
   
-  // Group moves by pairs (white and black)
   const movesPaired = [];
   for (let i = 0; i < moves.length; i += 2) {
     movesPaired.push({
@@ -34,7 +33,6 @@ const MoveHistory: React.FC<MoveHistoryProps> = ({
     });
   }
   
-  // Auto-scroll to the latest move
   useEffect(() => {
     if (movesContainerRef.current && moves.length > 0) {
       movesContainerRef.current.scrollTop = movesContainerRef.current.scrollHeight;
