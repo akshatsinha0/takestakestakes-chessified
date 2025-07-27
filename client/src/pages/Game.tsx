@@ -27,7 +27,9 @@ const subscription=supabase
 loadGame();
 })
 .subscribe();
-return()=>subscription.unsubscribe();
+return()=>{
+subscription.unsubscribe();
+};
 },[gameId,user]);
 
 useEffect(()=>{
@@ -93,11 +95,11 @@ console.error('Invalid move:',error);
 }
 return;
 }
-const piece=chess.get(square);
+const piece=chess.get(square as any);
 if(piece&&piece.color===(game.white_player_id===user?.id?'w':'b')){
 setSelectedSquare(square);
-const moves=chess.moves({square,verbose:true});
-setPossibleMoves(moves.map(m=>m.to));
+const moves=chess.moves({square:square as any,verbose:true});
+setPossibleMoves(moves.map((m:any)=>m.to));
 }else{
 setSelectedSquare(null);
 setPossibleMoves([]);

@@ -17,7 +17,9 @@ const subscription=supabase
 loadPendingChallenges();
 })
 .subscribe();
-return()=>subscription.unsubscribe();
+return()=>{
+subscription.unsubscribe();
+};
 },[user]);
 
 const loadPendingChallenges=async()=>{
