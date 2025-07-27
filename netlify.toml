@@ -1,6 +1,6 @@
 [build]
   base = "client"
-  command = "pnpm install --no-frozen-lockfile && pnpm run build"
+  command = "npm install -g pnpm@9.0.0 && pnpm install --no-frozen-lockfile && pnpm run build"
   publish = "dist"
 
 [[redirects]]
@@ -10,6 +10,5 @@
 
 [build.environment]
   NODE_VERSION = "20.12.2"
-  PNPM_VERSION = "9.0.0"
-  NPM_FLAGS = "--legacy-peer-deps"
+  NPM_CONFIG_PACKAGE_MANAGER = "pnpm"
   PNPM_FLAGS = "--shamefully-hoist=true --strict-peer-deps=false"
