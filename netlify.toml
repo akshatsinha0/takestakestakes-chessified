@@ -1,6 +1,6 @@
 [build]
   base = "client"
-  command = "npm install -g pnpm@9.0.0 && pnpm install --no-frozen-lockfile --shamefully-hoist --strict-peer-deps=false && pnpm run build"
+  command = "yarn install --frozen-lockfile=false && yarn build"
   publish = "dist"
 
 [[redirects]]
@@ -10,4 +10,4 @@
 
 [build.environment]
   NODE_VERSION = "20.12.2"
-  NPM_CONFIG_PACKAGE_MANAGER = "pnpm"
+  YARN_VERSION = "1.22.19"
