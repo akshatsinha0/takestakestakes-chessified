@@ -20,12 +20,25 @@ export const useSupabaseAuth = () => {
 
   useEffect(() => {
     let isUpdatingRef = false
+    let mounted = true
     
     // Get initial session
     const getInitialSession = async () => {
+      // Set a timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        if (mounted) {
+          console.warn('Session check timeout - setting loading to false')
+          setAuthState(prev => ({ ...prev, loading: false }))
+        }
+      }, 5000) // 5 second timeout
+      
       try {
         console.log('Getting initial session...')
         const { data: { session }, error } = await supabase.auth.getSession()
+        
+        clearTimeout(timeoutId)
+        
+        if (!mounted) return
         
         if (error) {
           console.error('Error getting session:', error)
@@ -47,19 +60,26 @@ export const useSupabaseAuth = () => {
             }
           }
           
-          setAuthState({
-            user: session.user,
-            profile,
-            session,
-            loading: false
-          })
+          if (mounted) {
+            setAuthState({
+              user: session.user,
+              profile,
+              session,
+              loading: false
+            })
+          }
         } else {
           console.log('No initial session found')
-          setAuthState(prev => ({ ...prev, loading: false }))
+          if (mounted) {
+            setAuthState(prev => ({ ...prev, loading: false }))
+          }
         }
       } catch (error) {
         console.error('Error in getInitialSession:', error)
-        setAuthState(prev => ({ ...prev, loading: false }))
+        clearTimeout(timeoutId)
+        if (mounted) {
+          setAuthState(prev => ({ ...prev, loading: false }))
+        }
       }
     }
 
@@ -118,6 +138,7 @@ export const useSupabaseAuth = () => {
     )
 
     return () => {
+      mounted = false
       subscription.unsubscribe()
     }
   }, [])

@@ -1,4 +1,4 @@
-import { useAuth } from '../../context/AuthContext';
+import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext';
 import React, { useState, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
@@ -31,7 +31,7 @@ interface ChessboardSectionProps {
 }
 
 const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode = false, onExitPlayYourself }) => {
-  const { user } = useAuth();
+  const { user, profile } = useSupabaseAuthContext();
   const [game, setGame] = useState(new Chess());
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
@@ -163,39 +163,69 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
       } else if (game.isDraw() || game.isStalemate() || game.isThreefoldRepetition() || game.isInsufficientMaterial()) {
         result = 'draw';
       }
-      const { data: gameData, error: gameError } = await supabase.from('games').insert([
-        {
-          created_by: user.id,
-          opponent_id: user.id,
-          status: 'game_over',
-          result,
-          created_at: new Date().toISOString()
-        }
-      ]).select().single();
+      
+      // Create game with proper fields
+      const gameToInsert: any = {
+        created_by: user.id,
+        white_player_id: user.id,
+        opponent_id: user.id, // For play yourself mode, opponent is same user
+        status: 'completed',
+        result,
+        time_control: 'Unlimited',
+        board_state: game.fen(),
+        current_turn: game.turn() === 'w' ? 'white' : 'black',
+        white_time_remaining: 0,
+        black_time_remaining: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        finished_at: new Date().toISOString()
+      };
+      
+      // Only add black_player_id if it exists in schema
+      // For play yourself mode, we can use the same user id or leave it null
+      const { data: gameData, error: gameError } = await supabase
+        .from('games')
+        .insert([gameToInsert])
+        .select()
+        .single();
+      
       if (gameError) {
-        setSubmitError(gameError.message || 'Game insert error');
+        console.error('Game insert error:', gameError);
+        setSubmitError(gameError.message || 'Failed to save game');
         setIsSubmitting(false);
         return;
       }
-      for (let i = 0; i < moves.length; i++) {
-        const move = moves[i];
-        const { error: moveError } = await supabase.from('moves').insert([
-          {
-            game_id: gameData.id,
-            move_number: i + 1,
-            san: move.san,
-            time_taken: move.time,
-            created_at: new Date().toISOString()
-          }
-        ]);
+      
+      // Save all moves
+      if (moves.length > 0) {
+        const movesToInsert = moves.map((move, i) => ({
+          game_id: gameData.id,
+          move_number: i + 1,
+          player_color: move.color === 'w' ? 'white' : 'black',
+          san: move.san,
+          fen: '',
+          time_taken: move.time,
+          created_at: new Date().toISOString()
+        }));
+        
+        const { error: moveError } = await supabase.from('moves').insert(movesToInsert);
         if (moveError) {
-          setSubmitError(moveError.message || 'Move insert error');
+          console.error('Move insert error:', moveError);
+          setSubmitError(moveError.message || 'Failed to save moves');
           setIsSubmitting(false);
           return;
         }
       }
+      
+      // Success - reset board and exit
+      setGame(new Chess());
+      setMoves([]);
+      setCurrentMoveIndex(-1);
+      setGameStatus('');
       if (onExitPlayYourself) onExitPlayYourself();
-    } catch (err) {
+      
+    } catch (err: any) {
+      console.error('Submit error:', err);
       setSubmitError(err?.message || 'Failed to save game. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -286,8 +316,8 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                   <img src="/path/to/default-avatar.png" alt="Opponent" />
                 </div>
                 <div className="player-details">
-                  <div className="player-name">Opponent</div>
-                  <div className="player-rating">1500</div>
+                  <div className="player-name">{playYourselfMode ? profile?.username || 'You' : 'Opponent'}</div>
+                  <div className="player-rating">{playYourselfMode ? profile?.rating || 1200 : 1500}</div>
                 </div>
               </div>
               
@@ -302,8 +332,8 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                   <img src="/path/to/user-avatar.png" alt="You" />
                 </div>
                 <div className="player-details">
-                  <div className="player-name">{user?.username || 'Guest'}</div>
-                  <div className="player-rating">{user?.rating}</div>
+                  <div className="player-name">{profile?.username || 'Guest'}</div>
+                  <div className="player-rating">{profile?.rating || 1200}</div>
                 </div>
               </div>
             </div>
@@ -416,10 +446,10 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                   <div className="game-result">
                     <div className="status-header">{gameStatus}</div>
                     <div className="result-details">
-                      {user?.username} ({user?.rating}) won by resignation ({gameResult.time})
+                      {profile?.username || 'Guest'} ({profile?.rating || 1200}) won by resignation ({gameResult.time})
                     </div>
                     <div className="rating-change">
-                    {gameResult.winner === 'user' && `New rating: ${user?.rating}`}
+                    {gameResult.winner === 'user' && `New rating: ${profile?.rating || 1200}`}
                     </div>
                   </div>
                   

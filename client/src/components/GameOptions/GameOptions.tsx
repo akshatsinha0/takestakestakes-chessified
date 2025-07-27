@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import GameOption from './GameOption';
+import QuickMatch from '../QuickMatch/QuickMatch';
 import './GameOptions.css';
 
 const TIME_FORMATS = [
@@ -42,6 +43,7 @@ const TIME_FORMATS = [
 
 const GameOptions: React.FC<{ onPlayYourself?: () => void }> = ({ onPlayYourself }) => {
   const [showTimeModal, setShowTimeModal] = useState(false);
+  const [showQuickMatch, setShowQuickMatch] = useState(false);
   const [showCustom, setShowCustom] = useState(false);
   const [customHour, setCustomHour] = useState(0);
   const [customMin, setCustomMin] = useState(10);
@@ -55,7 +57,7 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void }> = ({ onPlayYourself
   const handleTimeSelect = (label: string) => {
     setShowTimeModal(false);
     setShowCustom(false);
-    alert(`Selected: ${label}`);
+    setShowQuickMatch(true);
   };
 
   return (
@@ -215,6 +217,13 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void }> = ({ onPlayYourself
             </div>
             <button className="close-modal-btn" onClick={() => setShowTimeModal(false)}>×</button>
           </div>
+        </div>
+      )}
+      
+      {showQuickMatch && (
+        <div className="quick-match-container">
+          <QuickMatch />
+          <button className="close-quick-match" onClick={() => setShowQuickMatch(false)}>Back to Options</button>
         </div>
       )}
     </div>

@@ -30,6 +30,7 @@ const Header: React.FC = () => {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [challengeTarget, setChallengeTarget] = useState<any>(null);
   const [showGameHistory, setShowGameHistory] = useState(false);
+  const [userStats, setUserStats] = useState({ games: 0, wins: 0, winRate: 0 });
   
   const open = Boolean(anchorEl);
   
@@ -292,15 +293,15 @@ const Header: React.FC = () => {
                   <div className="dropdown-footer">
                     <div className="user-stats">
                       <div className="stat-item">
-                        <span className="stat-value">42</span>
+                        <span className="stat-value">0</span>
                         <span className="stat-label">Games</span>
                       </div>
                       <div className="stat-item">
-                        <span className="stat-value">28</span>
+                        <span className="stat-value">0</span>
                         <span className="stat-label">Wins</span>
                       </div>
                       <div className="stat-item">
-                        <span className="stat-value">67%</span>
+                        <span className="stat-value">0%</span>
                         <span className="stat-label">Win Rate</span>
                       </div>
                     </div>

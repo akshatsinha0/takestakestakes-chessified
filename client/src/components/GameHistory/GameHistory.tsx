@@ -32,8 +32,8 @@ black_player:profiles!games_black_player_id_fkey(username),
 moves(*)
 `)
 .or(`white_player_id.eq.${user?.id},black_player_id.eq.${user?.id}`)
-.eq('status','completed')
-.order('finished_at',{ascending:false})
+.in('status',['completed','game_over'])
+.order('finished_at,created_at',{ascending:false})
 .limit(50);
 if(error)throw error;
 setGames(data||[]);
