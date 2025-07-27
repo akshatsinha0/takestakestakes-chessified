@@ -1,40 +1,26 @@
 #!/bin/bash
 set -e
 
-echo "Starting build process..."
+echo "Starting robust build process..."
 
 # Ensure we're in the right directory
 cd "$(dirname "$0")"
 
-# Install pnpm using the official installer
-echo "Installing pnpm..."
-curl -fsSL https://get.pnpm.io/install.sh | sh -
-
-# Add pnpm to PATH
-export PNPM_HOME="$HOME/.local/share/pnpm"
-export PATH="$PNPM_HOME:$PATH"
-
-# Verify pnpm installation
-echo "Verifying pnpm installation..."
-pnpm --version
-
-# Remove any npm lock files that might interfere
-echo "Cleaning up npm artifacts..."
+# Clean up any existing artifacts
+echo "Cleaning up existing artifacts..."
 rm -f package-lock.json
+rm -f yarn.lock
+rm -f pnpm-lock.yaml
 rm -f npm-shrinkwrap.json
-rm -rf node_modules/.package-lock.json
 rm -rf node_modules
+rm -rf dist
 
-# Disable npm to prevent accidental usage
-echo "Disabling npm..."
-alias npm='echo "npm is disabled, use pnpm instead" && exit 1'
-
-# Install dependencies with pnpm
-echo "Installing dependencies with pnpm..."
-pnpm install --no-frozen-lockfile --shamefully-hoist --strict-peer-deps=false --reporter=append-only
+# Use npm with specific flags to avoid workspace issues
+echo "Installing dependencies with npm..."
+npm install --legacy-peer-deps --no-package-lock --no-shrinkwrap
 
 # Build the project
 echo "Building the project..."
-pnpm run build
+npm run build
 
 echo "Build completed successfully!"

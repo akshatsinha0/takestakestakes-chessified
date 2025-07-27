@@ -1,7 +1,6 @@
 [build]
-  base = "client"
-  command = "yarn install --frozen-lockfile=false && yarn build"
-  publish = "dist"
+  command = "cd client && chmod +x build.sh && ./build.sh"
+  publish = "client/dist"
 
 [[redirects]]
   from = "/*"
@@ -10,4 +9,5 @@
 
 [build.environment]
   NODE_VERSION = "20.12.2"
-  YARN_VERSION = "1.22.19"
+  NPM_CONFIG_LEGACY_PEER_DEPS = "true"
+  NPM_CONFIG_PACKAGE_LOCK = "false"
