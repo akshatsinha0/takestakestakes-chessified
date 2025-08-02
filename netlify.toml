@@ -1,6 +1,6 @@
 [build]
-  command = "cd client && npm install --legacy-peer-deps --no-package-lock --no-audit --no-fund && npm run build"
-  publish = "client/dist"
+  command = "npm install --legacy-peer-deps --no-package-lock --no-audit --no-fund && npm run build"
+  publish = "dist"
 
 [[redirects]]
   from = "/*"
@@ -15,3 +15,6 @@
   NPM_CONFIG_AUDIT = "false"
   NPM_CONFIG_FUND = "false"
   NODE_OPTIONS = "--max-old-space-size=4096"
+  NPM_CONFIG_CACHE = "/tmp/npm-cache"
+  NPM_CONFIG_PROGRESS = "false"
+  CI = "true"
