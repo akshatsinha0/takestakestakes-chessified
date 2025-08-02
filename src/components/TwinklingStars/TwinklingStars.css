@@ -1,0 +1,45 @@
+.twinkling-stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background: #00d4aa;
+  border-radius: 50%;
+  animation: gentle-twinkle 4s infinite ease-in-out;
+  box-shadow: 0 0 3px rgba(0, 212, 170, 0.6);
+}
+
+.star:nth-child(3n) {
+  background: #00b8d4;
+  box-shadow: 0 0 3px rgba(0, 184, 212, 0.6);
+}
+
+.star:nth-child(5n) {
+  background: #26c6da;
+  box-shadow: 0 0 3px rgba(38, 198, 218, 0.6);
+}
+
+.star:nth-child(7n) {
+  animation-duration: 5s;
+}
+
+.star:nth-child(11n) {
+  animation-duration: 6s;
+}
+
+@keyframes gentle-twinkle {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
