@@ -60,11 +60,7 @@ export const sessionManager = {
     try {
       console.log('[SessionManager] Attempting session recovery...')
       
-      if (!this.hasValidSession()) {
-        console.log('[SessionManager] No valid session found')
-        return false
-      }
-
+      // Don't check hasValidSession here to avoid circular logic
       const { data: { session }, error } = await supabase.auth.getSession()
       
       if (error) {
@@ -80,7 +76,6 @@ export const sessionManager = {
       }
 
       console.log('[SessionManager] No session found in Supabase')
-      this.clearSession()
       return false
     } catch (error) {
       console.error('[SessionManager] Error in recoverSession:', error)

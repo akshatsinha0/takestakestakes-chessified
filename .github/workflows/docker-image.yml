@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build ./client --file ./client/Dockerfile --tag 00akshatsinha00/myapp
+        run: docker build . --file Dockerfile --tag 00akshatsinha00/myapp
 
       - name: Push Docker image
         run: docker push 00akshatsinha00/myapp

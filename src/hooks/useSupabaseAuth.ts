@@ -23,13 +23,18 @@ export const useSupabaseAuth = () => {
     let mounted = true
     let updateInProgress = false
     
+    // Safety timeout to prevent infinite loading
+    const safetyTimeout = setTimeout(() => {
+      if (mounted) {
+        console.warn('[Auth] Safety timeout reached, setting loading to false')
+        setAuthState(prev => ({ ...prev, loading: false }))
+      }
+    }, 10000) // 10 second timeout
+    
     // Get initial session
     const getInitialSession = async () => {
       try {
         console.log('[Auth] Getting initial session...')
-        
-        // Try to recover session from storage first
-        const recovered = await sessionManager.recoverSession()
         
         const { data: { session }, error } = await supabase.auth.getSession()
         
@@ -37,7 +42,6 @@ export const useSupabaseAuth = () => {
         
         if (error) {
           console.error('[Auth] Error getting session:', error)
-          sessionManager.clearSession()
           setAuthState({ user: null, profile: null, session: null, loading: false })
           return
         }
@@ -68,14 +72,12 @@ export const useSupabaseAuth = () => {
           }
         } else {
           console.log('[Auth] No initial session found')
-          sessionManager.clearSession()
           if (mounted) {
             setAuthState({ user: null, profile: null, session: null, loading: false })
           }
         }
       } catch (error) {
         console.error('[Auth] Error in getInitialSession:', error)
-        sessionManager.clearSession()
         if (mounted) {
           setAuthState({ user: null, profile: null, session: null, loading: false })
         }
@@ -162,6 +164,7 @@ export const useSupabaseAuth = () => {
 
     return () => {
       mounted = false
+      clearTimeout(safetyTimeout)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       subscription.unsubscribe()
     }
