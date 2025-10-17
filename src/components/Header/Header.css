@@ -315,6 +315,28 @@
   color: var(--accent);
 }
 
+/* MUI Icon Styles - Make icons white */
+.notification-icon svg,
+.settings-icon svg {
+  color: #ffffff !important;
+  transition: color 0.3s ease;
+}
+
+.notification-icon:hover svg,
+.settings-icon:hover svg {
+  color: var(--accent) !important;
+}
+
+.notification-icon .MuiSvgIcon-root,
+.settings-icon .MuiSvgIcon-root {
+  color: #ffffff !important;
+}
+
+.notification-icon:hover .MuiSvgIcon-root,
+.settings-icon:hover .MuiSvgIcon-root {
+  color: var(--accent) !important;
+}
+
 .notification-badge {
   position: absolute;
   top: -5px;
