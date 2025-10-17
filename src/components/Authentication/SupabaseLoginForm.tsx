@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext'
+import { authErrorHandler } from '../../utils/authErrorHandler'
+import { sessionManager } from '../../utils/sessionManager'
 import './Forms.css'
 import googleLogo from '../../assets/GoogleLogo.png'
 import facebookLogo from '../../assets/FacebookLogo.png'
@@ -40,21 +42,25 @@ const SupabaseLoginForm = ({ onClose }: { onClose: () => void }) => {
       
       if (error) {
         console.error('[LoginForm] Login error', error)
-        if (error.message?.includes('Invalid login credentials')) {
-          toast.error('Invalid email or password')
-        } else if (error.message?.includes('Too many requests')) {
-          toast.error('Too many login attempts. Please wait a few minutes and try again.')
-        } else if (error.message?.includes('Email not confirmed')) {
-          toast.error('Please check your email and confirm your account first')
-        } else {
-          toast.error(error.message || 'Login failed')
+        
+        // Use error handler for consistent error messaging
+        const errorInfo = authErrorHandler.showError(error)
+        
+        // Clear session if needed
+        if (errorInfo.shouldClearSession) {
+          sessionManager.clearSession()
         }
+        
         setIsLoading(false)
         return
       }
       
       if (data?.user && data?.session) {
         console.log('[LoginForm] Login successful, user:', data.user.id)
+        
+        // Update session timestamp
+        sessionManager.updateTimestamp()
+        
         toast.success('Welcome back, Grandmaster!')
         
         // Small delay to ensure auth state is updated
@@ -69,7 +75,7 @@ const SupabaseLoginForm = ({ onClose }: { onClose: () => void }) => {
       }
     } catch (error) {
       console.error('[LoginForm] Unexpected error', error)
-      toast.error('An unexpected error occurred. Please try again.')
+      authErrorHandler.showError(error)
       setIsLoading(false)
     }
   }

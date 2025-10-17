@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext'
+import { authErrorHandler } from '../../utils/authErrorHandler'
+import { sessionManager } from '../../utils/sessionManager'
 import './Forms.css'
 import googleLogo from '../../assets/GoogleLogo.png'
 import facebookLogo from '../../assets/FacebookLogo.png'
@@ -53,12 +55,13 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
       const { data, error } = await signUp(formData.email, formData.password, formData.username)
       
       if (error) {
-        toast.error(error.message || 'Signup failed')
+        authErrorHandler.showError(error)
         return
       }
       
       if (data.user) {
         if (data.session) {
+          sessionManager.updateTimestamp()
           toast.success('Account created successfully!')
           onClose()
           navigate('/dashboard')
@@ -68,8 +71,8 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
         }
       }
     } catch (error) {
-      toast.error('An unexpected error occurred')
-      console.error('Signup error:', error)
+      console.error('[SignupForm] Unexpected error:', error)
+      authErrorHandler.showError(error)
     } finally {
       setIsLoading(false)
     }
