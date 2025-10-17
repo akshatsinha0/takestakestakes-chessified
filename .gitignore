@@ -19,3 +19,8 @@ yarn.lock
 
 # TypeScript build info
 *.tsbuildinfo
+
+# Test coverage (keep reports for commits)
+coverage/
+!coverage/badges/
+!coverage/coverage-summary.json
