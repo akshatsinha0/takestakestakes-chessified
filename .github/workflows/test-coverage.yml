@@ -31,18 +31,23 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-      - name: Generate coverage badge
-        uses: cicirello/jacoco-badge-generator@v2
-        with:
-          badges-directory: coverage/badges
-          generate-branches-badge: true
-          generate-summary: true
+      - name: Generate coverage summary
+        run: |
+          echo "# Test Coverage Report" > coverage-summary.md
+          echo "" >> coverage-summary.md
+          echo "Generated on: $(date)" >> coverage-summary.md
+          echo "" >> coverage-summary.md
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "Coverage data generated successfully" >> coverage-summary.md
+          else
+            echo "No coverage data found" >> coverage-summary.md
+          fi
 
       - name: Commit coverage report
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add -A
+          git add coverage-summary.md
           git diff --quiet && git diff --staged --quiet || (git commit -m "test(coverage): update test coverage report [skip ci]" && git push)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
