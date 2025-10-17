@@ -63,6 +63,7 @@ export const useSupabaseAuth = () => {
           }
           
           if (mounted) {
+            clearTimeout(safetyTimeout)
             setAuthState({
               user: session.user,
               profile,
@@ -73,6 +74,7 @@ export const useSupabaseAuth = () => {
         } else {
           console.log('[Auth] No initial session found')
           if (mounted) {
+            clearTimeout(safetyTimeout)
             setAuthState({ user: null, profile: null, session: null, loading: false })
           }
         }
@@ -106,11 +108,10 @@ export const useSupabaseAuth = () => {
         
         console.log('[Auth] State changed:', event, session?.user?.id)
         
-        // Prevent race conditions
+        // Skip if update is in progress, but don't queue
         if (updateInProgress) {
-          console.log('[Auth] Update already in progress, queuing...')
-          await new Promise(resolve => setTimeout(resolve, 100))
-          if (!mounted) return
+          console.log('[Auth] Update already in progress, skipping...')
+          return
         }
         
         updateInProgress = true
@@ -132,6 +133,7 @@ export const useSupabaseAuth = () => {
             }
             
             if (mounted) {
+              clearTimeout(safetyTimeout)
               setAuthState({
                 user: session.user,
                 profile,
@@ -143,6 +145,7 @@ export const useSupabaseAuth = () => {
             // Clear state on logout
             sessionManager.clearSession()
             if (mounted) {
+              clearTimeout(safetyTimeout)
               setAuthState({
                 user: null,
                 profile: null,
