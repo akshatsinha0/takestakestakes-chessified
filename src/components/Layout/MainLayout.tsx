@@ -86,7 +86,6 @@ const MainLayout = ({ toggleSidebar, openLogin, openSignup }: MainLayoutProps) =
               alt="Chess board" 
               className="board-image"
               loading="eager"
-              fetchPriority="high"
             />
             <div className="board-glow"></div>
           </div>

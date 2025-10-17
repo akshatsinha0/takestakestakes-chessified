@@ -1,4 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+
+// Mock Supabase before importing sessionManager
+vi.mock('../../lib/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn(),
+      refreshSession: vi.fn()
+    }
+  }
+}))
+
 import { sessionManager } from '../sessionManager'
 
 describe('SessionManager', () => {

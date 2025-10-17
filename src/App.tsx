@@ -20,17 +20,11 @@ const Game = lazy(() => import('./pages/Game'));
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, loading } = useSupabaseAuthContext();
   const navigate = useNavigate();
-  const [shouldRender, setShouldRender] = useState(false);
   
   useEffect(() => {
-    if (!loading) {
-      if (!isAuthenticated) {
-        console.log('[ProtectedRoute] Not authenticated, redirecting to home');
-        navigate('/', { replace: true });
-      } else {
-        console.log('[ProtectedRoute] Authenticated, rendering protected content');
-        setShouldRender(true);
-      }
+    if (!loading && !isAuthenticated) {
+      console.log('[ProtectedRoute] Not authenticated, redirecting to home');
+      navigate('/', { replace: true });
     }
   }, [isAuthenticated, loading, navigate]);
   
@@ -50,7 +44,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
     );
   }
   
-  return (isAuthenticated && shouldRender) ? children : null;
+  return isAuthenticated ? children : null;
 };
 
 // Loading component for Suspense fallback
