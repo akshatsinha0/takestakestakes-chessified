@@ -33,22 +33,13 @@ const SupabaseLoginForm = ({ onClose }: { onClose: () => void }) => {
     e.preventDefault()
     setIsLoading(true)
     
-    const timeoutId = setTimeout(() => {
-      setIsLoading(false)
-      toast.error('Login timeout. Please clear browser data and try again.')
-    }, 15000)
-    
     try {
-      console.log('Login form: Starting login process')
-      
-      await new Promise(resolve => setTimeout(resolve, 500))
+      console.log('[LoginForm] Starting login process')
       
       const { data, error } = await signIn(formData.email, formData.password)
       
-      clearTimeout(timeoutId)
-      
       if (error) {
-        console.error('Login form: Login error', error)
+        console.error('[LoginForm] Login error', error)
         if (error.message?.includes('Invalid login credentials')) {
           toast.error('Invalid email or password')
         } else if (error.message?.includes('Too many requests')) {
@@ -58,22 +49,27 @@ const SupabaseLoginForm = ({ onClose }: { onClose: () => void }) => {
         } else {
           toast.error(error.message || 'Login failed')
         }
-        
         setIsLoading(false)
         return
       }
       
-      if (data.user) {
-        console.log('Login form: Login successful')
+      if (data?.user && data?.session) {
+        console.log('[LoginForm] Login successful, user:', data.user.id)
         toast.success('Welcome back, Grandmaster!')
+        
+        // Small delay to ensure auth state is updated
+        await new Promise(resolve => setTimeout(resolve, 300))
+        
         onClose()
-        navigate('/dashboard')
+        navigate('/dashboard', { replace: true })
+      } else {
+        console.error('[LoginForm] Login succeeded but no session')
+        toast.error('Login failed. Please try again.')
+        setIsLoading(false)
       }
     } catch (error) {
-      clearTimeout(timeoutId)
-      console.error('Login form: Unexpected error', error)
-      toast.error('An unexpected error occurred. Please try clearing your browser data.')
-    } finally {
+      console.error('[LoginForm] Unexpected error', error)
+      toast.error('An unexpected error occurred. Please try again.')
       setIsLoading(false)
     }
   }

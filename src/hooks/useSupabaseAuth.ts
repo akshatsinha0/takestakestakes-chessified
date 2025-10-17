@@ -19,35 +19,25 @@ export const useSupabaseAuth = () => {
   })
 
   useEffect(() => {
-    let isUpdatingRef = false
     let mounted = true
+    let updateInProgress = false
     
     // Get initial session
     const getInitialSession = async () => {
-      // Set a timeout to prevent infinite loading
-      const timeoutId = setTimeout(() => {
-        if (mounted) {
-          console.warn('Session check timeout - setting loading to false')
-          setAuthState(prev => ({ ...prev, loading: false }))
-        }
-      }, 5000) // 5 second timeout
-      
       try {
-        console.log('Getting initial session...')
+        console.log('[Auth] Getting initial session...')
         const { data: { session }, error } = await supabase.auth.getSession()
-        
-        clearTimeout(timeoutId)
         
         if (!mounted) return
         
         if (error) {
-          console.error('Error getting session:', error)
-          setAuthState(prev => ({ ...prev, loading: false }))
+          console.error('[Auth] Error getting session:', error)
+          setAuthState({ user: null, profile: null, session: null, loading: false })
           return
         }
 
         if (session?.user) {
-          console.log('Initial session found for user:', session.user.id)
+          console.log('[Auth] Initial session found for user:', session.user.id)
           let profile = await fetchUserProfile(session.user.id)
           
           // If no profile exists and user has username in metadata, create profile
@@ -56,7 +46,7 @@ export const useSupabaseAuth = () => {
               await createUserProfile(session.user.id, session.user.user_metadata.username)
               profile = await fetchUserProfile(session.user.id)
             } catch (error) {
-              console.error('Failed to create profile on initial session:', error)
+              console.error('[Auth] Failed to create profile on initial session:', error)
             }
           }
           
@@ -69,16 +59,15 @@ export const useSupabaseAuth = () => {
             })
           }
         } else {
-          console.log('No initial session found')
+          console.log('[Auth] No initial session found')
           if (mounted) {
-            setAuthState(prev => ({ ...prev, loading: false }))
+            setAuthState({ user: null, profile: null, session: null, loading: false })
           }
         }
       } catch (error) {
-        console.error('Error in getInitialSession:', error)
-        clearTimeout(timeoutId)
+        console.error('[Auth] Error in getInitialSession:', error)
         if (mounted) {
-          setAuthState(prev => ({ ...prev, loading: false }))
+          setAuthState({ user: null, profile: null, session: null, loading: false })
         }
       }
     }
@@ -88,15 +77,18 @@ export const useSupabaseAuth = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id)
+        if (!mounted) return
         
-        // Prevent multiple simultaneous updates using ref
-        if (isUpdatingRef) {
-          console.log('Auth state update already in progress, skipping...')
-          return
+        console.log('[Auth] State changed:', event, session?.user?.id)
+        
+        // Prevent race conditions
+        if (updateInProgress) {
+          console.log('[Auth] Update already in progress, queuing...')
+          await new Promise(resolve => setTimeout(resolve, 100))
+          if (!mounted) return
         }
         
-        isUpdatingRef = true
+        updateInProgress = true
         
         try {
           if (session?.user) {
@@ -108,31 +100,36 @@ export const useSupabaseAuth = () => {
                 await createUserProfile(session.user.id, session.user.user_metadata.username)
                 profile = await fetchUserProfile(session.user.id)
               } catch (error) {
-                console.error('Failed to create profile on auth state change:', error)
-                // Continue without profile if creation fails
+                console.error('[Auth] Failed to create profile on auth state change:', error)
               }
             }
             
-            setAuthState({
-              user: session.user,
-              profile,
-              session,
-              loading: false
-            })
+            if (mounted) {
+              setAuthState({
+                user: session.user,
+                profile,
+                session,
+                loading: false
+              })
+            }
           } else {
             // Clear state on logout
-            setAuthState({
-              user: null,
-              profile: null,
-              session: null,
-              loading: false
-            })
+            if (mounted) {
+              setAuthState({
+                user: null,
+                profile: null,
+                session: null,
+                loading: false
+              })
+            }
           }
         } catch (error) {
-          console.error('Error in auth state change handler:', error)
-          setAuthState(prev => ({ ...prev, loading: false }))
+          console.error('[Auth] Error in auth state change handler:', error)
+          if (mounted) {
+            setAuthState(prev => ({ ...prev, loading: false }))
+          }
         } finally {
-          isUpdatingRef = false
+          updateInProgress = false
         }
       }
     )
@@ -213,23 +210,28 @@ export const useSupabaseAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('Starting signIn process...')
+      console.log('[Auth] Starting signIn process...')
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
-      console.log('SignIn response:', { data: !!data, error: !!error })
+      console.log('[Auth] SignIn response:', { hasData: !!data, hasError: !!error })
 
       if (error) {
-        console.error('SignIn error:', error)
+        console.error('[Auth] SignIn error:', error)
         throw error
+      }
+
+      // Wait for auth state to update
+      if (data.session) {
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
 
       return { data, error: null }
     } catch (error) {
-      console.error('Signin error:', error)
+      console.error('[Auth] Signin error:', error)
       return { data: null, error: error as AuthError }
     }
   }
@@ -272,16 +274,9 @@ export const useSupabaseAuth = () => {
 
   const signOut = async () => {
     try {
-      console.log('Starting signOut process...')
+      console.log('[Auth] Starting signOut process...')
       
-      // Let Supabase handle the session cleanup properly
-      const { error } = await supabase.auth.signOut()
-      if (error) {
-        console.error('Signout error:', error)
-        // Don't throw error, continue with cleanup
-      }
-      
-      // Clear local state after Supabase cleanup
+      // Clear local state first to prevent UI flicker
       setAuthState({
         user: null,
         profile: null,
@@ -289,10 +284,16 @@ export const useSupabaseAuth = () => {
         loading: false
       })
       
-      console.log('SignOut completed')
+      // Then clear Supabase session
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.error('[Auth] Signout error:', error)
+      }
+      
+      console.log('[Auth] SignOut completed')
     } catch (error) {
-      console.error('Signout error:', error)
-      // Even if signOut fails, clear local state
+      console.error('[Auth] Signout error:', error)
+      // Ensure state is cleared even if signOut fails
       setAuthState({
         user: null,
         profile: null,

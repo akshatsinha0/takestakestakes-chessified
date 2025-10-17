@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,10 +18,17 @@ import { SupabaseAuthProvider, useSupabaseAuthContext } from './context/Supabase
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, loading } = useSupabaseAuthContext();
   const navigate = useNavigate();
+  const [shouldRender, setShouldRender] = useState(false);
   
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate('/', { replace: true });
+    if (!loading) {
+      if (!isAuthenticated) {
+        console.log('[ProtectedRoute] Not authenticated, redirecting to home');
+        navigate('/', { replace: true });
+      } else {
+        console.log('[ProtectedRoute] Authenticated, rendering protected content');
+        setShouldRender(true);
+      }
     }
   }, [isAuthenticated, loading, navigate]);
   
@@ -42,19 +48,35 @@ const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
     );
   }
   
-  return isAuthenticated ? children : null;
+  return (isAuthenticated && shouldRender) ? children : null;
 };
 
 // Public route that redirects authenticated users to dashboard
 const PublicRoute = ({ children }: { children: React.ReactElement }) => {
-  const { isAuthenticated } = useSupabaseAuthContext();
+  const { isAuthenticated, loading } = useSupabaseAuthContext();
   const navigate = useNavigate();
   
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!loading && isAuthenticated) {
+      console.log('[PublicRoute] User authenticated, redirecting to dashboard');
       navigate('/dashboard', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, loading, navigate]);
+  
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        backgroundColor: 'var(--primary-dark, #1a1d29)',
+        color: 'var(--text-light, #fff)'
+      }}>
+        <div>Loading...</div>
+      </div>
+    );
+  }
   
   return !isAuthenticated ? children : null;
 };
