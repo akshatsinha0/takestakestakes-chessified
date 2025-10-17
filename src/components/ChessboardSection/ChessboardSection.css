@@ -13,7 +13,7 @@
 /* ===== BOARD AND PLAYERS CONTAINER ===== */
 .board-and-players-container {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 1.5rem;
   max-width: 100%;
   width: 100%;
@@ -24,22 +24,20 @@
   display: flex;
   align-items: flex-start;
   gap: 1.5rem;
-  margin-bottom: 20px;
   width: 100%;
   box-sizing: border-box;
 }
 
 /* ===== CHESSBOARD CONTAINER ===== */
 .chessboard-container {
-  width: 100%;
-  max-width: 550px;
+  flex: 1;
+  max-width: 600px;
   aspect-ratio: 1/1;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
   border-radius: 8px;
   overflow: visible;
   background-color: var(--primary-dark);
   padding: 0.5rem;
-  margin: 0;
   box-sizing: border-box;
   flex-shrink: 0;
 }
@@ -158,12 +156,11 @@
 
 /* ===== GAME ANALYSIS CONTAINER ===== */
 .game-analysis-container {
-  flex: 1;
-  min-width: 280px;
-  max-width: 320px;
+  width: 100%;
+  max-width: 100%;
   margin: 0;
   height: auto;
-  min-height: 550px;
+  min-height: 400px;
   background-color: #512917cd;
   color: #fff;
   border-radius: 8px;
@@ -575,16 +572,9 @@ input:checked+.toggle-slider:before {
 
 /* Desktop (max-width: 1200px) */
 @media (max-width: 1200px) {
-  .board-and-players-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
   .board-sidebar-wrapper {
     flex-direction: column;
     align-items: center;
-    width: 100%;
-    max-width: 600px;
   }
 
   .chessboard-container {
@@ -611,12 +601,6 @@ input:checked+.toggle-slider:before {
     justify-content: space-around;
     order: -1;
     margin-bottom: 1rem;
-  }
-
-  .game-analysis-container {
-    width: 100%;
-    max-width: 600px;
-    margin: 20px auto 0;
   }
 }
 
@@ -645,14 +629,9 @@ input:checked+.toggle-slider:before {
     padding: 1rem;
   }
 
-  .board-and-players-container {
+  .board-sidebar-wrapper {
     flex-direction: column;
     align-items: center;
-    padding: 0;
-  }
-
-  .board-sidebar-wrapper {
-    width: 100%;
   }
 
   .chessboard-container {
@@ -668,11 +647,6 @@ input:checked+.toggle-slider:before {
 
   .player-info {
     width: 100%;
-  }
-
-  .game-analysis-container {
-    width: 100%;
-    max-width: 100%;
   }
 }
 
