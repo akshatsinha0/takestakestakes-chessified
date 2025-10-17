@@ -812,3 +812,49 @@ input:checked + .toggle-slider:before {
     max-width: 400px;
   }
 }
+
+
+/* ===== RESPONSIVE CHESSBOARD STYLES ===== */
+
+/* Mobile (max-width: 767px) */
+@media (max-width: 767px) {
+  .chessboard-section {
+    padding: 1rem;
+  }
+  
+  .chessboard-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: 1;
+  }
+  
+  .chessboard-wrapper > div {
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Make chessboard fill available space */
+  .react-chessboard {
+    width: 100% !important;
+    height: auto !important;
+    max-width: min(100vw - 2rem, 500px) !important;
+  }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .chessboard-section {
+    padding: 0.5rem;
+  }
+  
+  .react-chessboard {
+    max-width: min(100vw - 1rem, 400px) !important;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .react-chessboard {
+    max-width: min(50vw, 400px) !important;
+  }
+}
