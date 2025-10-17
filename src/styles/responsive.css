@@ -1,0 +1,129 @@
+/* Global Responsive Styles */
+
+/* Mobile First Approach */
+:root {
+  --mobile-padding: 1rem;
+  --tablet-padding: 1.5rem;
+  --desktop-padding: 2rem;
+  --max-width: 1400px;
+}
+
+/* Base responsive container */
+.responsive-container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--mobile-padding);
+}
+
+/* Responsive grid system */
+.responsive-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+/* Responsive flex utilities */
+.flex-responsive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.flex-column-mobile {
+  flex-direction: column;
+}
+
+/* Hide/Show utilities */
+.hide-mobile {
+  display: none;
+}
+
+.show-mobile {
+  display: block;
+}
+
+.hide-tablet {
+  display: block;
+}
+
+.hide-desktop {
+  display: block;
+}
+
+/* Responsive text */
+.text-responsive {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+.heading-responsive {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+}
+
+/* Tablet (768px and up) */
+@media (min-width: 768px) {
+  .responsive-container {
+    padding: 0 var(--tablet-padding);
+  }
+
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .flex-column-mobile {
+    flex-direction: row;
+  }
+
+  .hide-mobile {
+    display: block;
+  }
+
+  .show-mobile {
+    display: none;
+  }
+
+  .hide-tablet {
+    display: none;
+  }
+}
+
+/* Desktop (1024px and up) */
+@media (min-width: 1024px) {
+  .responsive-container {
+    padding: 0 var(--desktop-padding);
+  }
+
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .hide-desktop {
+    display: none;
+  }
+}
+
+/* Large Desktop (1440px and up) */
+@media (min-width: 1440px) {
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a,
+  .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .responsive-container {
+    padding: 0 0.5rem;
+  }
+}

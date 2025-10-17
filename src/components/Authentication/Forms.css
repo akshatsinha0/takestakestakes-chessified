@@ -254,3 +254,102 @@
 .password-generate-button:hover {
   background: rgba(212, 141, 59, 0.3);
 }
+
+
+/* ===== RESPONSIVE FORM STYLES ===== */
+
+/* Tablet (768px - 1023px) */
+@media (max-width: 1023px) {
+  .auth-form {
+    padding: 2rem;
+  }
+}
+
+/* Mobile (max-width: 767px) */
+@media (max-width: 767px) {
+  .auth-form {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+  
+  .form-title {
+    font-size: 1.5rem;
+  }
+  
+  .form-group label {
+    font-size: 0.9rem;
+  }
+  
+  .form-group input {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .submit-button {
+    padding: 0.875rem;
+    font-size: 0.95rem;
+  }
+  
+  .social-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .social-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .password-input-container {
+    gap: 0.5rem;
+  }
+  
+  .visibility-toggle {
+    padding: 0.5rem;
+  }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .auth-form {
+    padding: 1rem;
+  }
+  
+  .form-title {
+    font-size: 1.25rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-group input {
+    padding: 0.625rem;
+    font-size: 0.875rem;
+  }
+  
+  .submit-button {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .social-login p {
+    font-size: 0.875rem;
+  }
+  
+  .password-generate-button {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+/* Very small devices */
+@media (max-width: 360px) {
+  .auth-form {
+    padding: 0.75rem;
+  }
+  
+  .form-title {
+    font-size: 1.1rem;
+  }
+}

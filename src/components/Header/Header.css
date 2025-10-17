@@ -1221,3 +1221,133 @@
   color: var(--accent);
   font-weight: 500;
 }
+
+
+/* ===== RESPONSIVE HEADER STYLES ===== */
+
+/* Tablet (768px - 1023px) */
+@media (max-width: 1023px) {
+  .header-container {
+    padding: 0 1.5rem;
+  }
+  
+  .main-nav {
+    gap: 1rem;
+  }
+  
+  .nav-item {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .user-section {
+    gap: 0.75rem;
+  }
+}
+
+/* Mobile (max-width: 767px) */
+@media (max-width: 767px) {
+  .header {
+    height: 60px;
+  }
+  
+  .header-container {
+    padding: 0 1rem;
+  }
+  
+  .logo-text {
+    font-size: 1.25rem;
+  }
+  
+  .main-nav {
+    display: none;
+  }
+  
+  .user-list-trigger {
+    display: none !important;
+  }
+  
+  .user-profile {
+    padding: 0.4rem 0.75rem;
+  }
+  
+  .user-info {
+    display: none;
+  }
+  
+  .avatar-container {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .notification-icon,
+  .settings-icon {
+    padding: 0.4rem;
+  }
+  
+  .notification-icon svg,
+  .settings-icon svg {
+    font-size: 1.25rem;
+  }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .header {
+    height: 56px;
+  }
+  
+  .header-container {
+    padding: 0 0.75rem;
+  }
+  
+  .logo-text {
+    font-size: 1.1rem;
+  }
+  
+  .avatar-container {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .settings-icon {
+    display: none;
+  }
+}
+
+/* Mobile Navigation Menu */
+@media (max-width: 767px) {
+  .mobile-nav-toggle {
+    display: block;
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+  
+  .mobile-nav {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: var(--primary-dark);
+    padding: 1rem;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    z-index: 999;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .mobile-nav.open {
+    transform: translateY(0);
+  }
+  
+  .mobile-nav .nav-item {
+    display: block;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}

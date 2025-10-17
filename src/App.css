@@ -103,11 +103,34 @@ body {
   :root {
     --sidebar-width: 240px;
   }
+  
+  body {
+    font-size: 15px;
+  }
 }
 
 @media (max-width: 768px) {
   :root {
     --header-height: 60px;
+    --sidebar-width: 100%;
+  }
+  
+  body {
+    font-size: 14px;
+  }
+  
+  .app {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --header-height: 56px;
+  }
+  
+  body {
+    font-size: 13px;
   }
 }
 

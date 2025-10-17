@@ -304,3 +304,203 @@
   border-right-color: transparent !important;
   animation: none; /* Stop the blinking animation */
 }
+
+
+/* ===== RESPONSIVE STYLES ===== */
+
+/* Tablet (768px - 1023px) */
+@media (max-width: 1023px) {
+  .header {
+    padding: 0 1.5rem;
+  }
+  
+  .hero-section {
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    gap: 2rem;
+  }
+  
+  .hero-content,
+  .hero-visual {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .board-container {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+/* Mobile (max-width: 767px) */
+@media (max-width: 767px) {
+  .header {
+    padding: 0 1rem;
+    height: 60px;
+  }
+  
+  .header-logo {
+    height: 32px;
+  }
+  
+  .logo-container {
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+  }
+  
+  .typewriter-text {
+    font-size: 0.75rem;
+  }
+  
+  .header-right {
+    gap: 0.5rem;
+  }
+  
+  .auth-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .hero-section {
+    padding: 1.5rem 1rem;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .hero-title {
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  .hero-stats {
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .stat {
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .stat-number {
+    font-size: 1.75rem;
+  }
+  
+  .stat-label {
+    font-size: 0.875rem;
+  }
+  
+  .cta-button {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+  
+  .board-container {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .board-image {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .header {
+    padding: 0 0.75rem;
+    height: 56px;
+  }
+  
+  .header-logo {
+    height: 28px;
+  }
+  
+  .menu-button {
+    width: 26px;
+    height: 20px;
+  }
+  
+  .auth-button {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .auth-button.signup {
+    display: none;
+  }
+  
+  .hero-title {
+    font-size: 1.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.85rem;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem;
+  }
+  
+  .cta-button {
+    font-size: 0.9rem;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .hero-section {
+    flex-direction: row;
+    min-height: auto;
+    padding: 1rem;
+  }
+  
+  .hero-content,
+  .hero-visual {
+    width: 50%;
+  }
+  
+  .hero-title {
+    font-size: 1.5rem;
+  }
+  
+  .hero-stats {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  
+  .stat {
+    padding: 0.5rem;
+  }
+}
+
+/* Very small devices */
+@media (max-width: 360px) {
+  .header {
+    padding: 0 0.5rem;
+  }
+  
+  .hero-title {
+    font-size: 1.25rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .stat {
+    padding: 0.75rem;
+  }
+}
