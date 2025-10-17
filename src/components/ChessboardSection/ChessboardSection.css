@@ -23,7 +23,7 @@
 .board-sidebar-wrapper {
   display: flex;
   align-items: flex-start;
-  gap: 20px;
+  gap: 1.5rem;
   margin-bottom: 20px;
   width: 100%;
   box-sizing: border-box;
@@ -32,20 +32,20 @@
 /* ===== CHESSBOARD CONTAINER ===== */
 .chessboard-container {
   width: 100%;
-  max-width: 650px;
+  max-width: 550px;
   aspect-ratio: 1/1;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
   border-radius: 8px;
   overflow: visible;
   background-color: var(--primary-dark);
   padding: 0.5rem;
-  margin: 0 auto;
+  margin: 0;
   box-sizing: border-box;
   flex-shrink: 0;
 }
 
 /* Ensure react-chessboard is responsive */
-.chessboard-container > div {
+.chessboard-container>div {
   width: 100% !important;
   height: auto !important;
 }
@@ -55,8 +55,9 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 32%;
-  min-width: 200px;
+  flex: 1;
+  min-width: 220px;
+  max-width: 280px;
   margin-top: 0;
   flex-shrink: 0;
 }
@@ -122,7 +123,8 @@
   margin: 1rem 0;
 }
 
-.opponent-timer, .player-timer {
+.opponent-timer,
+.player-timer {
   font-size: 1.5rem;
   font-weight: 700;
   font-family: monospace;
@@ -156,11 +158,12 @@
 
 /* ===== GAME ANALYSIS CONTAINER ===== */
 .game-analysis-container {
-  width: 100%;
-  max-width: 650px;
-  margin: 20px auto 0;
+  flex: 1;
+  min-width: 280px;
+  max-width: 320px;
+  margin: 0;
   height: auto;
-  min-height: 300px;
+  min-height: 550px;
   background-color: #512917cd;
   color: #fff;
   border-radius: 8px;
@@ -258,11 +261,11 @@
   border-radius: 50%;
 }
 
-input:checked + .toggle-slider {
+input:checked+.toggle-slider {
   background-color: #0e2093cf;
 }
 
-input:checked + .toggle-slider:before {
+input:checked+.toggle-slider:before {
   transform: translateX(16px);
 }
 
@@ -493,7 +496,8 @@ input:checked + .toggle-slider:before {
   font-size: 14px;
 }
 
-.result-details, .rating-change {
+.result-details,
+.rating-change {
   font-size: 13px;
   margin-bottom: 4px;
   color: #ccc;
@@ -575,30 +579,32 @@ input:checked + .toggle-slider:before {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .board-sidebar-wrapper {
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    max-width: 600px;
   }
-  
+
   .chessboard-container {
     width: 100%;
-    max-width: 550px;
+    max-width: 600px;
   }
-  
+
   .players-sidebar {
     width: 100%;
-    max-width: 550px;
+    max-width: 600px;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
     margin-top: 1rem;
   }
-  
+
   .player-info {
     width: 48%;
   }
-  
+
   .timer-container {
     width: 100%;
     flex-direction: row;
@@ -606,10 +612,11 @@ input:checked + .toggle-slider:before {
     order: -1;
     margin-bottom: 1rem;
   }
-  
+
   .game-analysis-container {
     width: 100%;
-    max-width: 550px;
+    max-width: 600px;
+    margin: 20px auto 0;
   }
 }
 
@@ -618,15 +625,15 @@ input:checked + .toggle-slider:before {
   .chessboard-section {
     padding: 1.25rem;
   }
-  
+
   .chessboard-container {
     max-width: 500px;
   }
-  
+
   .players-sidebar {
     max-width: 500px;
   }
-  
+
   .game-analysis-container {
     max-width: 500px;
   }
@@ -637,32 +644,32 @@ input:checked + .toggle-slider:before {
   .chessboard-section {
     padding: 1rem;
   }
-  
+
   .board-and-players-container {
     flex-direction: column;
     align-items: center;
     padding: 0;
   }
-  
+
   .board-sidebar-wrapper {
     width: 100%;
   }
-  
+
   .chessboard-container {
     width: 100%;
     max-width: 100%;
     padding: 0.5rem;
   }
-  
+
   .players-sidebar {
     width: 100%;
     max-width: 100%;
   }
-  
+
   .player-info {
     width: 100%;
   }
-  
+
   .game-analysis-container {
     width: 100%;
     max-width: 100%;
@@ -674,15 +681,15 @@ input:checked + .toggle-slider:before {
   .chessboard-section {
     padding: 0.75rem;
   }
-  
+
   .chessboard-container {
     padding: 0.25rem;
   }
-  
+
   .players-sidebar {
     gap: 0.75rem;
   }
-  
+
   .player-info {
     padding: 0.75rem;
   }
@@ -693,15 +700,15 @@ input:checked + .toggle-slider:before {
   .chessboard-section {
     padding: 0.5rem;
   }
-  
+
   .chessboard-container {
     padding: 0.25rem;
   }
-  
+
   .player-name {
     font-size: 1rem;
   }
-  
+
   .player-rating {
     font-size: 0.85rem;
   }
@@ -712,12 +719,12 @@ input:checked + .toggle-slider:before {
   .chessboard-container {
     max-width: 60vh;
   }
-  
+
   .board-and-players-container {
     flex-direction: row;
     gap: 1rem;
   }
-  
+
   .players-sidebar {
     max-width: 40%;
   }
