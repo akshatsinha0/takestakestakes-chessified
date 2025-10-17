@@ -16,35 +16,34 @@ const MyAccount = lazy(() => import('./pages/MyAccount'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Game = lazy(() => import('./pages/Game'));
 
-// Protected route component with useEffect for navigation
+// Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAuthenticated, loading } = useSupabaseAuthContext();
-  const navigate = useNavigate();
   
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      console.log('[ProtectedRoute] Not authenticated, redirecting to home');
-      navigate('/', { replace: true });
-    }
-  }, [isAuthenticated, loading, navigate]);
-  
-  // Show loading while checking authentication
   if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        backgroundColor: 'var(--primary-dark, #1a1d29)',
-        color: 'var(--text-light, #fff)'
-      }}>
-        <div>Loading...</div>
-      </div>
-    );
+    return <LoadingFallback />;
   }
   
-  return isAuthenticated ? children : null;
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
+
+// Public route that redirects authenticated users to dashboard
+const PublicRoute = ({ children }: { children: React.ReactElement }) => {
+  const { isAuthenticated, loading } = useSupabaseAuthContext();
+  
+  if (loading) {
+    return <LoadingFallback />;
+  }
+  
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
 };
 
 // Loading component for Suspense fallback
@@ -60,36 +59,6 @@ const LoadingFallback = () => (
     <div>Loading...</div>
   </div>
 );
-
-// Public route that redirects authenticated users to dashboard
-const PublicRoute = ({ children }: { children: React.ReactElement }) => {
-  const { isAuthenticated, loading } = useSupabaseAuthContext();
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      console.log('[PublicRoute] User authenticated, redirecting to dashboard');
-      navigate('/dashboard', { replace: true });
-    }
-  }, [isAuthenticated, loading, navigate]);
-  
-  if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        backgroundColor: 'var(--primary-dark, #1a1d29)',
-        color: 'var(--text-light, #fff)'
-      }}>
-        <div>Loading...</div>
-      </div>
-    );
-  }
-  
-  return !isAuthenticated ? children : null;
-};
 
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -117,57 +86,81 @@ function AppContent() {
       
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
-        {/* Home route with conditional rendering */}
-        <Route 
-          path="/" 
-          element={
-            isAuthenticated ? 
-            <Navigate to="/dashboard" replace /> : 
-            <>
-              <Sidebar 
-                isOpen={sidebarOpen} 
-                toggleSidebar={toggleSidebar} 
-                openLogin={() => openAuth('login')}
-              />
-              <MainLayout 
-                toggleSidebar={toggleSidebar} 
-                openLogin={() => openAuth('login')} 
-                openSignup={() => openAuth('signup')} 
-              />
-              {authMode && 
-                <AuthPanel 
-                  mode={authMode} 
-                  closePanel={closeAuth} 
-                  switchMode={(mode) => setAuthMode(mode)} 
-                />
-              }
-            </>
-          } 
-        />
-        
-        {/* Protected dashboard route */}
-        <Route 
-          path="/dashboard" 
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* Protected profile route */}
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        
-        {/* Protected account route */}
-        <Route path="/account" element={<ProtectedRoute><MyAccount /></ProtectedRoute>} />
-        
-        {/* Protected settings route */}
-        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-        
-        {/* Protected game route */}
-        <Route path="/game/:gameId" element={<ProtectedRoute><Game /></ProtectedRoute>} />
-        
-          {/* Fallback route for any unmatched paths */}
+          {/* Home route */}
+          <Route 
+            path="/" 
+            element={
+              <PublicRoute>
+                <>
+                  <Sidebar 
+                    isOpen={sidebarOpen} 
+                    toggleSidebar={toggleSidebar} 
+                    openLogin={() => openAuth('login')}
+                  />
+                  <MainLayout 
+                    toggleSidebar={toggleSidebar} 
+                    openLogin={() => openAuth('login')} 
+                    openSignup={() => openAuth('signup')} 
+                  />
+                  {authMode && 
+                    <AuthPanel 
+                      mode={authMode} 
+                      closePanel={closeAuth} 
+                      switchMode={(mode) => setAuthMode(mode)} 
+                    />
+                  }
+                </>
+              </PublicRoute>
+            } 
+          />
+          
+          {/* Protected routes */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/account" 
+            element={
+              <ProtectedRoute>
+                <MyAccount />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/settings" 
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/game/:gameId" 
+            element={
+              <ProtectedRoute>
+                <Game />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

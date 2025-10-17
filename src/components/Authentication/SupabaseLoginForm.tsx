@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext'
 import { authErrorHandler } from '../../utils/authErrorHandler'
-import { sessionManager } from '../../utils/sessionManager'
 import './Forms.css'
 import googleLogo from '../../assets/GoogleLogo.png'
 import facebookLogo from '../../assets/FacebookLogo.png'
@@ -36,45 +35,28 @@ const SupabaseLoginForm = ({ onClose }: { onClose: () => void }) => {
     setIsLoading(true)
     
     try {
-      console.log('[LoginForm] Starting login process')
-      
       const { data, error } = await signIn(formData.email, formData.password)
       
       if (error) {
-        console.error('[LoginForm] Login error', error)
-        
-        // Use error handler for consistent error messaging
-        const errorInfo = authErrorHandler.showError(error)
-        
-        // Clear session if needed
-        if (errorInfo.shouldClearSession) {
-          sessionManager.clearSession()
-        }
-        
+        authErrorHandler.showError(error)
         setIsLoading(false)
         return
       }
       
       if (data?.user && data?.session) {
-        console.log('[LoginForm] Login successful, user:', data.user.id)
-        
-        // Update session timestamp
-        sessionManager.updateTimestamp()
-        
         toast.success('Welcome back, Grandmaster!')
-        
-        // Small delay to ensure auth state is updated
-        await new Promise(resolve => setTimeout(resolve, 300))
-        
         onClose()
-        navigate('/dashboard', { replace: true })
+        
+        // Wait a bit for auth state to propagate
+        setTimeout(() => {
+          navigate('/dashboard', { replace: true })
+        }, 100)
       } else {
-        console.error('[LoginForm] Login succeeded but no session')
         toast.error('Login failed. Please try again.')
         setIsLoading(false)
       }
     } catch (error) {
-      console.error('[LoginForm] Unexpected error', error)
+      console.error('[LoginForm] Error:', error)
       authErrorHandler.showError(error)
       setIsLoading(false)
     }
