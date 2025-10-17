@@ -4,9 +4,9 @@ FROM node:18-alpine AS build
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and install dependencies
-COPY package.json package-lock.json ./
-RUN npm install
+# Copy package.json and .npmrc for dependency installation
+COPY package.json .npmrc ./
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the project files
 COPY . .
