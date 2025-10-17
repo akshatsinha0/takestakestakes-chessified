@@ -1,0 +1,49 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    # Run twice a week: Monday and Thursday at 10 AM UTC
+    - cron: '0 10 * * 1,4'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check for outdated packages
+        id: outdated
+        run: |
+          npm outdated --json > outdated.json || true
+          if [ -s outdated.json ]; then
+            echo "has_updates=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_updates=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update patch versions
+        if: steps.outdated.outputs.has_updates == 'true'
+        run: |
+          npm update --save
+          
+      - name: Commit dependency updates
+        if: steps.outdated.outputs.has_updates == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add package.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(deps): update dependencies to latest patch versions [skip ci]" && git push)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

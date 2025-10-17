@@ -1,0 +1,53 @@
+name: Documentation Updates
+
+on:
+  schedule:
+    # Run twice a week: Wednesday and Saturday at 11 AM UTC
+    - cron: '0 11 * * 3,6'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Generate project statistics
+        run: |
+          echo "# Project Statistics" > PROJECT_STATS.md
+          echo "" >> PROJECT_STATS.md
+          echo "Last updated: $(date)" >> PROJECT_STATS.md
+          echo "" >> PROJECT_STATS.md
+          echo "## Code Statistics" >> PROJECT_STATS.md
+          echo "" >> PROJECT_STATS.md
+          echo "- Total TypeScript files: $(find src -name '*.ts' -o -name '*.tsx' | wc -l)" >> PROJECT_STATS.md
+          echo "- Total CSS files: $(find src -name '*.css' | wc -l)" >> PROJECT_STATS.md
+          echo "- Total components: $(find src/components -type d -mindepth 1 -maxdepth 1 | wc -l)" >> PROJECT_STATS.md
+          echo "- Total pages: $(find src/pages -name '*.tsx' | wc -l)" >> PROJECT_STATS.md
+          echo "" >> PROJECT_STATS.md
+          echo "## Dependencies" >> PROJECT_STATS.md
+          echo "" >> PROJECT_STATS.md
+          echo "- Total dependencies: $(node -p "Object.keys(require('./package.json').dependencies).length")" >> PROJECT_STATS.md
+          echo "- Total devDependencies: $(node -p "Object.keys(require('./package.json').devDependencies).length")" >> PROJECT_STATS.md
+
+      - name: Commit documentation updates
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add PROJECT_STATS.md
+          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: update project statistics [skip ci]" && git push)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

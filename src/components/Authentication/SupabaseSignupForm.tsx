@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext'
 import { authErrorHandler } from '../../utils/authErrorHandler'
-import { sessionManager } from '../../utils/sessionManager'
 import './Forms.css'
 import googleLogo from '../../assets/GoogleLogo.png'
 import facebookLogo from '../../assets/FacebookLogo.png'
@@ -61,10 +60,11 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
       
       if (data.user) {
         if (data.session) {
-          sessionManager.updateTimestamp()
           toast.success('Account created successfully!')
           onClose()
-          navigate('/dashboard')
+          setTimeout(() => {
+            navigate('/dashboard')
+          }, 100)
         } else {
           toast.info('Please check your email to confirm your account')
           onClose()
