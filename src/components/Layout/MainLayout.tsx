@@ -49,7 +49,8 @@ const MainLayout = ({ toggleSidebar, openLogin, openSignup }: MainLayoutProps) =
             <img 
               src={logo} 
               alt="TakesTakesTakes" 
-              className={`header-logo ${animationComplete ? 'visible' : ''}`} 
+              className={`header-logo ${animationComplete ? 'visible' : ''}`}
+              loading="lazy"
             />
           </div>
         </div>
@@ -80,7 +81,13 @@ const MainLayout = ({ toggleSidebar, openLogin, openSignup }: MainLayoutProps) =
         </div>
         <div className="hero-visual">
           <div className="board-container">
-            <img src={centralBoard} alt="Chess board" className="board-image" />
+            <img 
+              src={centralBoard} 
+              alt="Chess board" 
+              className="board-image"
+              loading="eager"
+              fetchPriority="high"
+            />
             <div className="board-glow"></div>
           </div>
         </div>

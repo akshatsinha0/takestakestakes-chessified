@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
-import Sidebar from './components/Sidebar/Sidebar';
-import MainLayout from './components/Layout/MainLayout';
-import AuthPanel from './components/Authentication/AuthPanel';
-import Dashboard from './pages/Dashboard';
-import Profile from './pages/Profile';
-import MyAccount from './pages/MyAccount';
-import Settings from './pages/Settings';
-import Game from './pages/Game';
 import { SupabaseAuthProvider, useSupabaseAuthContext } from './context/SupabaseAuthContext';
+
+// Lazy load components
+const Sidebar = lazy(() => import('./components/Sidebar/Sidebar'));
+const MainLayout = lazy(() => import('./components/Layout/MainLayout'));
+const AuthPanel = lazy(() => import('./components/Authentication/AuthPanel'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Profile = lazy(() => import('./pages/Profile'));
+const MyAccount = lazy(() => import('./pages/MyAccount'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Game = lazy(() => import('./pages/Game'));
 
 // Protected route component with useEffect for navigation
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
@@ -50,6 +52,20 @@ const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
   
   return (isAuthenticated && shouldRender) ? children : null;
 };
+
+// Loading component for Suspense fallback
+const LoadingFallback = () => (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    height: '100vh',
+    backgroundColor: 'var(--primary-dark, #1a1d29)',
+    color: 'var(--text-light, #fff)'
+  }}>
+    <div>Loading...</div>
+  </div>
+);
 
 // Public route that redirects authenticated users to dashboard
 const PublicRoute = ({ children }: { children: React.ReactElement }) => {
@@ -105,7 +121,8 @@ function AppContent() {
         theme="dark"
       />
       
-      <Routes>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
         {/* Home route with conditional rendering */}
         <Route 
           path="/" 
@@ -156,9 +173,10 @@ function AppContent() {
         {/* Protected game route */}
         <Route path="/game/:gameId" element={<ProtectedRoute><Game /></ProtectedRoute>} />
         
-        {/* Fallback route for any unmatched paths */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Fallback route for any unmatched paths */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </div>
   );
 }

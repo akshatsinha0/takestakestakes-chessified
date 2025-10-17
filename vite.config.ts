@@ -8,9 +8,23 @@ export default defineConfig({
   build: {
     outDir: 'dist', // Output directory
     sourcemap: true, // Enable source maps for debugging production builds
-    emptyOutDir: true // Clear output directory before building
+    emptyOutDir: true, // Clear output directory before building
+    chunkSizeWarningLimit: 1000, // Increase limit to 1000 KB
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'mui-vendor': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
+          'chess-vendor': ['chess.js', 'react-chessboard'],
+          'three-vendor': ['three'],
+          'supabase-vendor': ['@supabase/supabase-js'],
+          'utils': ['react-toastify']
+        }
+      }
+    }
   },
   optimizeDeps: {
-    include: ['three'] // Pre-bundle Three.js for faster builds
+    include: ['three', 'chess.js', '@supabase/supabase-js'] // Pre-bundle for faster builds
   }
 });
