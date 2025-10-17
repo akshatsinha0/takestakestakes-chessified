@@ -21,15 +21,26 @@ export const useSupabaseAuth = () => {
   useEffect(() => {
     let mounted = true
 
+    // Safety timeout
+    const timeout = setTimeout(() => {
+      if (mounted) {
+        console.warn('[Auth] Timeout reached, forcing loading to false')
+        setAuthState(prev => ({ ...prev, loading: false }))
+      }
+    }, 3000)
+
     // Get initial session
     const initAuth = async () => {
       try {
+        console.log('[Auth] Initializing...')
         const { data: { session } } = await supabase.auth.getSession()
         
         if (!mounted) return
 
         if (session?.user) {
+          console.log('[Auth] Session found:', session.user.id)
           const profile = await fetchUserProfile(session.user.id)
+          clearTimeout(timeout)
           setAuthState({
             user: session.user,
             profile,
@@ -37,6 +48,8 @@ export const useSupabaseAuth = () => {
             loading: false
           })
         } else {
+          console.log('[Auth] No session found')
+          clearTimeout(timeout)
           setAuthState({
             user: null,
             profile: null,
@@ -46,6 +59,7 @@ export const useSupabaseAuth = () => {
         }
       } catch (error) {
         console.error('[Auth] Init error:', error)
+        clearTimeout(timeout)
         if (mounted) {
           setAuthState({
             user: null,
@@ -87,6 +101,7 @@ export const useSupabaseAuth = () => {
 
     return () => {
       mounted = false
+      clearTimeout(timeout)
       subscription.unsubscribe()
     }
   }, [])
