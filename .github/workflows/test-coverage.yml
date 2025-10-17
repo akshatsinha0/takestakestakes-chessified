@@ -9,6 +9,9 @@ on:
     # Run tests twice daily at 9 AM and 9 PM UTC
     - cron: '0 9,21 * * *'
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
