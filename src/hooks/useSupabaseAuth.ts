@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { User, Session, AuthError } from '@supabase/supabase-js'
 import { supabase, Profile } from '../lib/supabase'
 import { toast } from 'react-toastify'
+import { sessionManager } from '../utils/sessionManager'
 
 export interface AuthState {
   user: User | null
@@ -26,18 +27,25 @@ export const useSupabaseAuth = () => {
     const getInitialSession = async () => {
       try {
         console.log('[Auth] Getting initial session...')
+        
+        // Try to recover session from storage first
+        const recovered = await sessionManager.recoverSession()
+        
         const { data: { session }, error } = await supabase.auth.getSession()
         
         if (!mounted) return
         
         if (error) {
           console.error('[Auth] Error getting session:', error)
+          sessionManager.clearSession()
           setAuthState({ user: null, profile: null, session: null, loading: false })
           return
         }
 
         if (session?.user) {
           console.log('[Auth] Initial session found for user:', session.user.id)
+          sessionManager.updateTimestamp()
+          
           let profile = await fetchUserProfile(session.user.id)
           
           // If no profile exists and user has username in metadata, create profile
@@ -60,12 +68,14 @@ export const useSupabaseAuth = () => {
           }
         } else {
           console.log('[Auth] No initial session found')
+          sessionManager.clearSession()
           if (mounted) {
             setAuthState({ user: null, profile: null, session: null, loading: false })
           }
         }
       } catch (error) {
         console.error('[Auth] Error in getInitialSession:', error)
+        sessionManager.clearSession()
         if (mounted) {
           setAuthState({ user: null, profile: null, session: null, loading: false })
         }
@@ -73,6 +83,19 @@ export const useSupabaseAuth = () => {
     }
 
     getInitialSession()
+
+    // Handle visibility change to refresh session
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible' && !updateInProgress) {
+        console.log('[Auth] Tab became visible, checking session...')
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          await sessionManager.refreshSession()
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -92,6 +115,8 @@ export const useSupabaseAuth = () => {
         
         try {
           if (session?.user) {
+            sessionManager.updateTimestamp()
+            
             let profile = await fetchUserProfile(session.user.id)
             
             // If no profile exists and user has username in metadata, create profile
@@ -114,6 +139,7 @@ export const useSupabaseAuth = () => {
             }
           } else {
             // Clear state on logout
+            sessionManager.clearSession()
             if (mounted) {
               setAuthState({
                 user: null,
@@ -136,6 +162,7 @@ export const useSupabaseAuth = () => {
 
     return () => {
       mounted = false
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
       subscription.unsubscribe()
     }
   }, [])
@@ -276,6 +303,9 @@ export const useSupabaseAuth = () => {
     try {
       console.log('[Auth] Starting signOut process...')
       
+      // Clear session manager data
+      sessionManager.clearSession()
+      
       // Clear local state first to prevent UI flicker
       setAuthState({
         user: null,
@@ -294,6 +324,7 @@ export const useSupabaseAuth = () => {
     } catch (error) {
       console.error('[Auth] Signout error:', error)
       // Ensure state is cleared even if signOut fails
+      sessionManager.clearSession()
       setAuthState({
         user: null,
         profile: null,
