@@ -24,7 +24,7 @@
     "@fortawesome/react-fontawesome": "^0.2.6",
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
-    "@supabase/supabase-js": "^2.75.1",
+    "@supabase/supabase-js": "^2.76.1",
     "@types/three": "^0.175.0",
     "chess.js": "^1.4.0",
     "react": "^18.3.1",
@@ -50,7 +50,7 @@
     "globals": "^15.15.0",
     "jsdom": "^27.0.1",
     "typescript": "~5.7.2",
-    "typescript-eslint": "^8.46.1",
+    "typescript-eslint": "^8.46.2",
     "vite": "^6.4.1",
     "vitest": "^3.2.4"
   }
