@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       if (!profile) {
         // Prompt for username or auto-generate a unique one
-        let baseUsername = data.user.email?.split('@')[0] || 'User';
+        const baseUsername = data.user.email?.split('@')[0] || 'User';
         let username = baseUsername;
         let suffix = 1;
         // Ensure username is unique
