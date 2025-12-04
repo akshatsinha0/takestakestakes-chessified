@@ -22,15 +22,15 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.6",
-    "@mui/icons-material": "^7.3.5",
-    "@mui/material": "^7.3.5",
+    "@mui/icons-material": "^7.3.6",
+    "@mui/material": "^7.3.6",
     "@supabase/supabase-js": "^2.86.0",
     "@types/three": "^0.175.0",
     "chess.js": "^1.4.0",
     "react": "^18.3.1",
     "react-chessboard": "^4.7.3",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.9.6",
+    "react-router-dom": "^7.10.0",
     "react-toastify": "^11.0.5",
     "three": "^0.175.0"
   },
@@ -50,7 +50,7 @@
     "globals": "^15.15.0",
     "jsdom": "^27.2.0",
     "typescript": "~5.7.2",
-    "typescript-eslint": "^8.48.0",
+    "typescript-eslint": "^8.48.1",
     "vite": "^6.4.1",
     "vitest": "^3.2.4"
   }
