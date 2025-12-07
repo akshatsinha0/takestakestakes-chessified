@@ -1,85 +1,144 @@
-.quick-match{
-background:rgba(255,255,255,0.05);
-border:1px solid rgba(255,255,255,0.2);
-border-radius:12px;
-padding:1.5rem;
-margin-bottom:2rem;
+.quick-match {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.quick-match h3{
-color:white;
-margin:0 0 1rem 0;
-font-size:1.2rem;
+.quick-match h3 {
+  color: white;
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
 }
 
-.time-selector{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:0.8rem;
-margin-bottom:1.5rem;
+.time-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
 }
 
-.time-btn{
-background:rgba(255,255,255,0.1);
-border:2px solid rgba(255,255,255,0.2);
-border-radius:8px;
-padding:0.8rem;
-cursor:pointer;
-transition:all 0.3s;
-text-align:center;
+.time-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
 }
 
-.time-btn:hover{
-background:rgba(255,255,255,0.15);
-border-color:rgba(255,255,255,0.4);
+.time-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
-.time-btn.selected{
-background:rgba(255,165,0,0.2);
-border-color:#ffa500;
-box-shadow:0 0 15px rgba(255,165,0,0.3);
+.time-btn.selected {
+  background: rgba(255, 165, 0, 0.2);
+  border-color: #ffa500;
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
 }
 
-.time-name{
-color:#ffa500;
-font-weight:bold;
-font-size:0.9rem;
-margin-bottom:0.3rem;
+.time-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.time-duration{
-color:white;
-font-size:1rem;
-font-weight:bold;
+.time-name {
+  color: #ffa500;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
 }
 
-.find-match-btn{
-width:100%;
-background:linear-gradient(135deg,#4caf50,#45a049);
-border:none;
-color:white;
-padding:1rem;
-border-radius:8px;
-font-size:1.1rem;
-font-weight:bold;
-cursor:pointer;
-transition:all 0.3s;
+.time-duration {
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
-.find-match-btn:hover:not(:disabled){
-background:linear-gradient(135deg,#45a049,#3d8b40);
-transform:translateY(-2px);
-box-shadow:0 5px 15px rgba(76,175,80,0.4);
+.find-match-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  border: none;
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-.find-match-btn:disabled{
-opacity:0.6;
-cursor:not-allowed;
-background:rgba(255,255,255,0.1);
+.find-match-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
 }
 
-@media(max-width:768px){
-.time-selector{
-grid-template-columns:repeat(2,1fr);
+.find-match-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.1);
 }
+
+/* Searching Container */
+.searching-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.searching-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top: 4px solid #ffa500;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.searching-text {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.cancel-search-btn {
+  background: rgba(244, 67, 54, 0.2);
+  border: 2px solid #f44336;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.cancel-search-btn:hover {
+  background: rgba(244, 67, 54, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+}
+
+@media (max-width: 768px) {
+  .time-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

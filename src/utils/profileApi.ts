@@ -19,10 +19,20 @@ export async function updateProfile(id: string, updates: Partial<{ username: str
 }
 
 export async function getAllProfiles() {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .order('username', { ascending: true });
-  if (error) throw error;
-  return data || [];
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('username', { ascending: true });
+    
+    if (error) {
+      console.error('Error fetching profiles:', error);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Exception in getAllProfiles:', error);
+    return [];
+  }
 }

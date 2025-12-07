@@ -84,16 +84,21 @@ const Header: React.FC = () => {
   };
 
   const handleUserDropdown = async () => {
-    setUserDropdownOpen((prev) => !prev);
-    if (!userDropdownOpen) {
+    const willOpen = !userDropdownOpen;
+    setUserDropdownOpen(willOpen);
+    
+    if (willOpen && allUsers.length === 0) {
       setLoadingUsers(true);
       try {
         const users = await getAllProfiles();
+        console.log('Fetched users:', users);
         setAllUsers(users);
       } catch (e) {
+        console.error('Error fetching users:', e);
         setAllUsers([]);
+      } finally {
+        setLoadingUsers(false);
       }
-      setLoadingUsers(false);
     }
   };
 
