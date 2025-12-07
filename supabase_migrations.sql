@@ -1,21 +1,33 @@
--- Create games table for matchmaking and gameplay
-CREATE TABLE IF NOT EXISTS public.games (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    white_player_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    black_player_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    status TEXT NOT NULL CHECK (status IN ('waiting', 'in_progress', 'completed', 'abandoned')),
-    time_control TEXT NOT NULL,
-    board_state TEXT NOT NULL DEFAULT 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-    current_turn TEXT NOT NULL DEFAULT 'white' CHECK (current_turn IN ('white', 'black')),
-    white_time_remaining INTEGER NOT NULL,
-    black_time_remaining INTEGER NOT NULL,
-    increment INTEGER DEFAULT 0,
-    winner UUID REFERENCES auth.users(id),
-    result TEXT CHECK (result IN ('checkmate', 'resignation', 'timeout', 'draw', 'stalemate')),
-    moves JSONB DEFAULT '[]'::jsonb,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Modify existing games table to add matchmaking columns
+-- Note: This assumes you already have a games table from the previous schema
+
+-- Add new columns if they don't exist
+ALTER TABLE public.games 
+ADD COLUMN IF NOT EXISTS white_player_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+ADD COLUMN IF NOT EXISTS black_player_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+ADD COLUMN IF NOT EXISTS time_control TEXT,
+ADD COLUMN IF NOT EXISTS board_state TEXT DEFAULT 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+ADD COLUMN IF NOT EXISTS current_turn TEXT DEFAULT 'white',
+ADD COLUMN IF NOT EXISTS white_time_remaining INTEGER,
+ADD COLUMN IF NOT EXISTS black_time_remaining INTEGER,
+ADD COLUMN IF NOT EXISTS increment INTEGER DEFAULT 0,
+ADD COLUMN IF NOT EXISTS winner UUID REFERENCES auth.users(id),
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+
+-- Update status check constraint to include new statuses
+ALTER TABLE public.games DROP CONSTRAINT IF EXISTS games_status_check;
+ALTER TABLE public.games ADD CONSTRAINT games_status_check 
+    CHECK (status IN ('waiting', 'in_progress', 'game_over', 'completed', 'abandoned'));
+
+-- Add check constraint for current_turn
+ALTER TABLE public.games DROP CONSTRAINT IF EXISTS games_current_turn_check;
+ALTER TABLE public.games ADD CONSTRAINT games_current_turn_check 
+    CHECK (current_turn IN ('white', 'black'));
+
+-- Update result check constraint
+ALTER TABLE public.games DROP CONSTRAINT IF EXISTS games_result_check;
+ALTER TABLE public.games ADD CONSTRAINT games_result_check 
+    CHECK (result IN ('checkmate', 'resignation', 'timeout', 'draw', 'stalemate', NULL));
 
 -- Create index for faster matchmaking queries
 CREATE INDEX IF NOT EXISTS idx_games_status_time ON public.games(status, time_control, created_at);
@@ -25,35 +37,48 @@ CREATE INDEX IF NOT EXISTS idx_games_black_player ON public.games(black_player_i
 -- Enable Row Level Security
 ALTER TABLE public.games ENABLE ROW LEVEL SECURITY;
 
--- Policy: Users can view games they're part of
-CREATE POLICY "Users can view their own games" ON public.games
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Game participants can view" ON public.games;
+DROP POLICY IF EXISTS "Game participants can insert" ON public.games;
+DROP POLICY IF EXISTS "Game participants can update" ON public.games;
+DROP POLICY IF EXISTS "Users can view their own games" ON public.games;
+DROP POLICY IF EXISTS "Users can create games" ON public.games;
+DROP POLICY IF EXISTS "Users can update their games" ON public.games;
+DROP POLICY IF EXISTS "Users can delete their waiting games" ON public.games;
+
+-- Create new comprehensive policies
+CREATE POLICY "Users can view games they participate in or waiting games" ON public.games
     FOR SELECT
     USING (
+        auth.uid() = created_by OR
+        auth.uid() = opponent_id OR
         auth.uid() = white_player_id OR 
         auth.uid() = black_player_id OR
         status = 'waiting'
     );
 
--- Policy: Users can create games
-CREATE POLICY "Users can create games" ON public.games
+CREATE POLICY "Users can create their own games" ON public.games
     FOR INSERT
-    WITH CHECK (auth.uid() = white_player_id);
+    WITH CHECK (
+        auth.uid() = created_by OR
+        auth.uid() = white_player_id
+    );
 
--- Policy: Users can update games they're part of
-CREATE POLICY "Users can update their games" ON public.games
+CREATE POLICY "Game participants can update games" ON public.games
     FOR UPDATE
     USING (
+        auth.uid() = created_by OR
+        auth.uid() = opponent_id OR
         auth.uid() = white_player_id OR 
         auth.uid() = black_player_id
     );
 
--- Policy: Users can delete their waiting games
 CREATE POLICY "Users can delete their waiting games" ON public.games
     FOR DELETE
     USING (
-        auth.uid() = white_player_id AND 
+        (auth.uid() = created_by OR auth.uid() = white_player_id) AND 
         status = 'waiting' AND 
-        black_player_id IS NULL
+        (black_player_id IS NULL OR opponent_id IS NULL)
     );
 
 -- Create function to update updated_at timestamp

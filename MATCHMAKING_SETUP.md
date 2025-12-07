@@ -12,18 +12,32 @@ To enable the matchmaking functionality, you need to run the SQL migrations in y
 
 2. **Open SQL Editor**
    - Click on "SQL Editor" in the left sidebar
-   - Click "New Query"
+   - Find your existing query with the profiles and games tables
+   - **OR** click "New Query" if you prefer
 
 3. **Run the Migration**
    - Copy the contents of `supabase_migrations.sql`
-   - Paste it into the SQL editor
+   - Paste it **at the end** of your existing SQL (after your current schema)
    - Click "Run" to execute the migration
+   - **Note**: The migration is designed to work with your existing `games` table by adding new columns
 
-4. **Verify Tables Created**
+4. **Verify Tables Updated**
    - Go to "Table Editor" in the left sidebar
-   - You should see the following tables:
-     - `games` - Stores active and completed games
+   - Click on the `games` table
+   - You should see new columns:
+     - `white_player_id`, `black_player_id`
+     - `time_control`, `board_state`, `current_turn`
+     - `white_time_remaining`, `black_time_remaining`, `increment`
+     - `winner`, `updated_at`
+   - You should also see a new table:
      - `game_history` - Stores historical game data
+
+### Important Notes:
+
+- The migration **modifies your existing `games` table** by adding new columns
+- It **does not delete** any existing data
+- It updates the RLS policies to work with both old and new column names
+- The `status` constraint is updated to include 'waiting', 'in_progress', 'completed', 'abandoned'
 
 ## Features Implemented
 

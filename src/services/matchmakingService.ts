@@ -56,6 +56,7 @@ export async function joinMatchmakingQueue(
         .from('games')
         .update({
           black_player_id: userId,
+          opponent_id: userId,
           status: 'in_progress',
           updated_at: new Date().toISOString()
         })
@@ -77,8 +78,10 @@ export async function joinMatchmakingQueue(
       .from('games')
       .insert([
         {
+          created_by: userId,
           white_player_id: userId,
           black_player_id: null,
+          opponent_id: null,
           status: 'waiting',
           time_control: timeControl,
           board_state: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
@@ -114,7 +117,7 @@ export async function leaveMatchmakingQueue(userId: string): Promise<void> {
     await supabase
       .from('games')
       .delete()
-      .eq('white_player_id', userId)
+      .or(`white_player_id.eq.${userId},created_by.eq.${userId}`)
       .eq('status', 'waiting')
       .is('black_player_id', null);
   } catch (error) {
