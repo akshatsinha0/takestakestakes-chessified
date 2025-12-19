@@ -87,7 +87,8 @@ const Header: React.FC = () => {
     const willOpen = !userDropdownOpen;
     setUserDropdownOpen(willOpen);
     
-    if (willOpen && allUsers.length === 0) {
+    // Fetch users every time the dropdown opens to get fresh data
+    if (willOpen) {
       setLoadingUsers(true);
       try {
         const users = await getAllProfiles();
@@ -118,31 +119,38 @@ const Header: React.FC = () => {
                 ) : (
                   <div className="user-list-scroll">
                     {allUsers.length === 0 && <div className="user-list-empty">No users found.</div>}
-                    {allUsers.map((u) => (
-                      <div className="user-list-item" key={u.id}>
-                        <div className="user-list-avatar">
-                          {u.avatar_url ? (
-                            <img src={u.avatar_url} alt={u.username} />
-                          ) : (
-                            <span className="avatar-fallback">{u.username?.charAt(0)?.toUpperCase() || 'U'}</span>
+                    {allUsers.map((u) => {
+                      // Consider user online if they were active in the last 5 minutes
+                      const isOnline = u.last_active ? 
+                        (new Date().getTime() - new Date(u.last_active).getTime()) < 5 * 60 * 1000 
+                        : false;
+                      
+                      return (
+                        <div className="user-list-item" key={u.id}>
+                          <div className="user-list-avatar">
+                            {u.avatar_url ? (
+                              <img src={u.avatar_url} alt={u.username} />
+                            ) : (
+                              <span className="avatar-fallback">{u.username?.charAt(0)?.toUpperCase() || 'U'}</span>
+                            )}
+                            <span className={`user-status-dot ${isOnline ? 'online' : 'offline'}`}></span>
+                          </div>
+                          <div className="user-list-info">
+                            <span className="user-list-username">{u.username}</span>
+                            <span className="user-list-rating">{u.rating || 1200}</span>
+                          </div>
+                          {u.id !== user?.id && (
+                            <button className="challenge-btn" onClick={(e) => {
+                              e.stopPropagation();
+                              setChallengeTarget(u);
+                              setUserDropdownOpen(false);
+                            }}>
+                              Challenge
+                            </button>
                           )}
-                          <span className={`user-status-dot offline`}></span>
                         </div>
-                        <div className="user-list-info">
-                          <span className="user-list-username">{u.username}</span>
-                          <span className="user-list-rating">{u.rating || 1200}</span>
-                        </div>
-                        {u.id !== user?.id && (
-                          <button className="challenge-btn" onClick={(e) => {
-                            e.stopPropagation();
-                            setChallengeTarget(u);
-                            setUserDropdownOpen(false);
-                          }}>
-                            Challenge
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -317,7 +325,7 @@ const Header: React.FC = () => {
           </div>
           
           <IconButton aria-label="notifications" className="notification-icon">
-            <Badge badgeContent={3} color="error">
+            <Badge badgeContent={0} color="error">
               <Notifications />
             </Badge>
           </IconButton>

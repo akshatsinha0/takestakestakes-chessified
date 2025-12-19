@@ -5,9 +5,16 @@ import ChessboardSection from '../components/ChessboardSection/ChessboardSection
 import GameOptions from '../components/GameOptions/GameOptions';
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification';
 import ActiveGames from '../components/ActiveGames/ActiveGames';
+import { useSupabaseAuthContext } from '../context/SupabaseAuthContext';
+import { useUserPresence } from '../hooks/useUserPresence';
 import './Dashboard.css';
+
 const Dashboard: React.FC = () => {
+  const { user } = useSupabaseAuthContext();
   const [playYourselfMode, setPlayYourselfMode] = useState(false);
+  
+  // Track user presence
+  useUserPresence(user?.id);
 
   const handlePlayYourself = () => setPlayYourselfMode(true);
   const handleExitPlayYourself = () => setPlayYourselfMode(false);
