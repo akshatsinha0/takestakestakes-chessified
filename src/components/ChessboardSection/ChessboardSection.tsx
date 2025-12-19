@@ -138,13 +138,22 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
   };
 
   const onDrop = (sourceSquare: string, targetSquare: string) => {
+    console.log('onDrop called:', { 
+      sourceSquare, 
+      targetSquare, 
+      activeGame: !!activeGame, 
+      playYourselfMode,
+      playerColor,
+      currentTurn: game.turn()
+    });
+
     // Check if it's multiplayer mode and if it's player's turn
     if (activeGame && !playYourselfMode) {
       const currentTurn = game.turn(); // 'w' or 'b'
       const isPlayerTurn = (currentTurn === 'w' && playerColor === 'white') || 
                            (currentTurn === 'b' && playerColor === 'black');
       
-      console.log('Turn check:', { currentTurn, playerColor, isPlayerTurn });
+      console.log('Turn check:', { currentTurn, playerColor, isPlayerTurn, activeGame: activeGame.id });
       
       if (!isPlayerTurn) {
         console.log('Not your turn!');
@@ -158,7 +167,12 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
       promotion: 'q'
     });
 
-    if (move === null) return false;
+    console.log('Move result:', move);
+
+    if (move === null) {
+      console.log('Invalid move!');
+      return false;
+    }
 
     // Save move to database for multiplayer games (async, don't wait)
     if (activeGame && !playYourselfMode) {
@@ -615,6 +629,23 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                 position={game.fen()}
                 onPieceDrop={onDrop}
                 boardOrientation={isBoardFlipped ? 'black' : 'white'}
+                isDraggablePiece={({ piece }) => {
+                  // In play yourself mode, allow all pieces
+                  if (playYourselfMode) return true;
+                  
+                  // In multiplayer, only allow dragging your own pieces on your turn
+                  if (!activeGame) return true; // Allow moves if no active game yet
+                  
+                  const currentTurn = game.turn();
+                  const isMyTurn = (currentTurn === 'w' && playerColor === 'white') || 
+                                   (currentTurn === 'b' && playerColor === 'black');
+                  
+                  if (!isMyTurn) return false;
+                  
+                  // Check if piece belongs to current player
+                  const pieceColor = piece[0]; // 'w' or 'b'
+                  return pieceColor === currentTurn;
+                }}
                 customBoardStyle={{
                   borderRadius: '8px',
                   boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)'
