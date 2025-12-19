@@ -71,10 +71,10 @@ const blackPlayerId=isWhite?challenge.from_user_id:user.id;
 // Parse time control (e.g., "10+0" -> 10 minutes)
 const timeMinutes=parseInt(challenge.time_control.split('+')[0]);
 const incrementSeconds=parseInt(challenge.time_control.split('+')[1]||'0');
-// Create the game
+// Create the game (created_by must be current user for RLS policy)
 const{data:gameData,error:gameError}=await supabase.from('games').insert([{
-created_by:challenge.from_user_id,
-opponent_id:user.id,
+created_by:user.id,
+opponent_id:challenge.from_user_id,
 white_player_id:whitePlayerId,
 black_player_id:blackPlayerId,
 time_control:challenge.time_control,
