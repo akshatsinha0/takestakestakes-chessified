@@ -60,28 +60,48 @@ setChallenges([]);
 
 const acceptChallenge=async(challengeId:string)=>{
 try{
+const challenge=challenges.find(c=>c.id===challengeId);
+if(!challenge||!user){
+throw new Error('Challenge or user not found');
+}
+// Randomly assign colors
+const isWhite=Math.random()>0.5;
+const whitePlayerId=isWhite?user.id:challenge.from_user_id;
+const blackPlayerId=isWhite?challenge.from_user_id:user.id;
+// Parse time control (e.g., "10+0" -> 10 minutes)
+const timeMinutes=parseInt(challenge.time_control.split('+')[0]);
+const incrementSeconds=parseInt(challenge.time_control.split('+')[1]||'0');
+// Create the game
+const{data:gameData,error:gameError}=await supabase.from('games').insert([{
+created_by:challenge.from_user_id,
+opponent_id:user.id,
+white_player_id:whitePlayerId,
+black_player_id:blackPlayerId,
+time_control:challenge.time_control,
+status:'in_progress',
+board_state:'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+current_turn:'white',
+white_time_remaining:timeMinutes*60,
+black_time_remaining:timeMinutes*60,
+increment:incrementSeconds
+}]).select();
+if(gameError){
+console.error('Game creation error:',gameError);
+throw gameError;
+}
+// Update invitation status
 const{error:updateError}=await supabase
 .from('game_invitations')
 .update({status:'accepted'})
 .eq('id',challengeId);
-if(updateError)throw updateError;
-const challenge=challenges.find(c=>c.id===challengeId);
-if(challenge){
-const{error:gameError}=await supabase.from('games').insert([{
-created_by:challenge.from_user_id,
-white_player_id:Math.random()>0.5?challenge.from_user_id:user?.id,
-black_player_id:Math.random()>0.5?challenge.from_user_id:user?.id,
-time_control:challenge.time_control,
-status:'waiting',
-board_state:'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-current_turn:'white',
-white_time_remaining:parseInt(challenge.time_control.split('+')[0])*60,
-black_time_remaining:parseInt(challenge.time_control.split('+')[0])*60
-}]);
-if(gameError)throw gameError;
+if(updateError){
+console.error('Invitation update error:',updateError);
+throw updateError;
 }
 toast.success('Challenge accepted! Game starting...');
 loadPendingChallenges();
+// TODO: Navigate to game board
+// window.location.href = `/game/${gameData[0].id}`;
 }catch(error){
 console.error('Failed to accept challenge:',error);
 toast.error('Failed to accept challenge');
