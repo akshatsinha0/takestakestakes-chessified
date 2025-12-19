@@ -390,9 +390,22 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
             setGame(newGame);
           }
           
-          // Set timer values from database
-          setWhiteTime(gameData.white_time_remaining || 600);
-          setBlackTime(gameData.black_time_remaining || 600);
+          // Set timer values from database or parse from time_control
+          let initialTime = 600; // default 10 minutes
+          if (gameData.time_control) {
+            // Parse time control like "10+0", "5+3", etc.
+            const timeMinutes = parseInt(gameData.time_control.split('+')[0]);
+            initialTime = timeMinutes * 60;
+          }
+          
+          setWhiteTime(gameData.white_time_remaining || initialTime);
+          setBlackTime(gameData.black_time_remaining || initialTime);
+          
+          console.log('Timer initialized:', {
+            timeControl: gameData.time_control,
+            whiteTime: gameData.white_time_remaining || initialTime,
+            blackTime: gameData.black_time_remaining || initialTime
+          });
           
           setIsTheaterMode(true);
         }
@@ -431,6 +444,14 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
           if (updatedGame.board_state) {
             const newGame = new Chess(updatedGame.board_state);
             setGame(newGame);
+          }
+          
+          // Update timer values from opponent's move
+          if (updatedGame.white_time_remaining !== undefined) {
+            setWhiteTime(updatedGame.white_time_remaining);
+          }
+          if (updatedGame.black_time_remaining !== undefined) {
+            setBlackTime(updatedGame.black_time_remaining);
           }
         }
       })
