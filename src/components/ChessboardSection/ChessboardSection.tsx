@@ -132,7 +132,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
     }
   };
 
-  const onDrop = async (sourceSquare: string, targetSquare: string) => {
+  const onDrop = (sourceSquare: string, targetSquare: string) => {
     // Check if it's multiplayer mode and if it's player's turn
     if (activeGame && !playYourselfMode) {
       const isPlayerTurn = (game.turn() === 'w' && playerColor === 'white') || 
@@ -151,37 +151,93 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
 
     if (move === null) return false;
 
-    // Save move to database for multiplayer games
+    // Save move to database for multiplayer games (async, don't wait)
     if (activeGame && !playYourselfMode) {
-      try {
-        // Update game board state
-        await supabase
-          .from('games')
-          .update({
-            board_state: game.fen(),
-            current_turn: game.turn() === 'w' ? 'white' : 'black',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', activeGame.id);
+      (async () => {
+        try {
+          // Update game board state
+          await supabase
+            .from('games')
+            .update({
+              board_state: game.fen(),
+              current_turn: game.turn() === 'w' ? 'white' : 'black',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', activeGame.id);
 
-        // Save move
-        await supabase
-          .from('moves')
-          .insert({
-            game_id: activeGame.id,
-            move_number: moves.length + 1,
-            player_color: playerColor,
-            san: move.san,
-            fen: game.fen(),
-            time_taken: 0,
-            created_at: new Date().toISOString()
-          });
-      } catch (error) {
-        console.error('Failed to save move:', error);
-      }
+          // Save move
+          await supabase
+            .from('moves')
+            .insert({
+              game_id: activeGame.id,
+              move_number: moves.length + 1,
+              player_color: playerColor,
+              san: move.san,
+              fen: game.fen(),
+              time_taken: 0,
+              created_at: new Date().toISOString()
+            });
+        } catch (error) {
+          console.error('Failed to save move:', error);
+        }
+      })();
     }
 
     return true;
+  };
+
+  // Handle resign
+  const handleResign = async () => {
+    if (!activeGame || !user) return;
+    
+    try {
+      const winner = playerColor === 'white' ? activeGame.black_player_id : activeGame.white_player_id;
+      
+      await supabase
+        .from('games')
+        .update({
+          status: 'completed',
+          result: 'resignation',
+          winner: winner,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', activeGame.id);
+      
+      setGameStatus('GAME OVER');
+      setGameResult({
+        winner: playerColor === 'white' ? 'black' : 'white',
+        method: 'resignation',
+        time: activeGame.time_control
+      });
+    } catch (error) {
+      console.error('Failed to resign:', error);
+    }
+  };
+
+  // Handle draw offer
+  const handleOfferDraw = async () => {
+    if (!activeGame || !user) return;
+    
+    // For now, just accept draw immediately (you can add draw offer logic later)
+    try {
+      await supabase
+        .from('games')
+        .update({
+          status: 'completed',
+          result: 'draw',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', activeGame.id);
+      
+      setGameStatus('GAME OVER');
+      setGameResult({
+        winner: null,
+        method: 'draw',
+        time: activeGame.time_control
+      });
+    } catch (error) {
+      console.error('Failed to offer draw:', error);
+    }
   };
   
   useEffect(() => {
@@ -573,6 +629,26 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                   <span>Game Review</span>
                 </button>
               </div>
+              
+              {/* Draw and Resign buttons for multiplayer games */}
+              {activeGame && !playYourselfMode && !gameStatus && (
+                <div className="game-actions" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', justifyContent: 'center' }}>
+                  <button 
+                    className="review-btn" 
+                    onClick={handleOfferDraw}
+                    style={{ background: '#4a5568', flex: 1 }}
+                  >
+                    Offer Draw
+                  </button>
+                  <button 
+                    className="review-btn" 
+                    onClick={handleResign}
+                    style={{ background: '#e53e3e', flex: 1 }}
+                  >
+                    Resign
+                  </button>
+                </div>
+              )}
               
               <div className="move-controls">
                 <div className="move-buttons">
