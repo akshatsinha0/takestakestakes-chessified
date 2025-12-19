@@ -27,17 +27,19 @@ if(!user)return;
 try{
 const{data,error}=await supabase
 .from('game_invitations')
-.select(`
-*,
-from_user:profiles!game_invitations_from_user_id_fkey(username,rating)
-`)
+.select('*')
 .eq('to_user_id',user.id)
 .eq('status','pending')
 .gt('expires_at',new Date().toISOString());
-if(error)throw error;
+if(error) {
+console.error('Error loading challenges:', error);
+setChallenges([]);
+return;
+}
 setChallenges(data||[]);
 }catch(error){
 console.error('Failed to load challenges:',error);
+setChallenges([]);
 }
 };
 

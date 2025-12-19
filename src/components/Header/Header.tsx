@@ -91,11 +91,12 @@ const Header: React.FC = () => {
     if (willOpen) {
       setLoadingUsers(true);
       try {
+        console.log('[UserDropdown] Fetching all profiles...');
         const users = await getAllProfiles();
-        console.log('Fetched users:', users);
+        console.log('[UserDropdown] Fetched users:', users.length, users);
         setAllUsers(users);
       } catch (e) {
-        console.error('Error fetching users:', e);
+        console.error('[UserDropdown] Error fetching users:', e);
         setAllUsers([]);
       } finally {
         setLoadingUsers(false);

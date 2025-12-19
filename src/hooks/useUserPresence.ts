@@ -5,17 +5,15 @@ export const useUserPresence = (userId: string | undefined) => {
   useEffect(() => {
     if (!userId) return;
 
-    // Update last_active on mount and every 2 minutes
+    // Update last_active in profiles table on mount and every 2 minutes
     const updatePresence = async () => {
       try {
         await supabase
-          .from('user_stats')
-          .upsert({
-            id: userId,
+          .from('profiles')
+          .update({
             last_active: new Date().toISOString()
-          }, {
-            onConflict: 'id'
-          });
+          })
+          .eq('id', userId);
       } catch (error) {
         console.error('Error updating presence:', error);
       }

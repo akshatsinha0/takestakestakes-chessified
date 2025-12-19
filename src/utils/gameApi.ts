@@ -49,32 +49,39 @@ if(updateError)throw updateError;
 };
 
 export const getGameHistory=async(userId:string)=>{
+try {
 const{data,error}=await supabase
 .from('games')
-.select(`
-*,
-white_player:profiles!games_white_player_id_fkey(username),
-black_player:profiles!games_black_player_id_fkey(username),
-moves(*)
-`)
+.select('*')
 .or(`white_player_id.eq.${userId},black_player_id.eq.${userId}`)
 .eq('status','completed')
 .order('finished_at',{ascending:false});
-if(error)throw error;
-return data;
+if(error) {
+console.error('Error fetching game history:', error);
+return [];
+}
+return data || [];
+} catch (error) {
+console.error('Exception in getGameHistory:', error);
+return [];
+}
 };
 
 export const getActiveGames=async(userId:string)=>{
+try {
 const{data,error}=await supabase
 .from('games')
-.select(`
-*,
-white_player:profiles!games_white_player_id_fkey(username),
-black_player:profiles!games_black_player_id_fkey(username)
-`)
+.select('*')
 .or(`white_player_id.eq.${userId},black_player_id.eq.${userId}`)
 .in('status',['waiting','in_progress'])
 .order('created_at',{ascending:false});
-if(error)throw error;
-return data;
+if(error) {
+console.error('Error fetching active games:', error);
+return [];
+}
+return data || [];
+} catch (error) {
+console.error('Exception in getActiveGames:', error);
+return [];
+}
 };
