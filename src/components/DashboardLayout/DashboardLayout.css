@@ -1,10 +1,13 @@
 .dashboard-layout {
     min-height: 100vh;
+    width: 100%;
+    max-width: 100vw;
     background: #0f1419;
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   .dashboard-content-wrapper {
@@ -13,6 +16,9 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
   
   .dashboard-content {
@@ -20,10 +26,11 @@
     grid-template-columns: 70% 30%;
     gap: 1.5rem;
     width: 100%;
-    max-width: 1600px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 1.5rem;
     box-sizing: border-box;
+    overflow-x: hidden;
   }
   
   @media (max-width: 1200px) {
