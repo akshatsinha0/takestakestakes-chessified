@@ -25,7 +25,7 @@ subscription.unsubscribe();
 const loadPendingChallenges=async()=>{
 if(!user)return;
 try{
-const{data,error}=await supabase
+const{data:invitations,error}=await supabase
 .from('game_invitations')
 .select('*')
 .eq('to_user_id',user.id)
@@ -36,7 +36,22 @@ console.error('Error loading challenges:', error);
 setChallenges([]);
 return;
 }
-setChallenges(data||[]);
+// Fetch user profiles for each invitation
+if(invitations && invitations.length > 0){
+const userIds = invitations.map(inv => inv.from_user_id);
+const{data:profiles}=await supabase
+.from('profiles')
+.select('id,username,rating')
+.in('id',userIds);
+// Merge profiles with invitations
+const challengesWithProfiles = invitations.map(inv => ({
+...inv,
+from_user: profiles?.find(p => p.id === inv.from_user_id)
+}));
+setChallenges(challengesWithProfiles);
+} else {
+setChallenges([]);
+}
 }catch(error){
 console.error('Failed to load challenges:',error);
 setChallenges([]);

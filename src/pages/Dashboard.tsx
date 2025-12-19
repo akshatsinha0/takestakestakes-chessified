@@ -24,7 +24,7 @@ const Dashboard: React.FC = () => {
       <Header />
       <ChallengeNotification />
       <div className="dashboard-content">
-        <ActiveGames />
+        {/* <ActiveGames /> */}
         <ChessboardSection 
           playYourselfMode={playYourselfMode} 
           onExitPlayYourself={handleExitPlayYourself}
