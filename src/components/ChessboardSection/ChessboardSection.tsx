@@ -43,6 +43,11 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
   const [activeGame, setActiveGame] = useState<any>(null);
   const [opponentProfile, setOpponentProfile] = useState<any>(null);
   const [playerColor, setPlayerColor] = useState<'white' | 'black'>('white');
+  
+  // Timer state
+  const [whiteTime, setWhiteTime] = useState<number>(600); // 10 minutes in seconds
+  const [blackTime, setBlackTime] = useState<number>(600);
+  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [moves, setMoves] = useState<ChessMove[]>([]);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
@@ -135,10 +140,14 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
   const onDrop = (sourceSquare: string, targetSquare: string) => {
     // Check if it's multiplayer mode and if it's player's turn
     if (activeGame && !playYourselfMode) {
-      const isPlayerTurn = (game.turn() === 'w' && playerColor === 'white') || 
-                           (game.turn() === 'b' && playerColor === 'black');
+      const currentTurn = game.turn(); // 'w' or 'b'
+      const isPlayerTurn = (currentTurn === 'w' && playerColor === 'white') || 
+                           (currentTurn === 'b' && playerColor === 'black');
+      
+      console.log('Turn check:', { currentTurn, playerColor, isPlayerTurn });
       
       if (!isPlayerTurn) {
+        console.log('Not your turn!');
         return false; // Not player's turn
       }
     }
@@ -155,12 +164,17 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
     if (activeGame && !playYourselfMode) {
       (async () => {
         try {
-          // Update game board state
+          const newFen = game.fen();
+          const newTurn = game.turn();
+          
+          // Update game board state and times
           await supabase
             .from('games')
             .update({
-              board_state: game.fen(),
-              current_turn: game.turn() === 'w' ? 'white' : 'black',
+              board_state: newFen,
+              current_turn: newTurn === 'w' ? 'white' : 'black',
+              white_time_remaining: whiteTime,
+              black_time_remaining: blackTime,
               updated_at: new Date().toISOString()
             })
             .eq('id', activeGame.id);
@@ -173,7 +187,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
               move_number: moves.length + 1,
               player_color: playerColor,
               san: move.san,
-              fen: game.fen(),
+              fen: newFen,
               time_taken: 0,
               created_at: new Date().toISOString()
             });
@@ -251,6 +265,76 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
     if (playYourselfMode) setIsTheaterMode(true);
   }, [playYourselfMode]);
 
+  // Timer logic for multiplayer games
+  useEffect(() => {
+    if (!activeGame || playYourselfMode || gameStatus) {
+      // Clear timer if no active game
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
+      }
+      return;
+    }
+
+    // Start timer
+    timerIntervalRef.current = setInterval(() => {
+      const currentTurn = game.turn();
+      
+      if (currentTurn === 'w') {
+        setWhiteTime(prev => {
+          if (prev <= 0) {
+            // White ran out of time
+            handleTimeOut('white');
+            return 0;
+          }
+          return prev - 1;
+        });
+      } else {
+        setBlackTime(prev => {
+          if (prev <= 0) {
+            // Black ran out of time
+            handleTimeOut('black');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }
+    }, 1000);
+
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, [activeGame, playYourselfMode, gameStatus, game]);
+
+  const handleTimeOut = async (color: 'white' | 'black') => {
+    if (!activeGame) return;
+    
+    const winner = color === 'white' ? activeGame.black_player_id : activeGame.white_player_id;
+    
+    try {
+      await supabase
+        .from('games')
+        .update({
+          status: 'completed',
+          result: 'timeout',
+          winner: winner,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', activeGame.id);
+      
+      setGameStatus('GAME OVER');
+      setGameResult({
+        winner: color === 'white' ? 'black' : 'white',
+        method: 'timeout',
+        time: activeGame.time_control
+      });
+    } catch (error) {
+      console.error('Failed to handle timeout:', error);
+    }
+  };
+
   // Load active game and set up real-time sync
   useEffect(() => {
     if (!user || playYourselfMode) return;
@@ -280,6 +364,14 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
           setPlayerColor(color);
           setIsBoardFlipped(color === 'black');
           
+          console.log('Game loaded:', { 
+            gameId: gameData.id, 
+            playerColor: color, 
+            whitePlayer: gameData.white_player_id,
+            blackPlayer: gameData.black_player_id,
+            currentUser: user.id
+          });
+          
           // Load opponent profile
           const opponentId = color === 'white' ? gameData.black_player_id : gameData.white_player_id;
           const { data: opponentData } = await supabase
@@ -297,6 +389,10 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
             const newGame = new Chess(gameData.board_state);
             setGame(newGame);
           }
+          
+          // Set timer values from database
+          setWhiteTime(gameData.white_time_remaining || 600);
+          setBlackTime(gameData.black_time_remaining || 600);
           
           setIsTheaterMode(true);
         }
@@ -527,9 +623,17 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
               </div>
               
               <div className="timer-container">
-                <div className="opponent-timer">10:00</div>
+                <div className="opponent-timer">
+                  {playerColor === 'white' 
+                    ? `${Math.floor(blackTime / 60)}:${(blackTime % 60).toString().padStart(2, '0')}`
+                    : `${Math.floor(whiteTime / 60)}:${(whiteTime % 60).toString().padStart(2, '0')}`}
+                </div>
                 <div className="vs-indicator">vs</div>
-                <div className="player-timer">10:00</div>
+                <div className="player-timer">
+                  {playerColor === 'white' 
+                    ? `${Math.floor(whiteTime / 60)}:${(whiteTime % 60).toString().padStart(2, '0')}`
+                    : `${Math.floor(blackTime / 60)}:${(blackTime % 60).toString().padStart(2, '0')}`}
+                </div>
               </div>
               
               <div className="player-info user">
