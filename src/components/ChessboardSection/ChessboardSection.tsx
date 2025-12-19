@@ -28,15 +28,21 @@ interface ChessMove {
 interface ChessboardSectionProps {
   playYourselfMode?: boolean;
   onExitPlayYourself?: () => void;
+  gameId?: string;
 }
 
-const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode = false, onExitPlayYourself }) => {
+const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode = false, onExitPlayYourself, gameId }) => {
   const { user, profile } = useSupabaseAuthContext();
   const [game, setGame] = useState(new Chess());
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [isBoardFlipped, setIsBoardFlipped] = useState(false);
   const { playMove, playCapture, playCastle, playCheck } = useChessSounds();
+  
+  // Multiplayer game state
+  const [activeGame, setActiveGame] = useState<any>(null);
+  const [opponentProfile, setOpponentProfile] = useState<any>(null);
+  const [playerColor, setPlayerColor] = useState<'white' | 'black'>('white');
 
   const [moves, setMoves] = useState<ChessMove[]>([]);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
@@ -126,7 +132,17 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
     }
   };
 
-  const onDrop = (sourceSquare: string, targetSquare: string) => {
+  const onDrop = async (sourceSquare: string, targetSquare: string) => {
+    // Check if it's multiplayer mode and if it's player's turn
+    if (activeGame && !playYourselfMode) {
+      const isPlayerTurn = (game.turn() === 'w' && playerColor === 'white') || 
+                           (game.turn() === 'b' && playerColor === 'black');
+      
+      if (!isPlayerTurn) {
+        return false; // Not player's turn
+      }
+    }
+
     const move = makeAMove({
       from: sourceSquare,
       to: targetSquare,
@@ -134,6 +150,37 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
     });
 
     if (move === null) return false;
+
+    // Save move to database for multiplayer games
+    if (activeGame && !playYourselfMode) {
+      try {
+        // Update game board state
+        await supabase
+          .from('games')
+          .update({
+            board_state: game.fen(),
+            current_turn: game.turn() === 'w' ? 'white' : 'black',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', activeGame.id);
+
+        // Save move
+        await supabase
+          .from('moves')
+          .insert({
+            game_id: activeGame.id,
+            move_number: moves.length + 1,
+            player_color: playerColor,
+            san: move.san,
+            fen: game.fen(),
+            time_taken: 0,
+            created_at: new Date().toISOString()
+          });
+      } catch (error) {
+        console.error('Failed to save move:', error);
+      }
+    }
+
     return true;
   };
   
@@ -147,6 +194,100 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
   useEffect(() => {
     if (playYourselfMode) setIsTheaterMode(true);
   }, [playYourselfMode]);
+
+  // Load active game and set up real-time sync
+  useEffect(() => {
+    if (!user || playYourselfMode) return;
+
+    const loadActiveGame = async () => {
+      try {
+        // Find active game for this user
+        const { data: games, error } = await supabase
+          .from('games')
+          .select('*')
+          .eq('status', 'in_progress')
+          .or(`white_player_id.eq.${user.id},black_player_id.eq.${user.id}`)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (error) {
+          console.error('Error loading game:', error);
+          return;
+        }
+
+        if (games && games.length > 0) {
+          const gameData = games[0];
+          setActiveGame(gameData);
+          
+          // Set player color
+          const color = gameData.white_player_id === user.id ? 'white' : 'black';
+          setPlayerColor(color);
+          setIsBoardFlipped(color === 'black');
+          
+          // Load opponent profile
+          const opponentId = color === 'white' ? gameData.black_player_id : gameData.white_player_id;
+          const { data: opponentData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', opponentId)
+            .single();
+          
+          if (opponentData) {
+            setOpponentProfile(opponentData);
+          }
+          
+          // Load board state
+          if (gameData.board_state) {
+            const newGame = new Chess(gameData.board_state);
+            setGame(newGame);
+          }
+          
+          setIsTheaterMode(true);
+        }
+      } catch (error) {
+        console.error('Failed to load game:', error);
+      }
+    };
+
+    loadActiveGame();
+
+    // Subscribe to game updates and new games
+    const channel = supabase
+      .channel('game-updates')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'games'
+      }, (payload) => {
+        const newGame = payload.new as any;
+        // Check if this game involves the current user
+        if (newGame.white_player_id === user.id || newGame.black_player_id === user.id) {
+          loadActiveGame(); // Reload to get the new game
+        }
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'games'
+      }, (payload) => {
+        const updatedGame = payload.new as any;
+        // Only update if it's the active game
+        if (activeGame && updatedGame.id === activeGame.id) {
+          setActiveGame(updatedGame);
+          
+          // Update board state
+          if (updatedGame.board_state) {
+            const newGame = new Chess(updatedGame.board_state);
+            setGame(newGame);
+          }
+        }
+      })
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [user, playYourselfMode, gameId, activeGame]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -316,8 +457,16 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                   <img src="/path/to/default-avatar.png" alt="Opponent" />
                 </div>
                 <div className="player-details">
-                  <div className="player-name">{playYourselfMode ? profile?.username || 'You' : 'Opponent'}</div>
-                  <div className="player-rating">{playYourselfMode ? profile?.rating || 1200 : 1500}</div>
+                  <div className="player-name">
+                    {playYourselfMode 
+                      ? profile?.username || 'You' 
+                      : opponentProfile?.username || 'Opponent'}
+                  </div>
+                  <div className="player-rating">
+                    {playYourselfMode 
+                      ? profile?.rating || 1200 
+                      : opponentProfile?.rating || 1200}
+                  </div>
                 </div>
               </div>
               
