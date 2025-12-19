@@ -21,31 +21,55 @@ export const useSupabaseAuth = () => {
   useEffect(() => {
     let mounted = true
 
-    // Safety timeout
+    // Safety timeout - 5 seconds should be enough
     const timeout = setTimeout(() => {
       if (mounted) {
-        console.warn('[Auth] Timeout reached, forcing loading to false')
-        setAuthState(prev => ({ ...prev, loading: false }))
+        console.warn('[Auth] Timeout reached after 5s, forcing loading to false')
+        setAuthState(prev => {
+          console.log('[Auth] Current state before timeout:', prev)
+          return { ...prev, loading: false }
+        })
       }
-    }, 3000)
+    }, 5000)
 
     // Get initial session
     const initAuth = async () => {
       try {
         console.log('[Auth] Initializing...')
-        const { data: { session } } = await supabase.auth.getSession()
+        
+        // Try to get session from storage first
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('[Auth] Session error:', error)
+          throw error
+        }
         
         if (!mounted) return
 
         if (session?.user) {
           console.log('[Auth] Session found:', session.user.id)
-          const profile = await fetchUserProfile(session.user.id)
-          clearTimeout(timeout)
+          
+          // Set user immediately, fetch profile in background
           setAuthState({
             user: session.user,
-            profile,
+            profile: null,
             session,
             loading: false
+          })
+          
+          clearTimeout(timeout)
+          
+          // Fetch profile asynchronously
+          fetchUserProfile(session.user.id).then(profile => {
+            if (mounted) {
+              setAuthState(prev => ({
+                ...prev,
+                profile
+              }))
+            }
+          }).catch(err => {
+            console.error('[Auth] Profile fetch failed:', err)
           })
         } else {
           console.log('[Auth] No session found')
@@ -78,17 +102,39 @@ export const useSupabaseAuth = () => {
       async (event, session) => {
         if (!mounted) return
 
-        console.log('[Auth] Event:', event)
+        console.log('[Auth] Event:', event, 'Session:', !!session)
+
+        if (event === 'SIGNED_OUT') {
+          setAuthState({
+            user: null,
+            profile: null,
+            session: null,
+            loading: false
+          })
+          return
+        }
 
         if (session?.user) {
-          const profile = await fetchUserProfile(session.user.id)
+          // Set user immediately
           setAuthState({
             user: session.user,
-            profile,
+            profile: null,
             session,
             loading: false
           })
-        } else {
+          
+          // Fetch profile in background
+          fetchUserProfile(session.user.id).then(profile => {
+            if (mounted) {
+              setAuthState(prev => ({
+                ...prev,
+                profile
+              }))
+            }
+          })
+        } else if (event === 'SIGNED_IN') {
+          // If we get SIGNED_IN but no session, something is wrong
+          console.error('[Auth] SIGNED_IN event but no session')
           setAuthState({
             user: null,
             profile: null,
@@ -108,21 +154,43 @@ export const useSupabaseAuth = () => {
 
   const fetchUserProfile = async (userId: string): Promise<Profile | null> => {
     try {
+      console.log('[Auth] Fetching profile for:', userId)
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
 
       if (error) {
         console.error('[Auth] Profile fetch error:', error)
-        return null
+        // Return a default profile instead of null
+        return {
+          id: userId,
+          username: 'User',
+          rating: 1200
+        }
       }
 
+      if (!data) {
+        console.warn('[Auth] No profile found, returning default')
+        return {
+          id: userId,
+          username: 'User',
+          rating: 1200
+        }
+      }
+
+      console.log('[Auth] Profile fetched successfully')
       return data
     } catch (error) {
-      console.error('[Auth] Profile fetch error:', error)
-      return null
+      console.error('[Auth] Profile fetch exception:', error)
+      // Return a default profile on exception
+      return {
+        id: userId,
+        username: 'User',
+        rating: 1200
+      }
     }
   }
 
@@ -168,16 +236,34 @@ export const useSupabaseAuth = () => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Set loading state immediately
+      setAuthState(prev => ({ ...prev, loading: true }))
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
-      if (error) throw error
+      if (error) {
+        setAuthState(prev => ({ ...prev, loading: false }))
+        throw error
+      }
+
+      // Fetch profile immediately after successful login
+      if (data.user) {
+        const profile = await fetchUserProfile(data.user.id)
+        setAuthState({
+          user: data.user,
+          profile,
+          session: data.session,
+          loading: false
+        })
+      }
 
       return { data, error: null }
     } catch (error) {
       console.error('[Auth] Signin error:', error)
+      setAuthState(prev => ({ ...prev, loading: false }))
       return { data: null, error: error as AuthError }
     }
   }
