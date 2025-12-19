@@ -45,12 +45,13 @@ const SupabaseLoginForm = ({ onClose }: { onClose: () => void }) => {
       
       if (data?.user && data?.session) {
         toast.success('Welcome back, Grandmaster!')
-        onClose()
         
-        // Wait a bit for auth state to propagate
-        setTimeout(() => {
-          navigate('/dashboard', { replace: true })
-        }, 100)
+        // Close modal and navigate immediately
+        onClose()
+        navigate('/dashboard', { replace: true })
+        
+        // Reset loading after navigation
+        setIsLoading(false)
       } else {
         toast.error('Login failed. Please try again.')
         setIsLoading(false)
