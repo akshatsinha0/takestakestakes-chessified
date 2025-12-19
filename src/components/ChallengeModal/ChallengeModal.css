@@ -12,6 +12,8 @@ z-index:10000;
 backdrop-filter:blur(12px);
 -webkit-backdrop-filter:blur(12px);
 animation:fadeIn 0.3s ease-out;
+padding:2rem;
+overflow-y:auto;
 }
 
 @keyframes fadeIn{
@@ -30,8 +32,8 @@ background:linear-gradient(145deg,#1a2332 0%,#0f1419 100%);
 border-radius:24px;
 padding:2.5rem;
 width:600px;
-max-width:90vw;
-max-height:90vh;
+max-width:calc(100vw - 4rem);
+max-height:calc(100vh - 4rem);
 overflow-y:auto;
 border:2px solid rgba(212,141,59,0.3);
 box-shadow:0 25px 50px rgba(0,0,0,0.7),
@@ -39,6 +41,7 @@ box-shadow:0 25px 50px rgba(0,0,0,0.7),
 inset 0 1px 0 rgba(255,255,255,0.1);
 animation:modalSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
 position:relative;
+margin:auto;
 }
 
 @keyframes modalSlideIn{
