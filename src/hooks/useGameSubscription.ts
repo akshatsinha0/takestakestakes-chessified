@@ -112,9 +112,7 @@ export const useGameSubscription = (gameId: string | null) => {
         .insert({
           game_id: gameId,
           move_number: moveNumber,
-          player_color: playerColor,
-          san,
-          time_taken: timeTaken
+          san
         })
         .select()
         .single()

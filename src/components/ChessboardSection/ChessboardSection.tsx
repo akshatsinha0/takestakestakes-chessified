@@ -197,16 +197,13 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
               })
               .eq('id', activeGame.id);
 
-            // Save move
+            // Save move - using minimal fields to avoid schema issues
             const { error: moveInsertError } = await supabase
               .from('moves')
               .insert({
                 game_id: activeGame.id,
                 move_number: moves.length + 1,
-                player_color: playerColor,
-                san: move.san,
-                time_taken: 0,
-                created_at: new Date().toISOString()
+                san: move.san
               });
             
             if (moveInsertError) {

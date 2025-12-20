@@ -28,9 +28,7 @@ const playerColor=game.current_turn;
 const{error:moveError}=await supabase.from('moves').insert([{
 game_id:gameId,
 move_number:moveNumber,
-player_color:playerColor,
-san:move,
-time_taken:0
+san:move
 }]);
 if(moveError)throw moveError;
 const nextTurn=playerColor==='white'?'black':'white';
