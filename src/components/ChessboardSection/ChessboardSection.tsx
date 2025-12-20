@@ -630,21 +630,42 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                 onPieceDrop={onDrop}
                 boardOrientation={isBoardFlipped ? 'black' : 'white'}
                 isDraggablePiece={({ piece }) => {
+                  console.log('isDraggablePiece check:', { 
+                    piece, 
+                    playYourselfMode, 
+                    activeGame: !!activeGame,
+                    playerColor,
+                    currentTurn: game.turn()
+                  });
+                  
                   // In play yourself mode, allow all pieces
-                  if (playYourselfMode) return true;
+                  if (playYourselfMode) {
+                    console.log('Play yourself mode - allowing drag');
+                    return true;
+                  }
                   
                   // In multiplayer, only allow dragging your own pieces on your turn
-                  if (!activeGame) return true; // Allow moves if no active game yet
+                  if (!activeGame) {
+                    console.log('No active game - allowing drag');
+                    return true;
+                  }
                   
                   const currentTurn = game.turn();
                   const isMyTurn = (currentTurn === 'w' && playerColor === 'white') || 
                                    (currentTurn === 'b' && playerColor === 'black');
                   
-                  if (!isMyTurn) return false;
+                  console.log('Turn check in isDraggable:', { currentTurn, playerColor, isMyTurn });
+                  
+                  if (!isMyTurn) {
+                    console.log('Not my turn - blocking drag');
+                    return false;
+                  }
                   
                   // Check if piece belongs to current player
                   const pieceColor = piece[0]; // 'w' or 'b'
-                  return pieceColor === currentTurn;
+                  const canDrag = pieceColor === currentTurn;
+                  console.log('Piece color check:', { pieceColor, currentTurn, canDrag });
+                  return canDrag;
                 }}
                 customBoardStyle={{
                   borderRadius: '8px',
