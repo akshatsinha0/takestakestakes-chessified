@@ -749,11 +749,26 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                   const isMyTurn = (currentTurn === 'w' && playerColor === 'white') || 
                                    (currentTurn === 'b' && playerColor === 'black');
                   
-                  if (!isMyTurn) return false;
+                  console.log('isDraggablePiece check:', { 
+                    piece, 
+                    currentTurn, 
+                    playerColor, 
+                    isMyTurn,
+                    pieceColor: piece[0]
+                  });
+                  
+                  if (!isMyTurn) {
+                    console.log('Not your turn, piece not draggable');
+                    return false;
+                  }
                   
                   // Check if piece belongs to current player
                   const pieceColor = piece[0]; // 'w' or 'b'
-                  return pieceColor === currentTurn;
+                  const isDraggable = pieceColor === currentTurn;
+                  
+                  console.log('Piece draggable?', isDraggable, { pieceColor, currentTurn });
+                  
+                  return isDraggable;
                 }}
                 customBoardStyle={{
                   borderRadius: '8px',
