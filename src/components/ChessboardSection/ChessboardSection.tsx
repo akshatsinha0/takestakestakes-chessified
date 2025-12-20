@@ -14,6 +14,7 @@ import {
   faPlus as faAdd, faHistory
 } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from '../../lib/supabase';
+import { toast } from 'react-toastify';
 
 interface ChessMove {
   san: string;
@@ -265,6 +266,39 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
       });
     } catch (error) {
       console.error('Failed to offer draw:', error);
+    }
+  };
+
+  // Handle abort game
+  const handleAbortGame = async () => {
+    if (!activeGame || !user) return;
+    
+    if (!confirm('Are you sure you want to abort this game?')) return;
+    
+    try {
+      await supabase
+        .from('games')
+        .update({
+          status: 'abandoned',
+          result: 'abandoned',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', activeGame.id);
+      
+      // Reset board state
+      setActiveGame(null);
+      setOpponentProfile(null);
+      setGame(new Chess());
+      setMoves([]);
+      setGameStatus('');
+      setWhiteTime(600);
+      setBlackTime(600);
+      setIsTheaterMode(false);
+      
+      toast.info('Game aborted');
+    } catch (error) {
+      console.error('Failed to abort game:', error);
+      toast.error('Failed to abort game');
     }
   };
   
@@ -813,20 +847,27 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
               
               {/* Draw and Resign buttons for multiplayer games */}
               {activeGame && !playYourselfMode && !gameStatus && (
-                <div className="game-actions" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', justifyContent: 'center' }}>
+                <div className="game-actions" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <button 
                     className="review-btn" 
                     onClick={handleOfferDraw}
-                    style={{ background: '#4a5568', flex: 1 }}
+                    style={{ background: '#4a5568', flex: '1 1 45%' }}
                   >
                     Offer Draw
                   </button>
                   <button 
                     className="review-btn" 
                     onClick={handleResign}
-                    style={{ background: '#e53e3e', flex: 1 }}
+                    style={{ background: '#e53e3e', flex: '1 1 45%' }}
                   >
                     Resign
+                  </button>
+                  <button 
+                    className="review-btn" 
+                    onClick={handleAbortGame}
+                    style={{ background: '#f59e0b', flex: '1 1 100%' }}
+                  >
+                    Abort Game
                   </button>
                 </div>
               )}
