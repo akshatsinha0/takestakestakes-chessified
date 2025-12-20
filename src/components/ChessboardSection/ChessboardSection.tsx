@@ -139,7 +139,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
   };
 
   const onDrop = (sourceSquare: string, targetSquare: string) => {
-    console.log('onDrop called:', { 
+    console.log('=== onDrop CALLED ===', { 
       sourceSquare, 
       targetSquare, 
       activeGame: !!activeGame, 
@@ -148,71 +148,81 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
       currentTurn: game.turn()
     });
 
-    // Check if it's multiplayer mode and if it's player's turn
-    if (activeGame && !playYourselfMode) {
-      const currentTurn = game.turn(); // 'w' or 'b'
-      const isPlayerTurn = (currentTurn === 'w' && playerColor === 'white') || 
-                           (currentTurn === 'b' && playerColor === 'black');
-      
-      console.log('Turn check:', { currentTurn, playerColor, isPlayerTurn, activeGame: activeGame.id });
-      
-      if (!isPlayerTurn) {
-        console.log('Not your turn!');
-        return false; // Not player's turn
+    try {
+      // Check if it's multiplayer mode and if it's player's turn
+      if (activeGame && !playYourselfMode) {
+        const currentTurn = game.turn(); // 'w' or 'b'
+        const isPlayerTurn = (currentTurn === 'w' && playerColor === 'white') || 
+                             (currentTurn === 'b' && playerColor === 'black');
+        
+        console.log('Turn check:', { currentTurn, playerColor, isPlayerTurn, activeGame: activeGame.id });
+        
+        if (!isPlayerTurn) {
+          console.log('Not your turn!');
+          return false; // Not player's turn
+        }
       }
-    }
 
-    const move = makeAMove({
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: 'q'
-    });
+      const move = makeAMove({
+        from: sourceSquare,
+        to: targetSquare,
+        promotion: 'q'
+      });
 
-    console.log('Move result:', move);
+      console.log('Move result:', move);
 
-    if (move === null) {
-      console.log('Invalid move!');
+      if (move === null) {
+        console.log('Invalid move!');
+        return false;
+      }
+
+      // Save move to database for multiplayer games (async, don't wait)
+      if (activeGame && !playYourselfMode) {
+        (async () => {
+          try {
+            const newFen = game.fen();
+            const newTurn = game.turn();
+            
+            console.log('Saving move to database...', { gameId: activeGame.id, newFen });
+            
+            // Update game board state and times
+            await supabase
+              .from('games')
+              .update({
+                board_state: newFen,
+                current_turn: newTurn === 'w' ? 'white' : 'black',
+                white_time_remaining: whiteTime,
+                black_time_remaining: blackTime,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', activeGame.id);
+
+            // Save move
+            await supabase
+              .from('moves')
+              .insert({
+                game_id: activeGame.id,
+                move_number: moves.length + 1,
+                player_color: playerColor,
+                san: move.san,
+                fen: newFen,
+                time_taken: 0,
+                created_at: new Date().toISOString()
+              });
+              
+            console.log('Move saved successfully!');
+          } catch (error) {
+            console.error('Failed to save move:', error);
+          }
+        })();
+      }
+
+      console.log('onDrop returning true');
+      return true;
+    } catch (error) {
+      console.error('Error in onDrop:', error);
       return false;
     }
-
-    // Save move to database for multiplayer games (async, don't wait)
-    if (activeGame && !playYourselfMode) {
-      (async () => {
-        try {
-          const newFen = game.fen();
-          const newTurn = game.turn();
-          
-          // Update game board state and times
-          await supabase
-            .from('games')
-            .update({
-              board_state: newFen,
-              current_turn: newTurn === 'w' ? 'white' : 'black',
-              white_time_remaining: whiteTime,
-              black_time_remaining: blackTime,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', activeGame.id);
-
-          // Save move
-          await supabase
-            .from('moves')
-            .insert({
-              game_id: activeGame.id,
-              move_number: moves.length + 1,
-              player_color: playerColor,
-              san: move.san,
-              fen: newFen,
-              time_taken: 0,
-              created_at: new Date().toISOString()
-            });
-        } catch (error) {
-          console.error('Failed to save move:', error);
-        }
-      })();
-    }
-
-    return true;
   };
 
   // Handle resign
@@ -665,6 +675,12 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                 id="PlayChess"
                 position={game.fen()}
                 onPieceDrop={onDrop}
+                onPieceDragBegin={(piece, sourceSquare) => {
+                  console.log('=== DRAG BEGIN ===', { piece, sourceSquare });
+                }}
+                onPieceDragEnd={(piece, sourceSquare) => {
+                  console.log('=== DRAG END ===', { piece, sourceSquare });
+                }}
                 boardOrientation={isBoardFlipped ? 'black' : 'white'}
                 isDraggablePiece={({ piece }) => {
                   console.log('isDraggablePiece check:', { 
