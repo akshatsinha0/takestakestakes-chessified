@@ -521,7 +521,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
     return () => {
       channel.unsubscribe();
     };
-  }, [user, playYourselfMode, gameId, activeGame]);
+  }, [user, playYourselfMode, gameId]); // Removed activeGame from dependencies to prevent infinite loop
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -683,13 +683,8 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                 }}
                 boardOrientation={isBoardFlipped ? 'black' : 'white'}
                 isDraggablePiece={({ piece }) => {
-                  // Reduce logging - only log once per piece type
-                  // console.log('isDraggablePiece check:', { piece, playerColor, currentTurn: game.turn() });
-                  
                   // In play yourself mode, allow all pieces
-                  if (playYourselfMode) {
-                    return true;
-                  }
+                  if (playYourselfMode) return true;
                   
                   // In multiplayer, only allow dragging your own pieces on your turn
                   if (!activeGame) return true; // Allow moves if no active game yet
@@ -698,18 +693,11 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                   const isMyTurn = (currentTurn === 'w' && playerColor === 'white') || 
                                    (currentTurn === 'b' && playerColor === 'black');
                   
-                  if (!isMyTurn) {
-                    // Only log once when blocking
-                    if (piece[0] === currentTurn) {
-                      console.log('Not my turn - blocking drag');
-                    }
-                    return false;
-                  }
+                  if (!isMyTurn) return false;
                   
                   // Check if piece belongs to current player
                   const pieceColor = piece[0]; // 'w' or 'b'
-                  const canDrag = pieceColor === currentTurn;
-                  return canDrag;
+                  return pieceColor === currentTurn;
                 }}
                 customBoardStyle={{
                   borderRadius: '8px',

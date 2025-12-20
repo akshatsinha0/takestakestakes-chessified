@@ -70,9 +70,10 @@ position:absolute;
 top:0;
 left:0;
 right:0;
-height:4px;
-background:linear-gradient(90deg,#d48d3b,#e5a356,#d48d3b);
+height:0px;
+background:transparent;
 border-radius:24px 24px 0 0;
+display:none;
 }
 
 .challenge-header{
