@@ -504,6 +504,34 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
         if (activeGame && updatedGame.id === activeGame.id) {
           setActiveGame(updatedGame);
           
+          // Check if game was abandoned/aborted by opponent
+          if (updatedGame.status === 'abandoned' || updatedGame.status === 'completed') {
+            if (updatedGame.status === 'abandoned') {
+              toast.info('Your opponent has aborted the game');
+            } else if (updatedGame.result === 'resignation') {
+              const resignedPlayer = updatedGame.winner === user.id ? 'opponent' : 'you';
+              if (resignedPlayer === 'opponent') {
+                toast.success('Your opponent resigned. You win!');
+              }
+            } else if (updatedGame.result === 'timeout') {
+              toast.info('Game ended by timeout');
+            }
+            
+            // Reset board after a short delay
+            setTimeout(() => {
+              setActiveGame(null);
+              setOpponentProfile(null);
+              setGame(new Chess());
+              setMoves([]);
+              setGameStatus('');
+              setWhiteTime(600);
+              setBlackTime(600);
+              setIsTheaterMode(false);
+            }, 3000);
+            
+            return;
+          }
+          
           // Update board state
           if (updatedGame.board_state) {
             const newGame = new Chess(updatedGame.board_state);
