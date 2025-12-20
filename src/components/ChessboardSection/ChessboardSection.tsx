@@ -44,6 +44,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
   const [activeGame, setActiveGame] = useState<any>(null);
   const [opponentProfile, setOpponentProfile] = useState<any>(null);
   const [playerColor, setPlayerColor] = useState<'white' | 'black'>('white');
+  const activeGameIdRef = useRef<string | null>(null); // Track active game ID for subscriptions
   
   // Timer state
   const [whiteTime, setWhiteTime] = useState<number>(600); // 10 minutes in seconds
@@ -163,30 +164,40 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
         }
       }
 
-      const move = makeAMove({
+      // Create a temporary game copy to get the new FEN immediately
+      const tempGame = new Chess(game.fen());
+      const move = tempGame.move({
         from: sourceSquare,
         to: targetSquare,
         promotion: 'q'
       });
-
-      console.log('Move result:', move);
 
       if (move === null) {
         console.log('Invalid move!');
         return false;
       }
 
+      // Get the new FEN and turn BEFORE state updates
+      const newFen = tempGame.fen();
+      const newTurn = tempGame.turn();
+
+      console.log('Move result:', move, 'New FEN:', newFen);
+
+      // Now apply the move to the actual game state
+      makeAMove({
+        from: sourceSquare,
+        to: targetSquare,
+        promotion: 'q'
+      });
+
       // Save move to database for multiplayer games (async, don't wait)
       if (activeGame && !playYourselfMode) {
         (async () => {
           try {
-            const newFen = game.fen();
-            const newTurn = game.turn();
-            
             console.log('Saving move to database...', { gameId: activeGame.id, newFen });
             
             // Update game board state and times
-            await supabase
+            const { error: updateError } = await supabase
               .from('games')
               .update({
                 board_state: newFen,
@@ -196,6 +207,11 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                 updated_at: new Date().toISOString()
               })
               .eq('id', activeGame.id);
+
+            if (updateError) {
+              console.error('Game update error:', updateError);
+              return;
+            }
 
             // Save move - using minimal fields to avoid schema issues
             const { error: moveInsertError } = await supabase
@@ -209,7 +225,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
             if (moveInsertError) {
               console.error('Move insert error:', moveInsertError);
             } else {
-              console.log('Move saved successfully!');
+              console.log('Move saved successfully! FEN:', newFen);
             }
           } catch (error) {
             console.error('Failed to save move:', error);
@@ -297,6 +313,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
       
       // Reset board state
       setActiveGame(null);
+      activeGameIdRef.current = null;
       setOpponentProfile(null);
       setGame(new Chess());
       setMoves([]);
@@ -416,6 +433,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
         if (games && games.length > 0) {
           const gameData = games[0];
           setActiveGame(gameData);
+          activeGameIdRef.current = gameData.id; // Update ref
           
           // Set player color
           const color = gameData.white_player_id === user.id ? 'white' : 'black';
@@ -430,7 +448,8 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
             whitePlayer: gameData.white_player_id,
             blackPlayer: gameData.black_player_id,
             currentUser: user.id,
-            boardFlipped: color === 'black'
+            boardFlipped: color === 'black',
+            boardState: gameData.board_state
           });
           
           // Load opponent profile
@@ -497,8 +516,16 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
         table: 'games'
       }, (payload) => {
         const updatedGame = payload.new as any;
-        // Only update if it's the active game
-        if (activeGame && updatedGame.id === activeGame.id) {
+        console.log('=== GAME UPDATE RECEIVED ===', { 
+          updatedGameId: updatedGame.id, 
+          activeGameId: activeGameIdRef.current,
+          boardState: updatedGame.board_state,
+          currentTurn: updatedGame.current_turn
+        });
+        
+        // Only update if it's the active game (use ref for current value)
+        if (activeGameIdRef.current && updatedGame.id === activeGameIdRef.current) {
+          console.log('Updating active game with new board state');
           setActiveGame(updatedGame);
           
           // Check if game was abandoned/aborted by opponent
@@ -517,6 +544,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
             // Reset board after a short delay
             setTimeout(() => {
               setActiveGame(null);
+              activeGameIdRef.current = null;
               setOpponentProfile(null);
               setGame(new Chess());
               setMoves([]);
@@ -529,8 +557,9 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
             return;
           }
           
-          // Update board state
+          // Update board state - THIS IS CRITICAL FOR REAL-TIME SYNC
           if (updatedGame.board_state) {
+            console.log('Setting new board state:', updatedGame.board_state);
             const newGame = new Chess(updatedGame.board_state);
             setGame(newGame);
           }
