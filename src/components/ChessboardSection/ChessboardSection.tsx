@@ -376,6 +376,8 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
           // Set player color
           const color = gameData.white_player_id === user.id ? 'white' : 'black';
           setPlayerColor(color);
+          // White should see board from white's perspective (not flipped)
+          // Black should see board from black's perspective (flipped)
           setIsBoardFlipped(color === 'black');
           
           console.log('Game loaded:', { 
@@ -383,7 +385,8 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
             playerColor: color, 
             whitePlayer: gameData.white_player_id,
             blackPlayer: gameData.black_player_id,
-            currentUser: user.id
+            currentUser: user.id,
+            boardFlipped: color === 'black'
           });
           
           // Load opponent profile
@@ -635,7 +638,8 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                     playYourselfMode, 
                     activeGame: !!activeGame,
                     playerColor,
-                    currentTurn: game.turn()
+                    currentTurn: game.turn(),
+                    boardFlipped: isBoardFlipped
                   });
                   
                   // In play yourself mode, allow all pieces
