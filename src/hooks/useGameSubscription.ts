@@ -114,7 +114,6 @@ export const useGameSubscription = (gameId: string | null) => {
           move_number: moveNumber,
           player_color: playerColor,
           san,
-          fen,
           time_taken: timeTaken
         })
         .select()

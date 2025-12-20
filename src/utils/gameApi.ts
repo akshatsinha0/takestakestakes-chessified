@@ -30,7 +30,6 @@ game_id:gameId,
 move_number:moveNumber,
 player_color:playerColor,
 san:move,
-fen:newFen,
 time_taken:0
 }]);
 if(moveError)throw moveError;

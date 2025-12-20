@@ -581,7 +581,6 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
           move_number: i + 1,
           player_color: move.color === 'w' ? 'white' : 'black',
           san: move.san,
-          fen: '',
           time_taken: move.time,
           created_at: new Date().toISOString()
         }));
