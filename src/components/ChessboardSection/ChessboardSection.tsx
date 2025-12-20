@@ -198,7 +198,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
               .eq('id', activeGame.id);
 
             // Save move
-            await supabase
+            const { error: moveInsertError } = await supabase
               .from('moves')
               .insert({
                 game_id: activeGame.id,
@@ -209,8 +209,12 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                 time_taken: 0,
                 created_at: new Date().toISOString()
               });
-              
-            console.log('Move saved successfully!');
+            
+            if (moveInsertError) {
+              console.error('Move insert error:', moveInsertError);
+            } else {
+              console.log('Move saved successfully!');
+            }
           } catch (error) {
             console.error('Failed to save move:', error);
           }
