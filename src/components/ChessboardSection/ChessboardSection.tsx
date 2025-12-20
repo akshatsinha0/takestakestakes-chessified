@@ -50,6 +50,11 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
   const [whiteTime, setWhiteTime] = useState<number>(600); // 10 minutes in seconds
   const [blackTime, setBlackTime] = useState<number>(600);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTimerUpdateRef = useRef<number>(Date.now()); // Track last DB update
+  
+  // Draw offer state
+  const [drawOffered, setDrawOffered] = useState(false);
+  const [drawOfferFrom, setDrawOfferFrom] = useState<string | null>(null);
 
   const [moves, setMoves] = useState<ChessMove[]>([]);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
@@ -245,10 +250,14 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
   const handleResign = async () => {
     if (!activeGame || !user) return;
     
+    if (!confirm('Are you sure you want to resign? This will end the game and you will lose.')) {
+      return;
+    }
+    
     try {
       const winner = playerColor === 'white' ? activeGame.black_player_id : activeGame.white_player_id;
       
-      await supabase
+      const { error } = await supabase
         .from('games')
         .update({
           status: 'completed',
@@ -258,6 +267,14 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
         })
         .eq('id', activeGame.id);
       
+      if (error) {
+        console.error('Resign error:', error);
+        toast.error('Failed to resign');
+        return;
+      }
+      
+      toast.info('You resigned. Game over.');
+      
       setGameStatus('GAME OVER');
       setGameResult({
         winner: playerColor === 'white' ? 'black' : 'white',
@@ -266,6 +283,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
       });
     } catch (error) {
       console.error('Failed to resign:', error);
+      toast.error('Failed to resign');
     }
   };
 
@@ -273,25 +291,84 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
   const handleOfferDraw = async () => {
     if (!activeGame || !user) return;
     
-    // For now, just accept draw immediately (you can add draw offer logic later)
     try {
-      await supabase
+      // Send draw offer by updating game metadata
+      const { error } = await supabase
         .from('games')
         .update({
-          status: 'completed',
-          result: 'draw',
+          draw_offered_by: user.id,
           updated_at: new Date().toISOString()
         })
         .eq('id', activeGame.id);
       
-      setGameStatus('GAME OVER');
-      setGameResult({
-        winner: null,
-        method: 'draw',
-        time: activeGame.time_control
-      });
+      if (error) {
+        console.error('Draw offer error:', error);
+        toast.error('Failed to offer draw');
+        return;
+      }
+      
+      setDrawOffered(true);
+      setDrawOfferFrom(user.id);
+      toast.info('Draw offer sent to opponent');
     } catch (error) {
       console.error('Failed to offer draw:', error);
+      toast.error('Failed to offer draw');
+    }
+  };
+  
+  // Handle draw response
+  const handleDrawResponse = async (accept: boolean) => {
+    if (!activeGame || !user) return;
+    
+    try {
+      if (accept) {
+        // Accept draw - end game
+        const { error } = await supabase
+          .from('games')
+          .update({
+            status: 'completed',
+            result: 'draw',
+            draw_offered_by: null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', activeGame.id);
+        
+        if (error) {
+          console.error('Accept draw error:', error);
+          toast.error('Failed to accept draw');
+          return;
+        }
+        
+        toast.success('Draw accepted. Game over.');
+        
+        setGameStatus('GAME OVER');
+        setGameResult({
+          winner: null,
+          method: 'draw by agreement',
+          time: activeGame.time_control
+        });
+      } else {
+        // Decline draw
+        const { error } = await supabase
+          .from('games')
+          .update({
+            draw_offered_by: null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', activeGame.id);
+        
+        if (error) {
+          console.error('Decline draw error:', error);
+          return;
+        }
+        
+        toast.info('Draw offer declined');
+      }
+      
+      setDrawOffered(false);
+      setDrawOfferFrom(null);
+    } catch (error) {
+      console.error('Failed to respond to draw:', error);
     }
   };
 
@@ -352,26 +429,61 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
     }
 
     // Start timer
-    timerIntervalRef.current = setInterval(() => {
+    timerIntervalRef.current = setInterval(async () => {
       const currentTurn = game.turn();
+      const now = Date.now();
       
       if (currentTurn === 'w') {
         setWhiteTime(prev => {
-          if (prev <= 0) {
-            // White ran out of time
+          const newTime = prev <= 0 ? 0 : prev - 1;
+          
+          if (newTime <= 0) {
             handleTimeOut('white');
-            return 0;
           }
-          return prev - 1;
+          
+          // Persist to database every 5 seconds
+          if (now - lastTimerUpdateRef.current >= 5000) {
+            lastTimerUpdateRef.current = now;
+            supabase
+              .from('games')
+              .update({
+                white_time_remaining: newTime,
+                black_time_remaining: blackTime,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', activeGame.id)
+              .then(({ error }) => {
+                if (error) console.error('Timer update error:', error);
+              });
+          }
+          
+          return newTime;
         });
       } else {
         setBlackTime(prev => {
-          if (prev <= 0) {
-            // Black ran out of time
+          const newTime = prev <= 0 ? 0 : prev - 1;
+          
+          if (newTime <= 0) {
             handleTimeOut('black');
-            return 0;
           }
-          return prev - 1;
+          
+          // Persist to database every 5 seconds
+          if (now - lastTimerUpdateRef.current >= 5000) {
+            lastTimerUpdateRef.current = now;
+            supabase
+              .from('games')
+              .update({
+                white_time_remaining: whiteTime,
+                black_time_remaining: newTime,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', activeGame.id)
+              .then(({ error }) => {
+                if (error) console.error('Timer update error:', error);
+              });
+          }
+          
+          return newTime;
         });
       }
     }, 1000);
@@ -381,7 +493,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
         clearInterval(timerIntervalRef.current);
       }
     };
-  }, [activeGame, playYourselfMode, gameStatus, game]);
+  }, [activeGame, playYourselfMode, gameStatus, game, whiteTime, blackTime]);
 
   const handleTimeOut = async (color: 'white' | 'black') => {
     if (!activeGame) return;
@@ -562,6 +674,16 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
             console.log('Setting new board state:', updatedGame.board_state);
             const newGame = new Chess(updatedGame.board_state);
             setGame(newGame);
+          }
+          
+          // Check for draw offer
+          if (updatedGame.draw_offered_by && updatedGame.draw_offered_by !== user.id) {
+            setDrawOffered(true);
+            setDrawOfferFrom(updatedGame.draw_offered_by);
+            toast.info('Your opponent offered a draw', { autoClose: false });
+          } else if (!updatedGame.draw_offered_by) {
+            setDrawOffered(false);
+            setDrawOfferFrom(null);
           }
           
           // Update timer values from opponent's move
@@ -912,29 +1034,70 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
               
               {/* Draw and Resign buttons for multiplayer games */}
               {activeGame && !playYourselfMode && !gameStatus && (
-                <div className="game-actions" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <button 
-                    className="review-btn" 
-                    onClick={handleOfferDraw}
-                    style={{ background: '#4a5568', flex: '1 1 45%' }}
-                  >
-                    Offer Draw
-                  </button>
-                  <button 
-                    className="review-btn" 
-                    onClick={handleResign}
-                    style={{ background: '#e53e3e', flex: '1 1 45%' }}
-                  >
-                    Resign
-                  </button>
-                  <button 
-                    className="review-btn" 
-                    onClick={handleAbortGame}
-                    style={{ background: '#f59e0b', flex: '1 1 100%' }}
-                  >
-                    Abort Game
-                  </button>
-                </div>
+                <>
+                  {/* Draw offer notification */}
+                  {drawOffered && drawOfferFrom && drawOfferFrom !== user?.id && (
+                    <div style={{
+                      background: 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
+                      border: '2px solid #e5a356',
+                      borderRadius: '8px',
+                      padding: '1rem',
+                      marginTop: '1rem',
+                      textAlign: 'center',
+                      boxShadow: '0 4px 20px rgba(229, 163, 86, 0.3)'
+                    }}>
+                      <div style={{ color: '#f5f5f5', marginBottom: '0.75rem', fontSize: '1rem', fontWeight: '600' }}>
+                        Your opponent offered a draw
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                        <button 
+                          className="review-btn" 
+                          onClick={() => handleDrawResponse(true)}
+                          style={{ background: '#48bb78', flex: '1' }}
+                        >
+                          Accept
+                        </button>
+                        <button 
+                          className="review-btn" 
+                          onClick={() => handleDrawResponse(false)}
+                          style={{ background: '#e53e3e', flex: '1' }}
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="game-actions" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <button 
+                      className="review-btn" 
+                      onClick={handleOfferDraw}
+                      disabled={drawOffered && drawOfferFrom === user?.id}
+                      style={{ 
+                        background: drawOffered && drawOfferFrom === user?.id ? '#2d3748' : '#4a5568', 
+                        flex: '1 1 45%',
+                        opacity: drawOffered && drawOfferFrom === user?.id ? 0.6 : 1,
+                        cursor: drawOffered && drawOfferFrom === user?.id ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      {drawOffered && drawOfferFrom === user?.id ? 'Draw Offered' : 'Offer Draw'}
+                    </button>
+                    <button 
+                      className="review-btn" 
+                      onClick={handleResign}
+                      style={{ background: '#e53e3e', flex: '1 1 45%' }}
+                    >
+                      Resign
+                    </button>
+                    <button 
+                      className="review-btn" 
+                      onClick={handleAbortGame}
+                      style={{ background: '#f59e0b', flex: '1 1 100%' }}
+                    >
+                      Abort Game
+                    </button>
+                  </div>
+                </>
               )}
               
               <div className="move-controls">
