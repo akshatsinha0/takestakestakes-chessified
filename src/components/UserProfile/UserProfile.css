@@ -4,6 +4,8 @@
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
@@ -11,6 +13,8 @@
   z-index: 10000;
   backdrop-filter: blur(8px);
   animation: fadeIn 0.3s ease-out;
+  padding: 20px;
+  overflow-y: auto;
 }
 
 .user-profile-modal {
@@ -19,12 +23,13 @@
   border-radius: 16px;
   padding: 2rem;
   max-width: 600px;
-  width: calc(100vw - 40px);
-  max-height: 90vh;
+  width: 100%;
+  max-height: calc(100vh - 80px);
   overflow-y: auto;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
   position: relative;
   animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin: auto;
 }
 
 .close-btn {
