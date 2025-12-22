@@ -772,7 +772,11 @@ const Header: React.FC = () => {
             )}
           </div>
           
-          <IconButton aria-label="settings" className="settings-icon">
+          <IconButton 
+            aria-label="settings" 
+            className="settings-icon"
+            onClick={() => navigate('/settings')}
+          >
             <Settings />
           </IconButton>
         </div>
