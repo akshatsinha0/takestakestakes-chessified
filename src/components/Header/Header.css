@@ -1193,8 +1193,9 @@
   position: absolute;
   left: 0;
   top: 110%;
-  min-width: 260px;
-  max-width: 320px;
+  min-width: 320px;
+  max-width: 500px;
+  width: max-content;
   background: var(--primary);
   border-radius: 14px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.25);
@@ -1230,6 +1231,8 @@
   border-radius: 10px;
   transition: background 0.18s;
   cursor: pointer;
+  min-width: 0;
+  flex-wrap: nowrap;
 }
 .user-list-item:hover {
   background: var(--primary-light);
@@ -1273,11 +1276,16 @@
   flex-direction: column;
   justify-content: center;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 .user-list-username {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .user-list-rating {
   font-size: 0.85rem;
@@ -1450,5 +1458,51 @@
     padding: 1rem;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+
+/* Responsive fixes for user list */
+@media (max-width: 768px) {
+  .user-list-dropdown {
+    min-width: 280px;
+    max-width: calc(100vw - 40px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .user-list-item {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .user-list-actions {
+    width: 100%;
+    justify-content: stretch;
+    margin-top: 0.5rem;
+  }
+  
+  .view-profile-btn,
+  .challenge-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-list-dropdown {
+    min-width: 260px;
+  }
+  
+  .user-list-actions {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  
+  .view-profile-btn,
+  .challenge-btn {
+    width: 100%;
   }
 }
