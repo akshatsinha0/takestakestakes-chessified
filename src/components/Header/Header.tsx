@@ -218,7 +218,13 @@ const Header: React.FC = () => {
     <header className="header">
       <div className="header-container">
         <div className="header-left">
-          <div className="user-list-trigger" onClick={handleUserDropdown} tabIndex={0} style={{ marginRight: '1.2rem', position: 'relative' }}>
+          <div 
+            className="user-list-trigger" 
+            onClick={handleUserDropdown} 
+            tabIndex={0} 
+            aria-expanded={userDropdownOpen}
+            style={{ marginRight: '1.2rem', position: 'relative' }}
+          >
             <span className="user-list-icon">👥</span>
             <span className="user-list-label">Users</span>
             <span className="dropdown-arrow">▼</span>

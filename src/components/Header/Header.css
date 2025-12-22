@@ -916,7 +916,8 @@
   font-size: 1rem;
   margin-left: 0.3rem;
   color: rgba(255, 255, 255, 0.7);
-  transition: transform 0.2s;
+  transition: transform 0.3s ease-in-out;
+  display: inline-block;
 }
 
 .user-list-trigger[aria-expanded="true"] .dropdown-arrow {
@@ -1184,7 +1185,8 @@
   font-size: 1rem;
   margin-left: 0.3rem;
   color: var(--accent);
-  transition: transform 0.2s;
+  transition: transform 0.3s ease-in-out;
+  display: inline-block;
 }
 .user-list-trigger[aria-expanded="true"] .dropdown-arrow {
   transform: rotate(180deg);
