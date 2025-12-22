@@ -200,6 +200,43 @@ const Header: React.FC = () => {
     }
   };
 
+  // Handle accepting a friend request from notification
+  const handleAcceptFriendRequest = async (notification: any) => {
+    const friendRequest = notification.data?.friendRequest;
+    if (!friendRequest || !user) return;
+
+    try {
+      await supabase
+        .from('friend_requests')
+        .update({ status: 'accepted' })
+        .eq('id', friendRequest.id);
+
+      removeNotification(notification.id);
+      toast.success('Friend request accepted!');
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      toast.error('Failed to accept friend request');
+    }
+  };
+
+  // Handle declining a friend request from notification
+  const handleDeclineFriendRequest = async (notification: any) => {
+    const friendRequest = notification.data?.friendRequest;
+    if (!friendRequest) return;
+
+    try {
+      await supabase
+        .from('friend_requests')
+        .update({ status: 'rejected' })
+        .eq('id', friendRequest.id);
+
+      removeNotification(notification.id);
+      toast.info('Friend request declined');
+    } catch (error) {
+      console.error('Error declining friend request:', error);
+    }
+  };
+
   // Format time ago
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -668,6 +705,48 @@ const Header: React.FC = () => {
                             </button>
                             <button
                               onClick={() => handleDeclineChallenge(notification)}
+                              style={{
+                                flex: 1,
+                                padding: '0.6rem',
+                                background: 'rgba(229, 62, 62, 0.2)',
+                                color: '#fc8181',
+                                border: '1px solid rgba(229, 62, 62, 0.4)',
+                                borderRadius: '6px',
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              ✕ Decline
+                            </button>
+                          </div>
+                        )}
+                        {notification.type === 'friend_request' && (
+                          <div style={{
+                            display: 'flex',
+                            gap: '0.5rem',
+                            marginTop: '0.5rem'
+                          }}>
+                            <button
+                              onClick={() => handleAcceptFriendRequest(notification)}
+                              style={{
+                                flex: 1,
+                                padding: '0.6rem',
+                                background: 'linear-gradient(135deg, #d48d3b 0%, #e5a356 100%)',
+                                color: '#0f1419',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              ✓ Accept
+                            </button>
+                            <button
+                              onClick={() => handleDeclineFriendRequest(notification)}
                               style={{
                                 flex: 1,
                                 padding: '0.6rem',

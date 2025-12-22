@@ -4,7 +4,7 @@ import { useSupabaseAuthContext } from '../context/SupabaseAuthContext';
 
 export interface Notification {
   id: string;
-  type: 'challenge' | 'game_result' | 'system';
+  type: 'challenge' | 'friend_request' | 'game_result' | 'system';
   title: string;
   message: string;
   data?: any;
@@ -18,7 +18,7 @@ export const useNotifications = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Fetch pending game invitations
+  // Fetch pending game invitations and friend requests
   const fetchNotifications = useCallback(async () => {
     if (!user) {
       setNotifications([]);
@@ -46,25 +46,38 @@ export const useNotifications = () => {
 
       if (error) {
         console.error('Error fetching invitations:', error);
-        setLoading(false);
-        return;
       }
 
-      // Get sender profiles
-      const senderIds = invitations?.map(inv => inv.from_user_id) || [];
+      // Fetch pending friend requests
+      const { data: friendRequests, error: frError } = await supabase
+        .from('friend_requests')
+        .select('id, sender_id, status, created_at')
+        .eq('receiver_id', user.id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (frError) {
+        console.error('Error fetching friend requests:', frError);
+      }
+
+      // Get sender profiles for both invitations and friend requests
+      const invitationSenderIds = invitations?.map(inv => inv.from_user_id) || [];
+      const friendRequestSenderIds = friendRequests?.map(fr => fr.sender_id) || [];
+      const allSenderIds = [...invitationSenderIds, ...friendRequestSenderIds];
+      
       let senderProfiles: any[] = [];
       
-      if (senderIds.length > 0) {
+      if (allSenderIds.length > 0) {
         const { data: profiles } = await supabase
           .from('profiles')
           .select('id, username, rating, avatar_url')
-          .in('id', senderIds);
+          .in('id', allSenderIds);
         
         senderProfiles = profiles || [];
       }
 
       // Convert invitations to notifications
-      const notifs: Notification[] = (invitations || []).map(inv => {
+      const invitationNotifs: Notification[] = (invitations || []).map(inv => {
         const sender = senderProfiles.find(p => p.id === inv.from_user_id);
         return {
           id: inv.id,
@@ -80,8 +93,30 @@ export const useNotifications = () => {
         };
       });
 
-      setNotifications(notifs);
-      setUnreadCount(notifs.length);
+      // Convert friend requests to notifications
+      const friendRequestNotifs: Notification[] = (friendRequests || []).map(fr => {
+        const sender = senderProfiles.find(p => p.id === fr.sender_id);
+        return {
+          id: fr.id,
+          type: 'friend_request' as const,
+          title: 'Friend Request',
+          message: `${sender?.username || 'Someone'} sent you a friend request`,
+          data: {
+            friendRequest: fr,
+            sender
+          },
+          read: false,
+          created_at: fr.created_at
+        };
+      });
+
+      // Combine and sort all notifications
+      const allNotifs = [...invitationNotifs, ...friendRequestNotifs].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      setNotifications(allNotifs);
+      setUnreadCount(allNotifs.length);
     } catch (error) {
       console.error('Error in fetchNotifications:', error);
     } finally {
@@ -114,7 +149,7 @@ export const useNotifications = () => {
     fetchNotifications();
   }, [fetchNotifications]);
 
-  // Subscribe to real-time updates for game invitations
+  // Subscribe to real-time updates for game invitations and friend requests
   useEffect(() => {
     if (!user) return;
 
@@ -167,6 +202,56 @@ export const useNotifications = () => {
         schema: 'public',
         table: 'game_invitations',
         filter: `to_user_id=eq.${user.id}`
+      }, (payload) => {
+        removeNotification(payload.old.id);
+      })
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'friend_requests',
+        filter: `receiver_id=eq.${user.id}`
+      }, async (payload) => {
+        console.log('New friend request received:', payload);
+        
+        // Fetch sender profile
+        const { data: sender } = await supabase
+          .from('profiles')
+          .select('id, username, rating, avatar_url')
+          .eq('id', payload.new.sender_id)
+          .single();
+
+        const newNotif: Notification = {
+          id: payload.new.id,
+          type: 'friend_request',
+          title: 'Friend Request',
+          message: `${sender?.username || 'Someone'} sent you a friend request`,
+          data: {
+            friendRequest: payload.new,
+            sender
+          },
+          read: false,
+          created_at: payload.new.created_at
+        };
+
+        setNotifications(prev => [newNotif, ...prev]);
+        setUnreadCount(prev => prev + 1);
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'friend_requests',
+        filter: `receiver_id=eq.${user.id}`
+      }, (payload) => {
+        // If friend request was accepted/rejected, remove it
+        if (payload.new.status !== 'pending') {
+          removeNotification(payload.new.id);
+        }
+      })
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'friend_requests',
+        filter: `receiver_id=eq.${user.id}`
       }, (payload) => {
         removeNotification(payload.old.id);
       })
