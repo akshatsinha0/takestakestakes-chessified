@@ -19,6 +19,7 @@ import GameHistory from '../GameHistory/GameHistory';
 import { useNotifications } from '../../hooks/useNotifications';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'react-toastify';
+import notiIcon from '../../assets/images/noti.png';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -487,7 +488,16 @@ const Header: React.FC = () => {
                     alignItems: 'center',
                     gap: '0.5rem'
                   }}>
-                    🔔 Notifications
+                    <img 
+                      src={notiIcon} 
+                      alt="Notifications" 
+                      style={{ 
+                        width: '20px', 
+                        height: '20px',
+                        objectFit: 'contain'
+                      }} 
+                    />
+                    Notifications
                     {unreadCount > 0 && (
                       <span style={{
                         background: '#e53e3e',
@@ -522,7 +532,18 @@ const Header: React.FC = () => {
                       textAlign: 'center',
                       color: 'rgba(255, 255, 255, 0.5)'
                     }}>
-                      <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🔕</div>
+                      <div style={{ marginBottom: '0.75rem' }}>
+                        <img 
+                          src={notiIcon} 
+                          alt="No notifications" 
+                          style={{ 
+                            width: '60px', 
+                            height: '60px',
+                            objectFit: 'contain',
+                            opacity: 0.5
+                          }} 
+                        />
+                      </div>
                       <div style={{ fontSize: '0.95rem' }}>No notifications</div>
                       <div style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>
                         Challenge someone to play!
@@ -571,9 +592,21 @@ const Header: React.FC = () => {
                               color: '#e5a356',
                               fontSize: '0.85rem',
                               fontWeight: '600',
-                              marginBottom: '0.2rem'
+                              marginBottom: '0.2rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.4rem'
                             }}>
-                              ⚔️ {notification.title}
+                              <img 
+                                src={notiIcon} 
+                                alt="Challenge" 
+                                style={{ 
+                                  width: '14px', 
+                                  height: '14px',
+                                  objectFit: 'contain'
+                                }} 
+                              />
+                              {notification.title}
                             </div>
                             <div style={{
                               color: '#f5f5f5',
