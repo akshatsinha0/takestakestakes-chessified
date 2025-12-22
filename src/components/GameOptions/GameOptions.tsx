@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import GameOption from './GameOption';
 import QuickMatch from '../QuickMatch/QuickMatch';
 import BotSelection from '../BotSelection/BotSelection';
+import FriendInvite from '../FriendInvite/FriendInvite';
 import './GameOptions.css';
 
 const TIME_FORMATS = [
@@ -47,6 +48,7 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any
   const [showQuickMatch, setShowQuickMatch] = useState(false);
   const [showCustom, setShowCustom] = useState(false);
   const [showBotSelection, setShowBotSelection] = useState(false);
+  const [showFriendInvite, setShowFriendInvite] = useState(false);
   const [customHour, setCustomHour] = useState(0);
   const [customMin, setCustomMin] = useState(10);
   const [customSec, setCustomSec] = useState(0);
@@ -55,6 +57,7 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any
   const handleOptionClick = (id: string) => {
     if (id === 'play-online') setShowTimeModal(true);
     else if (id === 'play-bots') setShowBotSelection(true);
+    else if (id === 'play-friend') setShowFriendInvite(true);
   };
 
   const handleTimeSelect = (label: string) => {
@@ -235,6 +238,16 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any
           onClose={() => setShowBotSelection(false)}
           onSelectBot={(bot, timeControl) => {
             if (onPlayBot) onPlayBot(bot, timeControl);
+          }}
+        />
+      )}
+      
+      {showFriendInvite && (
+        <FriendInvite
+          onClose={() => setShowFriendInvite(false)}
+          onGameCreated={(gameId) => {
+            console.log('Game created:', gameId);
+            setShowFriendInvite(false);
           }}
         />
       )}
