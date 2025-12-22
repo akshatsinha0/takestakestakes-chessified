@@ -12,12 +12,24 @@ import './Dashboard.css';
 const Dashboard: React.FC = () => {
   const { user } = useSupabaseAuthContext();
   const [playYourselfMode, setPlayYourselfMode] = useState(false);
+  const [playBotMode, setPlayBotMode] = useState(false);
+  const [selectedBot, setSelectedBot] = useState<any>(null);
   
   // Track user presence
   useUserPresence(user?.id);
 
   const handlePlayYourself = () => setPlayYourselfMode(true);
   const handleExitPlayYourself = () => setPlayYourselfMode(false);
+  
+  const handlePlayBot = (bot: any) => {
+    setSelectedBot(bot);
+    setPlayBotMode(true);
+  };
+  
+  const handleExitBotMode = () => {
+    setPlayBotMode(false);
+    setSelectedBot(null);
+  };
 
   return (
     <DashboardLayout>
@@ -28,8 +40,14 @@ const Dashboard: React.FC = () => {
         <ChessboardSection 
           playYourselfMode={playYourselfMode} 
           onExitPlayYourself={handleExitPlayYourself}
+          playBotMode={playBotMode}
+          selectedBot={selectedBot}
+          onExitBotMode={handleExitBotMode}
         />
-        <GameOptions onPlayYourself={handlePlayYourself} />
+        <GameOptions 
+          onPlayYourself={handlePlayYourself}
+          onPlayBot={handlePlayBot}
+        />
       </div>
     </DashboardLayout>
   );

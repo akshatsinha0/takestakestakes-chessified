@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import GameOption from './GameOption';
 import QuickMatch from '../QuickMatch/QuickMatch';
+import BotSelection from '../BotSelection/BotSelection';
 import './GameOptions.css';
 
 const TIME_FORMATS = [
@@ -41,10 +42,11 @@ const TIME_FORMATS = [
   },
 ];
 
-const GameOptions: React.FC<{ onPlayYourself?: () => void }> = ({ onPlayYourself }) => {
+const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any) => void }> = ({ onPlayYourself, onPlayBot }) => {
   const [showTimeModal, setShowTimeModal] = useState(false);
   const [showQuickMatch, setShowQuickMatch] = useState(false);
   const [showCustom, setShowCustom] = useState(false);
+  const [showBotSelection, setShowBotSelection] = useState(false);
   const [customHour, setCustomHour] = useState(0);
   const [customMin, setCustomMin] = useState(10);
   const [customSec, setCustomSec] = useState(0);
@@ -52,6 +54,7 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void }> = ({ onPlayYourself
 
   const handleOptionClick = (id: string) => {
     if (id === 'play-online') setShowTimeModal(true);
+    else if (id === 'play-bots') setShowBotSelection(true);
   };
 
   const handleTimeSelect = (label: string) => {
@@ -225,6 +228,15 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void }> = ({ onPlayYourself
           <QuickMatch />
           <button className="close-quick-match" onClick={() => setShowQuickMatch(false)}>Back to Options</button>
         </div>
+      )}
+      
+      {showBotSelection && (
+        <BotSelection
+          onClose={() => setShowBotSelection(false)}
+          onSelectBot={(bot) => {
+            if (onPlayBot) onPlayBot(bot);
+          }}
+        />
       )}
     </div>
   );

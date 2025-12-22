@@ -30,9 +30,19 @@ interface ChessboardSectionProps {
   playYourselfMode?: boolean;
   onExitPlayYourself?: () => void;
   gameId?: string;
+  playBotMode?: boolean;
+  selectedBot?: any;
+  onExitBotMode?: () => void;
 }
 
-const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode = false, onExitPlayYourself, gameId }) => {
+const ChessboardSection: React.FC<ChessboardSectionProps> = ({ 
+  playYourselfMode = false, 
+  onExitPlayYourself, 
+  gameId,
+  playBotMode = false,
+  selectedBot,
+  onExitBotMode
+}) => {
   const { user, profile } = useSupabaseAuthContext();
   const [game, setGame] = useState(new Chess());
   const [isTheaterMode, setIsTheaterMode] = useState(false);
@@ -248,10 +258,64 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
       }
 
       console.log('onDrop returning true');
+      
+      // Trigger bot move after player move in bot mode
+      if (playBotMode && !playYourselfMode && !activeGame) {
+        setTimeout(() => makeBotMove(), 500);
+      }
+      
       return true;
     } catch (error) {
       console.error('Error in onDrop:', error);
       return false;
+    }
+  };
+  
+  // Bot move logic
+  const makeBotMove = () => {
+    if (!playBotMode || game.isGameOver()) return;
+    
+    const moves = game.moves({ verbose: true });
+    if (moves.length === 0) return;
+    
+    // Bot difficulty based on rating
+    const botRating = selectedBot?.rating || 1200;
+    let selectedMove;
+    
+    if (botRating < 1000) {
+      // Beginner: Random moves
+      selectedMove = moves[Math.floor(Math.random() * moves.length)];
+    } else if (botRating < 1300) {
+      // Easy: Prefer captures
+      const captures = moves.filter(m => m.captured);
+      selectedMove = captures.length > 0 && Math.random() > 0.3
+        ? captures[Math.floor(Math.random() * captures.length)]
+        : moves[Math.floor(Math.random() * moves.length)];
+    } else if (botRating < 1600) {
+      // Intermediate: Prefer captures and checks
+      const goodMoves = moves.filter(m => m.captured || m.san.includes('+'));
+      selectedMove = goodMoves.length > 0 && Math.random() > 0.2
+        ? goodMoves[Math.floor(Math.random() * goodMoves.length)]
+        : moves[Math.floor(Math.random() * moves.length)];
+    } else {
+      // Advanced/Master: Best moves (simplified - prefer center control, captures, checks)
+      const centerSquares = ['e4', 'e5', 'd4', 'd5', 'c4', 'c5', 'f4', 'f5'];
+      const excellentMoves = moves.filter(m => 
+        m.captured || 
+        m.san.includes('+') || 
+        centerSquares.includes(m.to)
+      );
+      selectedMove = excellentMoves.length > 0 && Math.random() > 0.1
+        ? excellentMoves[Math.floor(Math.random() * excellentMoves.length)]
+        : moves[Math.floor(Math.random() * moves.length)];
+    }
+    
+    if (selectedMove) {
+      makeAMove({
+        from: selectedMove.from,
+        to: selectedMove.to,
+        promotion: 'q'
+      });
     }
   };
 
@@ -430,10 +494,10 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
     }
   }, [moves.length]);
 
-  // Force theater mode if playYourselfMode is true
+  // Force theater mode if playYourselfMode or playBotMode is true
   useEffect(() => {
-    if (playYourselfMode) setIsTheaterMode(true);
-  }, [playYourselfMode]);
+    if (playYourselfMode || playBotMode) setIsTheaterMode(true);
+  }, [playYourselfMode, playBotMode]);
 
   // Timer logic for multiplayer games
   useEffect(() => {
@@ -957,11 +1021,15 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
                   <div className="player-name">
                     {playYourselfMode 
                       ? profile?.username || 'You' 
+                      : playBotMode
+                      ? selectedBot?.name || 'Bot'
                       : opponentProfile?.username || 'Opponent'}
                   </div>
                   <div className="player-rating">
                     {playYourselfMode 
                       ? profile?.rating || 1200 
+                      : playBotMode
+                      ? selectedBot?.rating || 1200
                       : opponentProfile?.rating || 1200}
                   </div>
                 </div>
@@ -1204,6 +1272,15 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
               Cancel
             </button>
             {submitError && <div style={{ color: 'red', marginTop: 8 }}>{submitError}</div>}
+          </div>
+        )}
+        
+        {/* Show Exit button in Bot mode */}
+        {playBotMode && (
+          <div style={{ textAlign: 'center', margin: '1.5rem 0' }}>
+            <button className="review-btn" style={{ background: '#d48d3b' }} onClick={onExitBotMode}>
+              Exit Bot Game
+            </button>
           </div>
         )}
       </div>
