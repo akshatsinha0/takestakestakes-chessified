@@ -1,0 +1,234 @@
+.settings-page {
+  min-height: calc(100vh - var(--header-height));
+  background: var(--primary-dark);
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.settings-container {
+  max-width: 800px;
+  width: 100%;
+}
+
+.settings-title {
+  color: #e5a356;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-shadow: 0 2px 10px rgba(229, 163, 86, 0.3);
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-tab {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-bottom: 3px solid transparent;
+  position: relative;
+  bottom: -2px;
+}
+
+.settings-tab.active {
+  color: #e5a356;
+  border-bottom-color: #e5a356;
+}
+
+.settings-content {
+  background: linear-gradient(145deg, #1a2332 0%, #0f1419 100%);
+  border: 2px solid rgba(229, 163, 86, 0.2);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.settings-section h2 {
+  color: #f5f5f5;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.settings-group {
+  margin-bottom: 1.5rem;
+}
+
+.settings-group label {
+  display: block;
+  color: #e5a356;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.settings-group small {
+  display: block;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.settings-group input[type="text"],
+.settings-group input[type="email"],
+.settings-group textarea,
+.settings-group select {
+  width: 100%;
+  background: rgba(42, 67, 97, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: #f5f5f5;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s;
+}
+
+.settings-group input[type="text"]:focus,
+.settings-group input[type="email"]:focus,
+.settings-group textarea:focus,
+.settings-group select:focus {
+  outline: none;
+  border-color: #e5a356;
+  background: rgba(42, 67, 97, 0.6);
+  box-shadow: 0 0 20px rgba(229, 163, 86, 0.2);
+}
+
+.settings-group input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.settings-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(42, 67, 97, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-toggle > div {
+  flex: 1;
+}
+
+.settings-toggle label {
+  margin-bottom: 0.25rem;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: 0.4s;
+  border-radius: 26px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #e5a356;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #d48d3b 0%, #e5a356 100%);
+  color: #0f1419;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 1rem;
+  box-shadow: 0 4px 15px rgba(212, 141, 59, 0.4);
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 1rem;
+  }
+
+  .settings-title {
+    font-size: 1.5rem;
+  }
+
+  .settings-tabs {
+    flex-direction: column;
+    border-bottom: none;
+  }
+
+  .settings-tab {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 3px solid transparent;
+    bottom: 0;
+  }
+
+  .settings-tab.active {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+    border-left-color: #e5a356;
+  }
+
+  .settings-content {
+    padding: 1.5rem;
+  }
+
+  .settings-toggle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
