@@ -10,11 +10,15 @@ import {
   ExitToApp, 
   KeyboardArrowDown,
   Person as PersonIcon,
-  History as HistoryIcon
+  History as HistoryIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
 import { getAllProfiles } from '../../utils/profileApi';
 import ChallengeModal from '../ChallengeModal/ChallengeModal';
 import GameHistory from '../GameHistory/GameHistory';
+import { useNotifications } from '../../hooks/useNotifications';
+import { supabase } from '../../lib/supabase';
+import { toast } from 'react-toastify';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -31,6 +35,10 @@ const Header: React.FC = () => {
   const [challengeTarget, setChallengeTarget] = useState<any>(null);
   const [showGameHistory, setShowGameHistory] = useState(false);
   const [userStats, setUserStats] = useState({ games: 0, wins: 0, winRate: 0 });
+  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  
+  // Use notifications hook
+  const { notifications, unreadCount, removeNotification } = useNotifications();
   
   const open = Boolean(anchorEl);
   
@@ -102,6 +110,105 @@ const Header: React.FC = () => {
         setLoadingUsers(false);
       }
     }
+  };
+
+  // Handle notification dropdown toggle
+  const handleNotificationClick = () => {
+    setNotificationDropdownOpen(!notificationDropdownOpen);
+  };
+
+  // Handle accepting a challenge from notification
+  const handleAcceptChallenge = async (notification: any) => {
+    const invitation = notification.data?.invitation;
+    if (!invitation || !user) return;
+
+    try {
+      // Update invitation status
+      await supabase
+        .from('game_invitations')
+        .update({ status: 'accepted' })
+        .eq('id', invitation.id);
+
+      // Determine colors randomly
+      const isWhite = Math.random() < 0.5;
+      const whitePlayerId = isWhite ? user.id : invitation.from_user_id;
+      const blackPlayerId = isWhite ? invitation.from_user_id : user.id;
+
+      // Parse time control
+      let initialTime = 600;
+      if (invitation.time_control) {
+        const timeMinutes = parseInt(invitation.time_control.split('+')[0]);
+        initialTime = timeMinutes * 60;
+      }
+
+      // Create the game
+      const { error: gameError } = await supabase
+        .from('games')
+        .insert({
+          created_by: user.id,
+          opponent_id: invitation.from_user_id,
+          white_player_id: whitePlayerId,
+          black_player_id: blackPlayerId,
+          status: 'in_progress',
+          time_control: invitation.time_control,
+          board_state: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+          current_turn: 'white',
+          white_time_remaining: initialTime,
+          black_time_remaining: initialTime,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+      if (gameError) {
+        console.error('Error creating game:', gameError);
+        toast.error('Failed to start game');
+        return;
+      }
+
+      removeNotification(notification.id);
+      setNotificationDropdownOpen(false);
+      toast.success('Game started!');
+      
+      // Navigate to play page if not already there
+      if (location.pathname !== '/play') {
+        navigate('/play');
+      }
+    } catch (error) {
+      console.error('Error accepting challenge:', error);
+      toast.error('Failed to accept challenge');
+    }
+  };
+
+  // Handle declining a challenge from notification
+  const handleDeclineChallenge = async (notification: any) => {
+    const invitation = notification.data?.invitation;
+    if (!invitation) return;
+
+    try {
+      await supabase
+        .from('game_invitations')
+        .update({ status: 'declined' })
+        .eq('id', invitation.id);
+
+      removeNotification(notification.id);
+      toast.info('Challenge declined');
+    } catch (error) {
+      console.error('Error declining challenge:', error);
+    }
+  };
+
+  // Format time ago
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${Math.floor(diffHours / 24)}d ago`;
   };
 
   return (
@@ -325,11 +432,216 @@ const Header: React.FC = () => {
             </Menu>
           </div>
           
-          <IconButton aria-label="notifications" className="notification-icon">
-            <Badge badgeContent={0} color="error">
-              <Notifications />
-            </Badge>
-          </IconButton>
+          <div className="notification-wrapper" style={{ position: 'relative' }}>
+            <IconButton 
+              aria-label="notifications" 
+              className="notification-icon"
+              onClick={handleNotificationClick}
+            >
+              <Badge 
+                badgeContent={unreadCount} 
+                color="error"
+                sx={{
+                  '& .MuiBadge-badge': {
+                    animation: unreadCount > 0 ? 'pulse 2s infinite' : 'none',
+                    backgroundColor: '#e53e3e',
+                    color: 'white',
+                    fontWeight: 'bold'
+                  }
+                }}
+              >
+                <Notifications />
+              </Badge>
+            </IconButton>
+            
+            {/* Notification Dropdown */}
+            {notificationDropdownOpen && (
+              <div className="notification-dropdown" style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '0.5rem',
+                width: '380px',
+                maxHeight: '500px',
+                background: 'linear-gradient(145deg, #1a2332 0%, #0f1419 100%)',
+                borderRadius: '12px',
+                border: '2px solid rgba(229, 163, 86, 0.3)',
+                boxShadow: '0 15px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(229, 163, 86, 0.1)',
+                zIndex: 10000,
+                overflow: 'hidden'
+              }}>
+                {/* Header */}
+                <div style={{
+                  padding: '1rem 1.25rem',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <h3 style={{ 
+                    color: '#f5f5f5', 
+                    margin: 0, 
+                    fontSize: '1.1rem',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}>
+                    🔔 Notifications
+                    {unreadCount > 0 && (
+                      <span style={{
+                        background: '#e53e3e',
+                        color: 'white',
+                        fontSize: '0.75rem',
+                        padding: '0.15rem 0.5rem',
+                        borderRadius: '10px',
+                        fontWeight: '700'
+                      }}>
+                        {unreadCount}
+                      </span>
+                    )}
+                  </h3>
+                  <IconButton 
+                    size="small" 
+                    onClick={() => setNotificationDropdownOpen(false)}
+                    sx={{ color: 'rgba(255,255,255,0.6)' }}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </div>
+                
+                {/* Notifications List */}
+                <div style={{
+                  maxHeight: '400px',
+                  overflowY: 'auto',
+                  padding: '0.5rem'
+                }}>
+                  {notifications.length === 0 ? (
+                    <div style={{
+                      padding: '2rem',
+                      textAlign: 'center',
+                      color: 'rgba(255, 255, 255, 0.5)'
+                    }}>
+                      <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🔕</div>
+                      <div style={{ fontSize: '0.95rem' }}>No notifications</div>
+                      <div style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>
+                        Challenge someone to play!
+                      </div>
+                    </div>
+                  ) : (
+                    notifications.map((notification) => (
+                      <div 
+                        key={notification.id}
+                        style={{
+                          background: 'rgba(42, 67, 97, 0.4)',
+                          borderRadius: '10px',
+                          padding: '1rem',
+                          marginBottom: '0.5rem',
+                          border: '1px solid rgba(229, 163, 86, 0.2)',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {/* Notification Header */}
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          marginBottom: '0.75rem'
+                        }}>
+                          {/* Avatar */}
+                          <div style={{
+                            width: '45px',
+                            height: '45px',
+                            borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #d48d3b, #e5a356)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.2rem',
+                            fontWeight: '700',
+                            color: '#0f1419',
+                            flexShrink: 0
+                          }}>
+                            {notification.data?.sender?.username?.charAt(0)?.toUpperCase() || '?'}
+                          </div>
+                          
+                          {/* Info */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{
+                              color: '#e5a356',
+                              fontSize: '0.85rem',
+                              fontWeight: '600',
+                              marginBottom: '0.2rem'
+                            }}>
+                              ⚔️ {notification.title}
+                            </div>
+                            <div style={{
+                              color: '#f5f5f5',
+                              fontSize: '0.9rem',
+                              lineHeight: '1.4'
+                            }}>
+                              {notification.message}
+                            </div>
+                            <div style={{
+                              color: 'rgba(255, 255, 255, 0.5)',
+                              fontSize: '0.75rem',
+                              marginTop: '0.3rem'
+                            }}>
+                              {formatTimeAgo(notification.created_at)}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        {notification.type === 'challenge' && (
+                          <div style={{
+                            display: 'flex',
+                            gap: '0.5rem',
+                            marginTop: '0.5rem'
+                          }}>
+                            <button
+                              onClick={() => handleAcceptChallenge(notification)}
+                              style={{
+                                flex: 1,
+                                padding: '0.6rem',
+                                background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              ✓ Accept
+                            </button>
+                            <button
+                              onClick={() => handleDeclineChallenge(notification)}
+                              style={{
+                                flex: 1,
+                                padding: '0.6rem',
+                                background: 'rgba(229, 62, 62, 0.2)',
+                                color: '#fc8181',
+                                border: '1px solid rgba(229, 62, 62, 0.4)',
+                                borderRadius: '6px',
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              ✕ Decline
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           
           <IconButton aria-label="settings" className="settings-icon">
             <Settings />
