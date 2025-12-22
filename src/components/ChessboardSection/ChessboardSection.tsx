@@ -59,6 +59,11 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
   // Timeout modal state
   const [showTimeoutModal, setShowTimeoutModal] = useState(false);
   const [timeoutWinner, setTimeoutWinner] = useState<'white' | 'black' | null>(null);
+  
+  // Resignation modal state
+  const [showResignModal, setShowResignModal] = useState(false);
+  const [showResignResultModal, setShowResignResultModal] = useState(false);
+  const [resignWinner, setResignWinner] = useState<'white' | 'black' | null>(null);
 
   const [moves, setMoves] = useState<ChessMove[]>([]);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
@@ -250,16 +255,21 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
     }
   };
 
-  // Handle resign
-  const handleResign = async () => {
+  // Handle resign - show confirmation modal
+  const handleResign = () => {
+    if (!activeGame || !user) return;
+    setShowResignModal(true);
+  };
+  
+  // Confirm resignation
+  const confirmResign = async () => {
     if (!activeGame || !user) return;
     
-    if (!confirm('Are you sure you want to resign? This will end the game and you will lose.')) {
-      return;
-    }
+    setShowResignModal(false);
     
     try {
       const winner = playerColor === 'white' ? activeGame.black_player_id : activeGame.white_player_id;
+      const winnerColor = playerColor === 'white' ? 'black' : 'white';
       
       const { error } = await supabase
         .from('games')
@@ -277,14 +287,18 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
         return;
       }
       
-      toast.info('You resigned. Game over.');
+      // Show result modal
+      setResignWinner(winnerColor as 'white' | 'black');
+      setShowResignResultModal(true);
       
       setGameStatus('GAME OVER');
       setGameResult({
-        winner: playerColor === 'white' ? 'black' : 'white',
+        winner: winnerColor,
         method: 'resignation',
         time: activeGame.time_control
       });
+      
+      toast.info('You resigned. Game over.');
     } catch (error) {
       console.error('Failed to resign:', error);
       toast.error('Failed to resign');
@@ -656,8 +670,21 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
             if (updatedGame.status === 'abandoned') {
               toast.info('Your opponent has aborted the game');
             } else if (updatedGame.result === 'resignation') {
-              const resignedPlayer = updatedGame.winner === user.id ? 'opponent' : 'you';
-              if (resignedPlayer === 'opponent') {
+              // Show resignation result modal
+              const didIWin = updatedGame.winner === user.id;
+              const winnerColor = didIWin ? playerColor : (playerColor === 'white' ? 'black' : 'white');
+              
+              setResignWinner(winnerColor as 'white' | 'black');
+              setShowResignResultModal(true);
+              
+              setGameStatus('GAME OVER');
+              setGameResult({
+                winner: winnerColor,
+                method: 'resignation',
+                time: updatedGame.time_control
+              });
+              
+              if (didIWin) {
                 toast.success('Your opponent resigned. You win!');
               }
             } else if (updatedGame.result === 'timeout') {
@@ -1284,6 +1311,300 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({ playYourselfMode 
             <button 
               onClick={() => {
                 setShowTimeoutModal(false);
+                // Reset game after closing modal
+                setTimeout(() => {
+                  setActiveGame(null);
+                  activeGameIdRef.current = null;
+                  setOpponentProfile(null);
+                  setGame(new Chess());
+                  setMoves([]);
+                  setGameStatus('');
+                  setWhiteTime(600);
+                  setBlackTime(600);
+                  setIsTheaterMode(false);
+                }, 500);
+              }}
+              style={{
+                background: 'linear-gradient(135deg, #d48d3b 0%, #e5a356 100%)',
+                color: '#0f1419',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '0.75rem 2.5rem',
+                fontSize: '1rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                boxShadow: '0 4px 15px rgba(212, 141, 59, 0.4)',
+                letterSpacing: '0.5px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(212, 141, 59, 0.6)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 141, 59, 0.4)';
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Resign Confirmation Modal */}
+      {showResignModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 999999,
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{
+            background: 'linear-gradient(145deg, #1a2332 0%, #0f1419 100%)',
+            borderRadius: '20px',
+            padding: '2.5rem',
+            maxWidth: '450px',
+            width: 'calc(100vw - 40px)',
+            border: '3px solid rgba(229, 163, 86, 0.5)',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.7), 0 0 100px rgba(229, 163, 86, 0.3)',
+            textAlign: 'center',
+            animation: 'modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            position: 'relative'
+          }}>
+            {/* Icon */}
+            <div style={{
+              width: '80px',
+              height: '80px',
+              margin: '0 auto 1.5rem',
+              background: 'linear-gradient(135deg, rgba(229, 163, 86, 0.2), rgba(212, 141, 59, 0.1))',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '3rem',
+              border: '3px solid rgba(229, 163, 86, 0.5)',
+              boxShadow: '0 0 30px rgba(229, 163, 86, 0.3)'
+            }}>
+              🏳️
+            </div>
+            
+            {/* Title */}
+            <h2 style={{
+              color: '#e5a356',
+              fontSize: '1.8rem',
+              fontWeight: '700',
+              marginBottom: '1rem',
+              textShadow: '0 2px 20px rgba(229, 163, 86, 0.5)',
+              letterSpacing: '0.5px'
+            }}>
+              Resign Game?
+            </h2>
+            
+            {/* Message */}
+            <p style={{
+              color: '#f5f5f5',
+              fontSize: '1.1rem',
+              marginBottom: '0.5rem',
+              fontWeight: '500',
+              lineHeight: '1.6'
+            }}>
+              Are you sure you want to resign?
+            </p>
+            
+            <p style={{
+              color: 'rgba(255, 255, 255, 0.7)',
+              fontSize: '0.95rem',
+              marginBottom: '2rem',
+              lineHeight: '1.5'
+            }}>
+              This will end the game and you will lose. This action cannot be undone.
+            </p>
+            
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button 
+                onClick={() => setShowResignModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: '#f5f5f5',
+                  border: '2px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: '8px',
+                  padding: '0.75rem 2rem',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  flex: '1'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmResign}
+                style={{
+                  background: 'linear-gradient(135deg, #e53e3e 0%, #c53030 100%)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '0.75rem 2rem',
+                  fontSize: '1rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  boxShadow: '0 4px 15px rgba(229, 62, 62, 0.4)',
+                  flex: '1'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(229, 62, 62, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(229, 62, 62, 0.4)';
+                }}
+              >
+                Resign
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Resign Result Modal */}
+      {showResignResultModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 999999,
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{
+            background: 'linear-gradient(145deg, #1a2332 0%, #0f1419 100%)',
+            borderRadius: '20px',
+            padding: '2.5rem',
+            maxWidth: '500px',
+            width: 'calc(100vw - 40px)',
+            border: resignWinner === playerColor 
+              ? '3px solid rgba(72, 187, 120, 0.5)' 
+              : '3px solid rgba(244, 67, 54, 0.5)',
+            boxShadow: resignWinner === playerColor
+              ? '0 25px 50px rgba(0, 0, 0, 0.7), 0 0 100px rgba(72, 187, 120, 0.3)'
+              : '0 25px 50px rgba(0, 0, 0, 0.7), 0 0 100px rgba(244, 67, 54, 0.3)',
+            textAlign: 'center',
+            animation: 'modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            position: 'relative'
+          }}>
+            {/* Icon */}
+            <div style={{
+              width: '80px',
+              height: '80px',
+              margin: '0 auto 1.5rem',
+              background: resignWinner === playerColor
+                ? 'linear-gradient(135deg, rgba(72, 187, 120, 0.2), rgba(56, 161, 105, 0.1))'
+                : 'linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(229, 57, 53, 0.1))',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '3rem',
+              border: resignWinner === playerColor
+                ? '3px solid rgba(72, 187, 120, 0.5)'
+                : '3px solid rgba(244, 67, 54, 0.5)',
+              boxShadow: resignWinner === playerColor
+                ? '0 0 30px rgba(72, 187, 120, 0.3)'
+                : '0 0 30px rgba(244, 67, 54, 0.3)'
+            }}>
+              {resignWinner === playerColor ? '🏆' : '🏳️'}
+            </div>
+            
+            {/* Title */}
+            <h2 style={{
+              color: resignWinner === playerColor ? '#48bb78' : '#f44336',
+              fontSize: '2rem',
+              fontWeight: '700',
+              marginBottom: '1rem',
+              textShadow: resignWinner === playerColor
+                ? '0 2px 20px rgba(72, 187, 120, 0.5)'
+                : '0 2px 20px rgba(244, 67, 54, 0.5)',
+              letterSpacing: '1px'
+            }}>
+              {resignWinner === playerColor ? 'VICTORY!' : 'DEFEAT'}
+            </h2>
+            
+            {/* Message */}
+            <p style={{
+              color: '#f5f5f5',
+              fontSize: '1.2rem',
+              marginBottom: '0.5rem',
+              fontWeight: '600'
+            }}>
+              {resignWinner === playerColor ? 'You won!' : 'You lost!'}
+            </p>
+            
+            <p style={{
+              color: 'rgba(255, 255, 255, 0.7)',
+              fontSize: '1rem',
+              marginBottom: '2rem'
+            }}>
+              {resignWinner === playerColor 
+                ? 'Your opponent resigned' 
+                : 'You resigned'}
+            </p>
+            
+            {/* Winner Display */}
+            <div style={{
+              background: 'rgba(42, 67, 97, 0.4)',
+              borderRadius: '12px',
+              padding: '1rem',
+              marginBottom: '2rem',
+              border: '2px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <div style={{ color: '#e5a356', fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: '600' }}>
+                Winner
+              </div>
+              <div style={{ color: '#f5f5f5', fontSize: '1.3rem', fontWeight: '700' }}>
+                {resignWinner === 'white' ? '♔ White' : '♚ Black'}
+              </div>
+              <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                Victory by resignation
+              </div>
+            </div>
+            
+            {/* Close Button */}
+            <button 
+              onClick={() => {
+                setShowResignResultModal(false);
                 // Reset game after closing modal
                 setTimeout(() => {
                   setActiveGame(null);
