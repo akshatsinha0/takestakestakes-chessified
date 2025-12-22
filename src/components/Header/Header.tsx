@@ -16,6 +16,7 @@ import {
 import { getAllProfiles } from '../../utils/profileApi';
 import ChallengeModal from '../ChallengeModal/ChallengeModal';
 import GameHistory from '../GameHistory/GameHistory';
+import UserProfile from '../UserProfile/UserProfile';
 import { useNotifications } from '../../hooks/useNotifications';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'react-toastify';
@@ -37,6 +38,7 @@ const Header: React.FC = () => {
   const [showGameHistory, setShowGameHistory] = useState(false);
   const [userStats, setUserStats] = useState({ games: 0, wins: 0, winRate: 0 });
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  const [viewProfileUserId, setViewProfileUserId] = useState<string | null>(null);
   
   // Use notifications hook
   const { notifications, unreadCount, removeNotification } = useNotifications();
@@ -249,13 +251,22 @@ const Header: React.FC = () => {
                             <span className="user-list-rating">{u.rating || 1200}</span>
                           </div>
                           {u.id !== user?.id && (
-                            <button className="challenge-btn" onClick={(e) => {
-                              e.stopPropagation();
-                              setChallengeTarget(u);
-                              setUserDropdownOpen(false);
-                            }}>
-                              Challenge
-                            </button>
+                            <div className="user-list-actions">
+                              <button className="view-profile-btn" onClick={(e) => {
+                                e.stopPropagation();
+                                setViewProfileUserId(u.id);
+                                setUserDropdownOpen(false);
+                              }}>
+                                View Profile
+                              </button>
+                              <button className="challenge-btn" onClick={(e) => {
+                                e.stopPropagation();
+                                setChallengeTarget(u);
+                                setUserDropdownOpen(false);
+                              }}>
+                                Challenge
+                              </button>
+                            </div>
                           )}
                         </div>
                       );
@@ -689,6 +700,12 @@ const Header: React.FC = () => {
       )}
       {showGameHistory && (
         <GameHistory onClose={() => setShowGameHistory(false)} />
+      )}
+      {viewProfileUserId && (
+        <UserProfile
+          userId={viewProfileUserId}
+          onClose={() => setViewProfileUserId(null)}
+        />
       )}
     </header>
   );
