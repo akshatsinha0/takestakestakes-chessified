@@ -23,7 +23,6 @@
   display: flex;
   gap: 0.5rem;
   margin-bottom: 2rem;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .settings-tab {
@@ -35,14 +34,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  border-bottom: 3px solid transparent;
-  position: relative;
-  bottom: -2px;
+  border-bottom: 3px dotted transparent;
 }
 
 .settings-tab.active {
   color: #e5a356;
-  border-bottom-color: #e5a356;
+  border-bottom: 3px dotted white;
 }
 
 .settings-content {
@@ -208,18 +205,16 @@ input:checked + .toggle-slider:before {
 
   .settings-tabs {
     flex-direction: column;
-    border-bottom: none;
   }
 
   .settings-tab {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    border-left: 3px solid transparent;
-    bottom: 0;
+    border-left: 3px dotted transparent;
+    border-bottom: none;
   }
 
   .settings-tab.active {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-    border-left-color: #e5a356;
+    border-left: 3px dotted white;
+    border-bottom: none;
   }
 
   .settings-content {
