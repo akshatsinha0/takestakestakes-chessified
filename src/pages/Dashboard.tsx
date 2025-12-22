@@ -14,6 +14,7 @@ const Dashboard: React.FC = () => {
   const [playYourselfMode, setPlayYourselfMode] = useState(false);
   const [playBotMode, setPlayBotMode] = useState(false);
   const [selectedBot, setSelectedBot] = useState<any>(null);
+  const [botTimeControl, setBotTimeControl] = useState<any>(null);
   
   // Track user presence
   useUserPresence(user?.id);
@@ -21,14 +22,16 @@ const Dashboard: React.FC = () => {
   const handlePlayYourself = () => setPlayYourselfMode(true);
   const handleExitPlayYourself = () => setPlayYourselfMode(false);
   
-  const handlePlayBot = (bot: any) => {
+  const handlePlayBot = (bot: any, timeControl: any) => {
     setSelectedBot(bot);
+    setBotTimeControl(timeControl);
     setPlayBotMode(true);
   };
   
   const handleExitBotMode = () => {
     setPlayBotMode(false);
     setSelectedBot(null);
+    setBotTimeControl(null);
   };
 
   return (
@@ -42,6 +45,7 @@ const Dashboard: React.FC = () => {
           onExitPlayYourself={handleExitPlayYourself}
           playBotMode={playBotMode}
           selectedBot={selectedBot}
+          botTimeControl={botTimeControl}
           onExitBotMode={handleExitBotMode}
         />
         <GameOptions 

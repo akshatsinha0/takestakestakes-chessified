@@ -19,7 +19,7 @@ const BOTS: Bot[] = [
     level: 'Beginner',
     description: 'Perfect for learning the basics',
     color: '#4caf50',
-    icon: '🌱'
+    icon: 'R'
   },
   {
     id: 'easy',
@@ -28,7 +28,7 @@ const BOTS: Bot[] = [
     level: 'Easy',
     description: 'Makes occasional mistakes',
     color: '#8bc34a',
-    icon: '😊'
+    icon: 'C'
   },
   {
     id: 'intermediate',
@@ -37,7 +37,7 @@ const BOTS: Bot[] = [
     level: 'Intermediate',
     description: 'Solid fundamental play',
     color: '#ffc107',
-    icon: '🎯'
+    icon: 'S'
   },
   {
     id: 'advanced',
@@ -46,7 +46,7 @@ const BOTS: Bot[] = [
     level: 'Advanced',
     description: 'Strong tactical awareness',
     color: '#ff9800',
-    icon: '🔥'
+    icon: 'E'
   },
   {
     id: 'master',
@@ -55,7 +55,7 @@ const BOTS: Bot[] = [
     level: 'Master',
     description: 'Near-perfect play',
     color: '#f44336',
-    icon: '👑'
+    icon: 'M'
   },
   {
     id: 'grandmaster',
@@ -64,17 +64,28 @@ const BOTS: Bot[] = [
     level: 'Grandmaster',
     description: 'Unforgiving and precise',
     color: '#9c27b0',
-    icon: '⚡'
+    icon: 'G'
   }
+];
+
+const TIME_CONTROLS = [
+  { label: '1 min', value: '1+0', minutes: 1, increment: 0 },
+  { label: '3 min', value: '3+0', minutes: 3, increment: 0 },
+  { label: '5 min', value: '5+0', minutes: 5, increment: 0 },
+  { label: '10 min', value: '10+0', minutes: 10, increment: 0 },
+  { label: '15 min', value: '15+0', minutes: 15, increment: 0 },
+  { label: '30 min', value: '30+0', minutes: 30, increment: 0 },
+  { label: 'Unlimited', value: 'unlimited', minutes: 0, increment: 0 }
 ];
 
 interface BotSelectionProps {
   onClose: () => void;
-  onSelectBot: (bot: Bot) => void;
+  onSelectBot: (bot: Bot, timeControl: any) => void;
 }
 
 const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => {
   const [selectedBot, setSelectedBot] = useState<Bot | null>(null);
+  const [selectedTime, setSelectedTime] = useState(TIME_CONTROLS[3]); // Default 10 min
 
   const handleBotClick = (bot: Bot) => {
     setSelectedBot(bot);
@@ -82,7 +93,7 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
 
   const handlePlayBot = () => {
     if (selectedBot) {
-      onSelectBot(selectedBot);
+      onSelectBot(selectedBot, selectedTime);
       onClose();
     }
   };
@@ -101,9 +112,12 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
               key={bot.id}
               className={`bot-card ${selectedBot?.id === bot.id ? 'selected' : ''}`}
               onClick={() => handleBotClick(bot)}
-              style={{ borderColor: selectedBot?.id === bot.id ? bot.color : 'transparent' }}
+              style={{ 
+                borderColor: selectedBot?.id === bot.id ? bot.color : 'transparent',
+                borderRadius: 0
+              }}
             >
-              <div className="bot-icon" style={{ background: bot.color }}>
+              <div className="bot-icon" style={{ background: bot.color, borderRadius: 0 }}>
                 {bot.icon}
               </div>
               <div className="bot-info">
@@ -115,7 +129,7 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
                 <p className="bot-description">{bot.description}</p>
               </div>
               {selectedBot?.id === bot.id && (
-                <div className="selected-indicator" style={{ background: bot.color }}>
+                <div className="selected-indicator" style={{ background: bot.color, borderRadius: 0 }}>
                   ✓
                 </div>
               )}
@@ -123,8 +137,29 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
           ))}
         </div>
 
+        {/* Time Control Selection */}
+        <div className="time-control-section">
+          <h3 className="time-control-title">Time Control</h3>
+          <div className="time-control-grid">
+            {TIME_CONTROLS.map((time) => (
+              <button
+                key={time.value}
+                className={`time-control-btn ${selectedTime.value === time.value ? 'selected' : ''}`}
+                onClick={() => setSelectedTime(time)}
+                style={{
+                  borderRadius: 0,
+                  background: selectedTime.value === time.value ? '#e5a356' : 'rgba(42, 67, 97, 0.4)',
+                  color: selectedTime.value === time.value ? '#0f1419' : '#f5f5f5'
+                }}
+              >
+                {time.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="bot-modal-footer">
-          <button className="cancel-btn" onClick={onClose}>
+          <button className="cancel-btn" onClick={onClose} style={{ borderRadius: 0 }}>
             Cancel
           </button>
           <button
@@ -133,7 +168,8 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
             disabled={!selectedBot}
             style={{
               background: selectedBot ? selectedBot.color : '#666',
-              cursor: selectedBot ? 'pointer' : 'not-allowed'
+              cursor: selectedBot ? 'pointer' : 'not-allowed',
+              borderRadius: 0
             }}
           >
             {selectedBot ? `Play vs ${selectedBot.name}` : 'Select a Bot'}

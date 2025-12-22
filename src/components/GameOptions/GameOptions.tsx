@@ -42,7 +42,7 @@ const TIME_FORMATS = [
   },
 ];
 
-const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any) => void }> = ({ onPlayYourself, onPlayBot }) => {
+const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any, timeControl: any) => void }> = ({ onPlayYourself, onPlayBot }) => {
   const [showTimeModal, setShowTimeModal] = useState(false);
   const [showQuickMatch, setShowQuickMatch] = useState(false);
   const [showCustom, setShowCustom] = useState(false);
@@ -233,8 +233,8 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any
       {showBotSelection && (
         <BotSelection
           onClose={() => setShowBotSelection(false)}
-          onSelectBot={(bot) => {
-            if (onPlayBot) onPlayBot(bot);
+          onSelectBot={(bot, timeControl) => {
+            if (onPlayBot) onPlayBot(bot, timeControl);
           }}
         />
       )}

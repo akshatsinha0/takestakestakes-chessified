@@ -23,20 +23,48 @@ loadGameHistory();
 
 const loadGameHistory=async()=>{
 try{
-const{data,error}=await supabase
+// First get games
+const{data: gamesData,error: gamesError}=await supabase
 .from('games')
-.select(`
-*,
-white_player:profiles!games_white_player_id_fkey(username),
-black_player:profiles!games_black_player_id_fkey(username),
-moves(*)
-`)
+.select('*')
 .or(`white_player_id.eq.${user?.id},black_player_id.eq.${user?.id}`)
 .in('status',['completed','game_over'])
-.order('finished_at,created_at',{ascending:false})
+.order('created_at',{ascending:false})
 .limit(50);
-if(error)throw error;
-setGames(data||[]);
+
+if(gamesError)throw gamesError;
+
+// Get player profiles for each game
+const gamesWithPlayers = await Promise.all((gamesData || []).map(async (game) => {
+  let whitePlayer = null;
+  let blackPlayer = null;
+  
+  if (game.white_player_id) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', game.white_player_id)
+      .single();
+    whitePlayer = data;
+  }
+  
+  if (game.black_player_id) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', game.black_player_id)
+      .single();
+    blackPlayer = data;
+  }
+  
+  return {
+    ...game,
+    white_player: whitePlayer,
+    black_player: blackPlayer
+  };
+}));
+
+setGames(gamesWithPlayers);
 }catch(error){
 console.error('Failed to load game history:',error);
 toast.error('Failed to load game history');

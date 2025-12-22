@@ -32,6 +32,7 @@ interface ChessboardSectionProps {
   gameId?: string;
   playBotMode?: boolean;
   selectedBot?: any;
+  botTimeControl?: any;
   onExitBotMode?: () => void;
 }
 
@@ -41,6 +42,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({
   gameId,
   playBotMode = false,
   selectedBot,
+  botTimeControl,
   onExitBotMode
 }) => {
   const { user, profile } = useSupabaseAuthContext();
@@ -498,6 +500,26 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({
   useEffect(() => {
     if (playYourselfMode || playBotMode) setIsTheaterMode(true);
   }, [playYourselfMode, playBotMode]);
+  
+  // Initialize bot game timer
+  useEffect(() => {
+    if (playBotMode && botTimeControl) {
+      const minutes = botTimeControl.minutes || 10;
+      if (minutes > 0) {
+        const timeInSeconds = minutes * 60;
+        setWhiteTime(timeInSeconds);
+        setBlackTime(timeInSeconds);
+      } else {
+        // Unlimited time
+        setWhiteTime(9999);
+        setBlackTime(9999);
+      }
+      // Reset game
+      setGame(new Chess());
+      setMoves([]);
+      setGameStatus('');
+    }
+  }, [playBotMode, botTimeControl]);
 
   // Timer logic for multiplayer games
   useEffect(() => {
