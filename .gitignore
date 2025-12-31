@@ -24,3 +24,6 @@ yarn.lock
 coverage/
 !coverage/badges/
 !coverage/coverage-summary.json
+
+# Project documentation
+PROJECT_DOCUMENTATION.txt
