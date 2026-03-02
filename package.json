@@ -24,7 +24,7 @@
     "@fortawesome/react-fontawesome": "^0.2.6",
     "@mui/icons-material": "^7.3.8",
     "@mui/material": "^7.3.8",
-    "@supabase/supabase-js": "^2.97.0",
+    "@supabase/supabase-js": "^2.98.0",
     "@types/three": "^0.175.0",
     "chess.js": "^1.4.0",
     "react": "^18.3.1",
