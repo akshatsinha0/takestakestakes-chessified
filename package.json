@@ -24,13 +24,13 @@
     "@fortawesome/react-fontawesome": "^0.2.6",
     "@mui/icons-material": "^7.3.10",
     "@mui/material": "^7.3.10",
-    "@supabase/supabase-js": "^2.103.0",
+    "@supabase/supabase-js": "^2.103.2",
     "@types/three": "^0.175.0",
     "chess.js": "^1.4.0",
     "react": "^18.3.1",
     "react-chessboard": "^4.7.3",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.14.0",
+    "react-router-dom": "^7.14.1",
     "react-toastify": "^11.0.5",
     "three": "^0.175.0"
   },
@@ -50,7 +50,7 @@
     "globals": "^15.15.0",
     "jsdom": "^27.4.0",
     "typescript": "~5.7.2",
-    "typescript-eslint": "^8.58.1",
+    "typescript-eslint": "^8.58.2",
     "vite": "^6.4.2",
     "vitest": "^3.2.4"
   }
