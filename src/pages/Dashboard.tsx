@@ -4,7 +4,6 @@ import Header from '../components/Header/Header';
 import ChessboardSection from '../components/ChessboardSection/ChessboardSection';
 import GameOptions from '../components/GameOptions/GameOptions';
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification';
-import ActiveGames from '../components/ActiveGames/ActiveGames';
 import { useAuth } from '../context/AuthContext';
 import { useUserPresence } from '../hooks/useUserPresence';
 import './Dashboard.css';
@@ -39,7 +38,6 @@ const Dashboard: React.FC = () => {
       <Header />
       <ChallengeNotification />
       <div className="dashboard-content">
-        {/* <ActiveGames /> */}
         <ChessboardSection 
           playYourselfMode={playYourselfMode} 
           onExitPlayYourself={handleExitPlayYourself}

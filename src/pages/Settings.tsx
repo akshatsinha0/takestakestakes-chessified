@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
 import { toast } from 'react-toastify';
 import Header from '../components/Header/Header';
 import DashboardLayout from '../components/DashboardLayout/DashboardLayout';
 import './Settings.css';
 
 const Settings: React.FC = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, updateProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   
   // Profile settings
@@ -37,25 +36,14 @@ const Settings: React.FC = () => {
   }, [profile, user]);
 
   const handleSaveProfile = async () => {
-    if (!user) return;
-    
+    if (!profile) return;
+
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          username,
-          bio,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-      
+      await updateProfile({ username, bio, avatarUrl: profile.avatarUrl });
       toast.success('Profile updated successfully!');
-    } catch (error: any) {
-      console.error('Error updating profile:', error);
-      toast.error(error.message || 'Failed to update profile');
+    } catch {
+      toast.error('Failed to update profile');
     } finally {
       setLoading(false);
     }

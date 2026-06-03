@@ -1,194 +1,192 @@
-import{useState,useEffect}from'react';
-import{useParams,useNavigate}from'react-router-dom';
-import{useAuth}from'../context/AuthContext';
-import{supabase}from'../lib/supabase';
-import{Chess}from'chess.js';
-import{makeMove}from'../utils/gameApi';
-import{toast}from'react-toastify';
-import'./Game.css';
+import { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useQuery, useMutation } from 'convex/react'
+import { Chess, type Square } from 'chess.js'
+import { api } from '../../convex/_generated/api'
+import type { Id } from '../../convex/_generated/dataModel'
+import { PieceColor, GameStatus } from '../../convex/lib/domain'
+import { useAuth } from '../context/AuthContext'
+import './Game.css'
 
-const Game:React.FC=()=>{
-const{gameId}=useParams<{gameId:string}>();
-const{user}=useAuth();
-const navigate=useNavigate();
-const[game,setGame]=useState<any>(null);
-const[chess]=useState(new Chess());
-const[selectedSquare,setSelectedSquare]=useState<string|null>(null);
-const[possibleMoves,setPossibleMoves]=useState<string[]>([]);
-const[isMyTurn,setIsMyTurn]=useState(false);
-const[timeLeft,setTimeLeft]=useState({white:0,black:0});
+/*
+(1.) Renders one live game from the reactive `games.get` query and submits moves through the
+     `moves.make` mutation. Convex reactivity replaces the former realtime subscription: when either
+     player moves, the query re-delivers the new board and the component re-renders, so both clients
+     stay in sync without any channel wiring.
+(2.) The board position is derived synchronously from the query's stored FEN on every render, so the
+     displayed position is always exactly the authoritative server state; move legality is checked
+     locally with chess.js purely to drive the click-to-move interaction before submitting, while the
+     server enforces turn order and clocks.
+(3.) A one-second ticker derives the on-screen clock for the player to move by subtracting elapsed
+     time since `turnStartedAt` from their stored remaining seconds, giving a live countdown without
+     persisting every tick, since the authoritative debit happens server-side on the next move.
+(4.) Interaction is gated to the local player's turn and color, and a missing or not-found game
+     resolves to explicit loading and empty states rather than rendering against undefined data.
 
-useEffect(()=>{
-if(!gameId||!user)return;
-loadGame();
-const subscription=supabase
-.channel(`game:${gameId}`)
-.on('postgres_changes',{event:'UPDATE',schema:'public',table:'games',filter:`id=eq.${gameId}`},(payload)=>{
-loadGame();
-})
-.subscribe();
-return()=>{
-subscription.unsubscribe();
-};
-},[gameId,user]);
+This page is the reactive board view. Deriving the position from server state each render and routing
+moves through a single transactional mutation gives consistent multiplayer sync by construction, and
+keeping the clock display local while the debit stays server-side avoids write amplification without
+sacrificing an authoritative timer.
+*/
 
-useEffect(()=>{
-if(!game)return;
-const interval=setInterval(()=>{
-if(game.status==='in_progress'){
-const now=Date.now();
-const elapsed=Math.floor((now-new Date(game.updated_at).getTime())/1000);
-if(game.current_turn==='white'){
-setTimeLeft(prev=>({...prev,white:Math.max(0,game.white_time_remaining-elapsed)}));
-}else{
-setTimeLeft(prev=>({...prev,black:Math.max(0,game.black_time_remaining-elapsed)}));
+const PIECE_SYMBOLS: Record<string, string> = {
+  wp: '♙', wr: '♖', wn: '♘', wb: '♗', wq: '♕', wk: '♔',
+  bp: '♟', br: '♜', bn: '♞', bb: '♝', bq: '♛', bk: '♚',
 }
+
+const formatClock = (seconds: number): string => {
+  const safe = Math.max(0, seconds)
+  const minutes = Math.floor(safe / 60)
+  return `${minutes}:${(safe % 60).toString().padStart(2, '0')}`
 }
-},1000);
-return()=>clearInterval(interval);
-},[game]);
 
-const loadGame=async()=>{
-if(!gameId)return;
-try{
-const{data,error}=await supabase
-.from('games')
-.select(`
-*,
-white_player:profiles!games_white_player_id_fkey(username,rating),
-black_player:profiles!games_black_player_id_fkey(username,rating),
-moves(*)
-`)
-.eq('id',gameId)
-.single();
-if(error)throw error;
-setGame(data);
-chess.load(data.board_state);
-const myColor=data.white_player_id===user?.id?'white':'black';
-setIsMyTurn(data.current_turn===myColor&&data.status==='in_progress');
-setTimeLeft({white:data.white_time_remaining,black:data.black_time_remaining});
-}catch(error){
-console.error('Failed to load game:',error);
-toast.error('Failed to load game');
-navigate('/dashboard');
+const Game = () => {
+  const { gameId } = useParams<{ gameId: string }>()
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const data = useQuery(
+    api.games.get,
+    gameId ? { gameId: gameId as Id<'games'> } : 'skip',
+  )
+  const submitMove = useMutation(api.moves.make)
+  const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
+  const [possibleMoves, setPossibleMoves] = useState<string[]>([])
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const ticker = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(ticker)
+  }, [])
+
+  if (data === undefined) {
+    return <div className="game-loading">Loading game...</div>
+  }
+  if (data === null) {
+    return <div className="game-loading">Game not found.</div>
+  }
+
+  const { game, moves, whitePlayer, blackPlayer } = data
+  const chess = new Chess(game.boardState)
+  const myColor =
+    game.whitePlayerId === user?.id ? PieceColor.White : PieceColor.Black
+  const isFlipped = game.blackPlayerId === user?.id
+  const isMyTurn =
+    game.currentTurn === myColor && game.status === GameStatus.InProgress
+
+  const clearSelection = () => {
+    setSelectedSquare(null)
+    setPossibleMoves([])
+  }
+
+  const handleSquareClick = (square: string) => {
+    if (!isMyTurn) {
+      return
+    }
+    if (selectedSquare && possibleMoves.includes(square)) {
+      try {
+        const move = chess.move({ from: selectedSquare, to: square, promotion: 'q' })
+        void submitMove({ gameId: game._id, san: move.san, fen: chess.fen() })
+      } catch {
+        // Illegal attempts are ignored; the board stays on authoritative server state.
+      }
+      clearSelection()
+      return
+    }
+    const piece = chess.get(square as Square)
+    const myPieceColor = myColor === PieceColor.White ? 'w' : 'b'
+    if (piece && piece.color === myPieceColor) {
+      setSelectedSquare(square)
+      setPossibleMoves(
+        chess
+          .moves({ square: square as Square, verbose: true })
+          .map((move) => move.to),
+      )
+    } else {
+      clearSelection()
+    }
+  }
+
+  const board = chess.board()
+  const displayBoard = isFlipped ? [...board].reverse() : board
+  const elapsed = Math.floor((now - game.turnStartedAt) / 1000)
+  const liveWhite =
+    game.currentTurn === PieceColor.White
+      ? game.whiteTimeRemaining - elapsed
+      : game.whiteTimeRemaining
+  const liveBlack =
+    game.currentTurn === PieceColor.Black
+      ? game.blackTimeRemaining - elapsed
+      : game.blackTimeRemaining
+
+  return (
+    <div className="game-page">
+      <div className="game-header">
+        <button className="back-btn" onClick={() => navigate('/dashboard')}>
+          ← Back to Dashboard
+        </button>
+        <div className="game-info">
+          <span className="time-control">{game.timeControl}</span>
+          <span className="game-status">{game.status.replace('_', ' ')}</span>
+        </div>
+      </div>
+      <div className="game-content">
+        <div className="game-sidebar">
+          <div className="player-info black">
+            <div className="player-name">{blackPlayer?.username ?? 'Waiting...'}</div>
+            <div className="player-rating">({blackPlayer?.rating ?? 1200})</div>
+            <div className="player-time">{formatClock(liveBlack)}</div>
+          </div>
+          <div className="move-history">
+            <h4>Moves</h4>
+            <div className="moves-list">
+              {moves.map((move, index) => (
+                <span key={move._id} className="move-notation">
+                  {Math.floor(index / 2) + 1}
+                  {index % 2 === 0 ? '.' : ''} {move.san}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="player-info white">
+            <div className="player-name">{whitePlayer?.username ?? 'Waiting...'}</div>
+            <div className="player-rating">({whitePlayer?.rating ?? 1200})</div>
+            <div className="player-time">{formatClock(liveWhite)}</div>
+          </div>
+        </div>
+        <div className="board-container">
+          <div className="game-board">
+            {displayBoard.map((row, rankIndex) => {
+              const actualRank = isFlipped ? rankIndex : 7 - rankIndex
+              const displayRow = isFlipped ? [...row].reverse() : row
+              return displayRow.map((square, fileIndex) => {
+                const actualFile = isFlipped ? 7 - fileIndex : fileIndex
+                const notation = String.fromCharCode(97 + actualFile) + (actualRank + 1)
+                const isLight = (actualRank + actualFile) % 2 === 0
+                const piece = square ? `${square.color}${square.type}` : null
+                return (
+                  <div
+                    key={notation}
+                    className={`game-square ${isLight ? 'light' : 'dark'} ${selectedSquare === notation ? 'selected' : ''} ${possibleMoves.includes(notation) ? 'possible-move' : ''}`}
+                    onClick={() => handleSquareClick(notation)}
+                  >
+                    {piece && (
+                      <div className={`game-piece ${piece}`}>
+                        {PIECE_SYMBOLS[piece]}
+                      </div>
+                    )}
+                    {possibleMoves.includes(notation) && (
+                      <div className="move-indicator" />
+                    )}
+                  </div>
+                )
+              })
+            })}
+          </div>
+          {isMyTurn && <div className="turn-indicator">Your Turn</div>}
+        </div>
+      </div>
+    </div>
+  )
 }
-};
 
-const handleSquareClick=(square:string)=>{
-if(!isMyTurn)return;
-if(selectedSquare===square){
-setSelectedSquare(null);
-setPossibleMoves([]);
-return;
-}
-if(selectedSquare&&possibleMoves.includes(square)){
-try{
-const move=chess.move({from:selectedSquare,to:square,promotion:'q'});
-if(move){
-const newFen=chess.fen();
-makeMove(gameId!,move.san,newFen,timeLeft[game.current_turn as'white'|'black']);
-setSelectedSquare(null);
-setPossibleMoves([]);
-}
-}catch(error){
-console.error('Invalid move:',error);
-}
-return;
-}
-const piece=chess.get(square as any);
-if(piece&&piece.color===(game.white_player_id===user?.id?'w':'b')){
-setSelectedSquare(square);
-const moves=chess.moves({square:square as any,verbose:true});
-setPossibleMoves(moves.map((m:any)=>m.to));
-}else{
-setSelectedSquare(null);
-setPossibleMoves([]);
-}
-};
-
-const renderBoard=()=>{
-const board=chess.board();
-const isFlipped=game?.black_player_id===user?.id;
-const displayBoard=isFlipped?board.slice().reverse():board;
-return(
-<div className="game-board">
-{displayBoard.map((row,rankIndex)=>{
-const actualRank=isFlipped?rankIndex:7-rankIndex;
-const displayRow=isFlipped?row.slice().reverse():row;
-return displayRow.map((square,fileIndex)=>{
-const actualFile=isFlipped?7-fileIndex:fileIndex;
-const squareNotation=String.fromCharCode(97+actualFile)+(actualRank+1);
-const isLight=(actualRank+actualFile)%2===0;
-const isSelected=selectedSquare===squareNotation;
-const isPossibleMove=possibleMoves.includes(squareNotation);
-const piece=square?`${square.color}${square.type}`:null;
-return(
-<div key={squareNotation}className={`game-square ${isLight?'light':'dark'} ${isSelected?'selected':''} ${isPossibleMove?'possible-move':''}`}onClick={()=>handleSquareClick(squareNotation)}>
-{piece&&<div className={`game-piece ${piece}`}>{getPieceSymbol(piece)}</div>}
-{isPossibleMove&&<div className="move-indicator"></div>}
-</div>
-);
-});
-})}
-</div>
-);
-};
-
-const getPieceSymbol=(piece:string)=>{
-const symbols:Record<string,string>={
-'wp':'♙','wr':'♖','wn':'♘','wb':'♗','wq':'♕','wk':'♔',
-'bp':'♟','br':'♜','bn':'♞','bb':'♝','bq':'♛','bk':'♚'
-};
-return symbols[piece]||'';
-};
-
-const formatTime=(seconds:number)=>{
-const mins=Math.floor(seconds/60);
-const secs=seconds%60;
-return`${mins}:${secs.toString().padStart(2,'0')}`;
-};
-
-if(!game)return<div className="game-loading">Loading game...</div>;
-
-return(
-<div className="game-page">
-<div className="game-header">
-<button className="back-btn"onClick={()=>navigate('/dashboard')}>← Back to Dashboard</button>
-<div className="game-info">
-<span className="time-control">{game.time_control}</span>
-<span className="game-status">{game.status.replace('_',' ')}</span>
-</div>
-</div>
-<div className="game-content">
-<div className="game-sidebar">
-<div className="player-info black">
-<div className="player-name">{game.black_player?.username}</div>
-<div className="player-rating">({game.black_player?.rating||1200})</div>
-<div className="player-time">{formatTime(timeLeft.black)}</div>
-</div>
-<div className="move-history">
-<h4>Moves</h4>
-<div className="moves-list">
-{game.moves?.map((move:any,index:number)=>(
-<span key={index}className="move-notation">
-{Math.floor(index/2)+1}{index%2===0?'.':''} {move.san}
-</span>
-))}
-</div>
-</div>
-<div className="player-info white">
-<div className="player-name">{game.white_player?.username}</div>
-<div className="player-rating">({game.white_player?.rating||1200})</div>
-<div className="player-time">{formatTime(timeLeft.white)}</div>
-</div>
-</div>
-<div className="board-container">
-{renderBoard()}
-{isMyTurn&&<div className="turn-indicator">Your Turn</div>}
-</div>
-</div>
-</div>
-);
-};
-
-export default Game;
+export default Game

@@ -1,274 +1,98 @@
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { useMemo, useState } from 'react'
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
+import type { Doc } from '../../convex/_generated/dataModel'
+import { useAuth } from '../context/AuthContext'
 
-export interface Notification {
-  id: string;
-  type: 'challenge' | 'friend_request' | 'game_result' | 'system';
-  title: string;
-  message: string;
-  data?: any;
-  read: boolean;
-  created_at: string;
+/*
+(1.) Composes the notification feed from two reactive Convex queries: pending game challenges
+     (`challenges.inbox`) and incoming friend requests (`friends.incomingRequests`), each already
+     enriched with the sender's profile. Convex reactivity replaces the former realtime channel
+     wiring, so a new challenge or request appears without any subscription bookkeeping.
+(2.) Both queries are skipped until the session is authenticated, so an anonymous visitor issues no
+     identity-bound reads, and a combined `loading` flag stays true until both resolve to avoid
+     rendering a half-populated feed.
+(3.) Dismissal is local: `removeNotification` records an id in a `dismissed` set that filters the
+     derived list, letting the UI hide an item immediately after the user acts on it while the
+     authoritative pending state remains the server's responsibility. The next reactive update from
+     the server (once the challenge or request is resolved) removes the row at the source.
+(4.) Each item is normalized to a stable shape (id, type, title, message, data, created_at) so the
+     header renders challenges and friend requests uniformly, and the sender is carried in `data`
+     for avatar and naming without a second lookup.
+
+This hook is the read model for the notification bell. Deriving it from reactive queries plus a small
+local dismissal set keeps the feed live and consistent with the backend while giving the immediate UI
+feedback users expect, and it exposes only what the header consumes, keeping the surface minimal.
+*/
+
+export interface AppNotification {
+  id: string
+  type: 'challenge' | 'friend_request'
+  title: string
+  message: string
+  data: {
+    invitation?: Doc<'gameInvitations'>
+    friendRequest?: Doc<'friendRequests'>
+    sender: Doc<'profiles'> | null
+  }
+  read: boolean
+  created_at: string
 }
 
 export const useNotifications = () => {
-  const { user } = useAuth();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated } = useAuth()
+  const challenges = useQuery(
+    api.challenges.inbox,
+    isAuthenticated ? {} : 'skip',
+  )
+  const friendRequests = useQuery(
+    api.friends.incomingRequests,
+    isAuthenticated ? {} : 'skip',
+  )
+  const [dismissed, setDismissed] = useState<Set<string>>(() => new Set())
 
-  // Fetch pending game invitations and friend requests
-  const fetchNotifications = useCallback(async () => {
-    if (!user) {
-      setNotifications([]);
-      setUnreadCount(0);
-      setLoading(false);
-      return;
-    }
+  const loading = challenges === undefined || friendRequests === undefined
 
-    try {
-      // Fetch pending game invitations for this user
-      const { data: invitations, error } = await supabase
-        .from('game_invitations')
-        .select(`
-          id,
-          from_user_id,
-          time_control,
-          message,
-          status,
-          created_at,
-          expires_at
-        `)
-        .eq('to_user_id', user.id)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
+  const notifications = useMemo<AppNotification[]>(() => {
+    const challengeNotifications: AppNotification[] = (challenges ?? []).map(
+      ({ invitation, sender }) => ({
+        id: invitation._id,
+        type: 'challenge',
+        title: 'Game Challenge',
+        message: `${sender?.username ?? 'Someone'} (${sender?.rating ?? 1200}) challenged you to a ${invitation.timeControl} game`,
+        data: { invitation, sender },
+        read: false,
+        created_at: new Date(invitation._creationTime).toISOString(),
+      }),
+    )
+    const friendNotifications: AppNotification[] = (friendRequests ?? []).map(
+      ({ request, sender }) => ({
+        id: request._id,
+        type: 'friend_request',
+        title: 'Friend Request',
+        message: `${sender?.username ?? 'Someone'} sent you a friend request`,
+        data: { friendRequest: request, sender },
+        read: false,
+        created_at: new Date(request._creationTime).toISOString(),
+      }),
+    )
+    return [...challengeNotifications, ...friendNotifications]
+      .filter((notification) => !dismissed.has(notification.id))
+      .sort(
+        (first, second) =>
+          new Date(second.created_at).getTime() -
+          new Date(first.created_at).getTime(),
+      )
+  }, [challenges, friendRequests, dismissed])
 
-      if (error) {
-        console.error('Error fetching invitations:', error);
-      }
-
-      // Fetch pending friend requests
-      const { data: friendRequests, error: frError } = await supabase
-        .from('friend_requests')
-        .select('id, sender_id, status, created_at')
-        .eq('receiver_id', user.id)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-
-      if (frError) {
-        console.error('Error fetching friend requests:', frError);
-      }
-
-      // Get sender profiles for both invitations and friend requests
-      const invitationSenderIds = invitations?.map(inv => inv.from_user_id) || [];
-      const friendRequestSenderIds = friendRequests?.map(fr => fr.sender_id) || [];
-      const allSenderIds = [...invitationSenderIds, ...friendRequestSenderIds];
-      
-      let senderProfiles: any[] = [];
-      
-      if (allSenderIds.length > 0) {
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, username, rating, avatar_url')
-          .in('id', allSenderIds);
-        
-        senderProfiles = profiles || [];
-      }
-
-      // Convert invitations to notifications
-      const invitationNotifs: Notification[] = (invitations || []).map(inv => {
-        const sender = senderProfiles.find(p => p.id === inv.from_user_id);
-        return {
-          id: inv.id,
-          type: 'challenge' as const,
-          title: 'Game Challenge',
-          message: `${sender?.username || 'Someone'} (${sender?.rating || 1200}) challenged you to a ${inv.time_control} game`,
-          data: {
-            invitation: inv,
-            sender
-          },
-          read: false,
-          created_at: inv.created_at
-        };
-      });
-
-      // Convert friend requests to notifications
-      const friendRequestNotifs: Notification[] = (friendRequests || []).map(fr => {
-        const sender = senderProfiles.find(p => p.id === fr.sender_id);
-        return {
-          id: fr.id,
-          type: 'friend_request' as const,
-          title: 'Friend Request',
-          message: `${sender?.username || 'Someone'} sent you a friend request`,
-          data: {
-            friendRequest: fr,
-            sender
-          },
-          read: false,
-          created_at: fr.created_at
-        };
-      });
-
-      // Combine and sort all notifications
-      const allNotifs = [...invitationNotifs, ...friendRequestNotifs].sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-
-      setNotifications(allNotifs);
-      setUnreadCount(allNotifs.length);
-    } catch (error) {
-      console.error('Error in fetchNotifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  // Mark notification as read
-  const markAsRead = useCallback((notificationId: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
-    );
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  }, []);
-
-  // Remove notification
-  const removeNotification = useCallback((notificationId: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== notificationId));
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  }, []);
-
-  // Clear all notifications
-  const clearAll = useCallback(() => {
-    setNotifications([]);
-    setUnreadCount(0);
-  }, []);
-
-  // Initial fetch
-  useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
-
-  // Subscribe to real-time updates for game invitations and friend requests
-  useEffect(() => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel('notifications')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'game_invitations',
-        filter: `to_user_id=eq.${user.id}`
-      }, async (payload) => {
-        console.log('New invitation received:', payload);
-        
-        // Fetch sender profile
-        const { data: sender } = await supabase
-          .from('profiles')
-          .select('id, username, rating, avatar_url')
-          .eq('id', payload.new.from_user_id)
-          .single();
-
-        const newNotif: Notification = {
-          id: payload.new.id,
-          type: 'challenge',
-          title: 'Game Challenge',
-          message: `${sender?.username || 'Someone'} (${sender?.rating || 1200}) challenged you to a ${payload.new.time_control} game`,
-          data: {
-            invitation: payload.new,
-            sender
-          },
-          read: false,
-          created_at: payload.new.created_at
-        };
-
-        setNotifications(prev => [newNotif, ...prev]);
-        setUnreadCount(prev => prev + 1);
-      })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'game_invitations',
-        filter: `to_user_id=eq.${user.id}`
-      }, (payload) => {
-        // If invitation was accepted/declined/expired, remove it
-        if (payload.new.status !== 'pending') {
-          removeNotification(payload.new.id);
-        }
-      })
-      .on('postgres_changes', {
-        event: 'DELETE',
-        schema: 'public',
-        table: 'game_invitations',
-        filter: `to_user_id=eq.${user.id}`
-      }, (payload) => {
-        removeNotification(payload.old.id);
-      })
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'friend_requests',
-        filter: `receiver_id=eq.${user.id}`
-      }, async (payload) => {
-        console.log('New friend request received:', payload);
-        
-        // Fetch sender profile
-        const { data: sender } = await supabase
-          .from('profiles')
-          .select('id, username, rating, avatar_url')
-          .eq('id', payload.new.sender_id)
-          .single();
-
-        const newNotif: Notification = {
-          id: payload.new.id,
-          type: 'friend_request',
-          title: 'Friend Request',
-          message: `${sender?.username || 'Someone'} sent you a friend request`,
-          data: {
-            friendRequest: payload.new,
-            sender
-          },
-          read: false,
-          created_at: payload.new.created_at
-        };
-
-        setNotifications(prev => [newNotif, ...prev]);
-        setUnreadCount(prev => prev + 1);
-      })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'friend_requests',
-        filter: `receiver_id=eq.${user.id}`
-      }, (payload) => {
-        // If friend request was accepted/rejected, remove it
-        if (payload.new.status !== 'pending') {
-          removeNotification(payload.new.id);
-        }
-      })
-      .on('postgres_changes', {
-        event: 'DELETE',
-        schema: 'public',
-        table: 'friend_requests',
-        filter: `receiver_id=eq.${user.id}`
-      }, (payload) => {
-        removeNotification(payload.old.id);
-      })
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [user, removeNotification]);
+  const removeNotification = (notificationId: string) => {
+    setDismissed((previous) => new Set(previous).add(notificationId))
+  }
 
   return {
     notifications,
-    unreadCount,
+    unreadCount: notifications.length,
     loading,
-    markAsRead,
     removeNotification,
-    clearAll,
-    refetch: fetchNotifications
-  };
-};
+  }
+}

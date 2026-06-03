@@ -94,6 +94,42 @@ export const respond = zMutation({
   },
 })
 
+export const incomingRequests = zQuery({
+  args: {},
+  handler: async (ctx) => {
+    const me = await requireAuthUserId(ctx)
+    const received = await ctx.db
+      .query('friendRequests')
+      .withIndex('by_receiverId', (q) => q.eq('receiverId', me))
+      .collect()
+    const pending = received.filter(
+      (edge) => edge.status === FriendStatus.Pending,
+    )
+    return await Promise.all(
+      pending.map(async (edge) => {
+        const sender = await ctx.db
+          .query('profiles')
+          .withIndex('by_userId', (q) => q.eq('userId', edge.senderId))
+          .unique()
+        return { request: edge, sender }
+      }),
+    )
+  },
+})
+
+export const remove = zMutation({
+  args: { requestId: zid('friendRequests') },
+  returns: z.null(),
+  handler: async (ctx, args) => {
+    const me = await requireAuthUserId(ctx)
+    const edge = await ctx.db.get(args.requestId)
+    if (edge && (edge.senderId === me || edge.receiverId === me)) {
+      await ctx.db.delete(edge._id)
+    }
+    return null
+  },
+})
+
 export const list = zQuery({
   args: {},
   handler: async (ctx) => {

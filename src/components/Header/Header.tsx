@@ -13,12 +13,12 @@ import {
   History as HistoryIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import { getAllProfiles } from '../../utils/profileApi';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
 import ChallengeModal from '../ChallengeModal/ChallengeModal';
 import GameHistory from '../GameHistory/GameHistory';
 import UserProfile from '../UserProfile/UserProfile';
-import { useNotifications } from '../../hooks/useNotifications';
-import { supabase } from '../../lib/supabase';
+import { useNotifications, type AppNotification } from '../../hooks/useNotifications';
 import { toast } from 'react-toastify';
 import notiIcon from '../../assets/images/noti.png';
 
@@ -32,8 +32,12 @@ const Header: React.FC = () => {
   const [animationDirection, setAnimationDirection] = useState('right');
   const indicatorRef = useRef<HTMLDivElement>(null);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [allUsers, setAllUsers] = useState<any[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
+  const directory = useQuery(api.profiles.directory, {});
+  const allUsers = directory ?? [];
+  const loadingUsers = directory === undefined;
+  const acceptChallengeMutation = useMutation(api.challenges.accept);
+  const declineChallengeMutation = useMutation(api.challenges.decline);
+  const respondFriendMutation = useMutation(api.friends.respond);
   const [challengeTarget, setChallengeTarget] = useState<any>(null);
   const [showGameHistory, setShowGameHistory] = useState(false);
   const [userStats, setUserStats] = useState({ games: 0, wins: 0, winRate: 0 });
@@ -94,25 +98,8 @@ const Header: React.FC = () => {
     navigate('/');
   };
 
-  const handleUserDropdown = async () => {
-    const willOpen = !userDropdownOpen;
-    setUserDropdownOpen(willOpen);
-    
-    // Fetch users every time the dropdown opens to get fresh data
-    if (willOpen) {
-      setLoadingUsers(true);
-      try {
-        console.log('[UserDropdown] Fetching all profiles...');
-        const users = await getAllProfiles();
-        console.log('[UserDropdown] Fetched users:', users.length, users);
-        setAllUsers(users);
-      } catch (e) {
-        console.error('[UserDropdown] Error fetching users:', e);
-        setAllUsers([]);
-      } finally {
-        setLoadingUsers(false);
-      }
-    }
+  const handleUserDropdown = () => {
+    setUserDropdownOpen((open) => !open);
   };
 
   // Handle notification dropdown toggle
@@ -120,120 +107,53 @@ const Header: React.FC = () => {
     setNotificationDropdownOpen(!notificationDropdownOpen);
   };
 
-  // Handle accepting a challenge from notification
-  const handleAcceptChallenge = async (notification: any) => {
-    const invitation = notification.data?.invitation;
-    if (!invitation || !user) return;
-
+  const handleAcceptChallenge = async (notification: AppNotification) => {
+    const invitation = notification.data.invitation;
+    if (!invitation) return;
     try {
-      // Update invitation status
-      await supabase
-        .from('game_invitations')
-        .update({ status: 'accepted' })
-        .eq('id', invitation.id);
-
-      // Determine colors randomly
-      const isWhite = Math.random() < 0.5;
-      const whitePlayerId = isWhite ? user.id : invitation.from_user_id;
-      const blackPlayerId = isWhite ? invitation.from_user_id : user.id;
-
-      // Parse time control
-      let initialTime = 600;
-      if (invitation.time_control) {
-        const timeMinutes = parseInt(invitation.time_control.split('+')[0]);
-        initialTime = timeMinutes * 60;
-      }
-
-      // Create the game
-      const { error: gameError } = await supabase
-        .from('games')
-        .insert({
-          created_by: user.id,
-          opponent_id: invitation.from_user_id,
-          white_player_id: whitePlayerId,
-          black_player_id: blackPlayerId,
-          status: 'in_progress',
-          time_control: invitation.time_control,
-          board_state: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-          current_turn: 'white',
-          white_time_remaining: initialTime,
-          black_time_remaining: initialTime,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
-
-      if (gameError) {
-        console.error('Error creating game:', gameError);
-        toast.error('Failed to start game');
-        return;
-      }
-
+      const gameId = await acceptChallengeMutation({ invitationId: invitation._id });
       removeNotification(notification.id);
       setNotificationDropdownOpen(false);
       toast.success('Game started!');
-      
-      // Navigate to play page if not already there
-      if (location.pathname !== '/play') {
-        navigate('/play');
-      }
-    } catch (error) {
-      console.error('Error accepting challenge:', error);
+      navigate(`/game/${gameId}`);
+    } catch {
       toast.error('Failed to accept challenge');
     }
   };
 
-  // Handle declining a challenge from notification
-  const handleDeclineChallenge = async (notification: any) => {
-    const invitation = notification.data?.invitation;
+  const handleDeclineChallenge = async (notification: AppNotification) => {
+    const invitation = notification.data.invitation;
     if (!invitation) return;
-
     try {
-      await supabase
-        .from('game_invitations')
-        .update({ status: 'declined' })
-        .eq('id', invitation.id);
-
+      await declineChallengeMutation({ invitationId: invitation._id });
       removeNotification(notification.id);
       toast.info('Challenge declined');
-    } catch (error) {
-      console.error('Error declining challenge:', error);
+    } catch {
+      toast.error('Failed to decline challenge');
     }
   };
 
-  // Handle accepting a friend request from notification
-  const handleAcceptFriendRequest = async (notification: any) => {
-    const friendRequest = notification.data?.friendRequest;
-    if (!friendRequest || !user) return;
-
+  const handleAcceptFriendRequest = async (notification: AppNotification) => {
+    const friendRequest = notification.data.friendRequest;
+    if (!friendRequest) return;
     try {
-      await supabase
-        .from('friend_requests')
-        .update({ status: 'accepted' })
-        .eq('id', friendRequest.id);
-
+      await respondFriendMutation({ requestId: friendRequest._id, accept: true });
       removeNotification(notification.id);
       toast.success('Friend request accepted!');
-    } catch (error) {
-      console.error('Error accepting friend request:', error);
+    } catch {
       toast.error('Failed to accept friend request');
     }
   };
 
-  // Handle declining a friend request from notification
-  const handleDeclineFriendRequest = async (notification: any) => {
-    const friendRequest = notification.data?.friendRequest;
+  const handleDeclineFriendRequest = async (notification: AppNotification) => {
+    const friendRequest = notification.data.friendRequest;
     if (!friendRequest) return;
-
     try {
-      await supabase
-        .from('friend_requests')
-        .update({ status: 'rejected' })
-        .eq('id', friendRequest.id);
-
+      await respondFriendMutation({ requestId: friendRequest._id, accept: false });
       removeNotification(notification.id);
       toast.info('Friend request declined');
-    } catch (error) {
-      console.error('Error declining friend request:', error);
+    } catch {
+      toast.error('Failed to decline friend request');
     }
   };
 
@@ -274,30 +194,28 @@ const Header: React.FC = () => {
                   <div className="user-list-scroll">
                     {allUsers.length === 0 && <div className="user-list-empty">No users found.</div>}
                     {allUsers.map((u) => {
-                      // Consider user online if they were active in the last 5 minutes
-                      const isOnline = u.last_active ? 
-                        (new Date().getTime() - new Date(u.last_active).getTime()) < 5 * 60 * 1000 
-                        : false;
-                      
+                      const isOnline =
+                        Date.now() - u.lastActive < 5 * 60 * 1000;
+
                       return (
-                        <div className="user-list-item" key={u.id}>
+                        <div className="user-list-item" key={u._id}>
                           <div className="user-list-avatar">
-                            {u.avatar_url ? (
-                              <img src={u.avatar_url} alt={u.username} />
+                            {u.avatarUrl ? (
+                              <img src={u.avatarUrl} alt={u.username} />
                             ) : (
-                              <span className="avatar-fallback">{u.username?.charAt(0)?.toUpperCase() || 'U'}</span>
+                              <span className="avatar-fallback">{u.username.charAt(0).toUpperCase()}</span>
                             )}
                             <span className={`user-status-dot ${isOnline ? 'online' : 'offline'}`}></span>
                           </div>
                           <div className="user-list-info">
                             <span className="user-list-username">{u.username}</span>
-                            <span className="user-list-rating">{u.rating || 1200}</span>
+                            <span className="user-list-rating">{u.rating}</span>
                           </div>
-                          {u.id !== user?.id && (
+                          {u.userId !== user?.id && (
                             <div className="user-list-actions">
                               <button className="view-profile-btn" onClick={(e) => {
                                 e.stopPropagation();
-                                setViewProfileUserId(u.id);
+                                setViewProfileUserId(u.userId);
                                 setUserDropdownOpen(false);
                               }}>
                                 View Profile

@@ -1,49 +1,60 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { getProfile, updateProfile } from '../utils/profileApi';
-import styles from './MyAccount.module.css';
-import { Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import styles from './MyAccount.module.css'
 
-const MyAccount: React.FC = () => {
-  const { user, profile: authProfile, loading: authLoading } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
-  const [username, setUsername] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState(false);
+/*
+(1.) Account settings page that reads the player's profile from the `useAuth` context and edits
+     the user-controlled username through the context's `updateProfile`, which writes to Convex and
+     re-renders every observer reactively, so no manual refetch is needed after saving.
+(2.) The username field is seeded from the current profile when it loads, and saving submits the
+     full editable set (username plus the existing bio and avatar) because the underlying mutation
+     takes complete values rather than partial updates, matching the project's no-optional rule.
+(3.) Route protection and load gating derive from the context, redirecting unauthenticated users
+     and showing a loading state until the profile resolves, so the form never renders against an
+     absent profile.
+
+This page is a focused editor over the authentication context's profile. Delegating persistence to
+the shared `updateProfile` keeps account edits consistent with how the rest of the app mutates
+profile data and removes the previous direct data-access path, leaving the Convex profile as the
+single source of truth.
+*/
+
+const SAVED_NOTICE_MS = 2000
+
+const MyAccount = () => {
+  const { user, profile, updateProfile } = useAuth()
+  const [username, setUsername] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
+    if (profile) {
+      setUsername(profile.username)
     }
-
-    // Use profile from auth context if available, otherwise fetch it
-    if (authProfile) {
-      setProfile(authProfile);
-      setUsername(authProfile.username || '');
-      setLoading(false);
-    } else {
-      getProfile(user.id).then((p) => {
-        setProfile(p);
-        setUsername(p.username || '');
-      }).finally(() => setLoading(false));
-    }
-  }, [user, authProfile]);
+  }, [profile])
 
   const handleSave = async () => {
-    if (!user) return;
-    
-    setSaving(true);
-    await updateProfile(user.id, { username });
-    setSuccess(true);
-    setSaving(false);
-    setTimeout(() => setSuccess(false), 2000);
-  };
+    if (!profile) {
+      return
+    }
+    setSaving(true)
+    await updateProfile({
+      username,
+      bio: profile.bio,
+      avatarUrl: profile.avatarUrl,
+    })
+    setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), SAVED_NOTICE_MS)
+  }
 
-  if (!user) return <Navigate to="/" />;
-  if (loading) return <div className={styles['account-page']}>Loading...</div>;
-  if (!profile) return <div className={styles['account-page']}>Account not found.</div>;
+  if (!user) {
+    return <Navigate to="/" />
+  }
+  if (!profile) {
+    return <div className={styles['account-page']}>Loading...</div>
+  }
 
   return (
     <div className={styles['account-page']}>
@@ -53,12 +64,16 @@ const MyAccount: React.FC = () => {
             {profile.avatarUrl ? (
               <img src={profile.avatarUrl} alt={profile.username} />
             ) : (
-              <span className="avatar-fallback">{profile.username?.charAt(0)?.toUpperCase() || 'U'}</span>
+              <span className="avatar-fallback">
+                {profile.username.charAt(0).toUpperCase()}
+              </span>
             )}
           </div>
           <div className={styles['account-header-info']}>
             <h2>{profile.username}</h2>
-            <div className={styles['account-rating']}>ELO: <span>{profile.rating || 1200}</span></div>
+            <div className={styles['account-rating']}>
+              ELO: <span>{profile.rating}</span>
+            </div>
           </div>
         </div>
         <div className={styles['account-fields']}>
@@ -68,21 +83,24 @@ const MyAccount: React.FC = () => {
           </div>
           <div className={styles['account-field']}>
             <label>Username</label>
-            <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
+            <input
+              type="text"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+            />
           </div>
         </div>
-        <button className={styles['save-btn']} onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
-        {success && <div className={styles['success-msg']}>Saved!</div>}
-        <div className={styles['account-divider']}></div>
-        <div className={styles['account-section']}>
-          <h3>Change Password</h3>
-          <div className={styles['account-field']}>
-            <input type="password" placeholder="New password (coming soon)" disabled />
-          </div>
-        </div>
+        <button
+          className={styles['save-btn']}
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? 'Saving...' : 'Save'}
+        </button>
+        {saved && <div className={styles['success-msg']}>Saved!</div>}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default MyAccount; 
+export default MyAccount

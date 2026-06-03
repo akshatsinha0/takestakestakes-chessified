@@ -18,13 +18,13 @@ export default defineConfig({
           'mui-vendor': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
           'chess-vendor': ['chess.js', 'react-chessboard'],
           'three-vendor': ['three'],
-          'supabase-vendor': ['@supabase/supabase-js'],
+          'convex-vendor': ['convex', '@convex-dev/better-auth', 'better-auth'],
           'utils': ['react-toastify']
         }
       }
     }
   },
   optimizeDeps: {
-    include: ['three', 'chess.js', '@supabase/supabase-js'] // Pre-bundle for faster builds
+    include: ['three', 'chess.js', 'convex'] // Pre-bundle for faster builds
   }
 });

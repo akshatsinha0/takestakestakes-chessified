@@ -1,145 +1,119 @@
-import{useState,useEffect}from'react';
-import{useAuth}from'../../context/AuthContext';
-import{supabase}from'../../lib/supabase';
-import{toast}from'react-toastify';
-import GameViewer from'../GameViewer/GameViewer';
-import'./GameHistory.css';
+import { useState } from 'react'
+import { useQuery } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
+import type { Doc } from '../../../convex/_generated/dataModel'
+import { GameResult } from '../../../convex/lib/domain'
+import { useAuth } from '../../context/AuthContext'
+import GameViewer from '../GameViewer/GameViewer'
+import './GameHistory.css'
 
-interface GameHistoryProps{
-onClose:()=>void;
-}
+/*
+(1.) Lists the signed-in player's completed games from the reactive `games.historyForUser`
+     query and lets them open any game in the move-by-move viewer. The list updates
+     automatically as new games finish, with no manual reload.
+(2.) Opponent and self usernames are resolved from the `profiles.directory` query through a
+     `nameOf` lookup, because the history query returns raw games keyed by player id; pairing the
+     two queries keeps each one simple and index-driven rather than embedding a join.
+(3.) The result label is computed relative to the viewer's color from the stored `result` enum,
+     so the same completed game reads as "Win" or "Loss" correctly for whichever side the user
+     played, and a missing finish time renders empty rather than an invalid date.
 
-const GameHistory:React.FC<GameHistoryProps>=({onClose})=>{
-const{user}=useAuth();
-const[games,setGames]=useState<any[]>([]);
-const[loading,setLoading]=useState(true);
-const[selectedGame,setSelectedGame]=useState<any>(null);
+This modal is a reactive history view composed from two focused queries. Deriving result and
+opponent display on the client from authoritative game and profile data keeps the backend
+queries minimal while presenting a complete, self-consistent record.
+*/
 
-useEffect(()=>{
-if(user){
-loadGameHistory();
-}
-},[user]);
+const GameHistory = ({ onClose }: { onClose: () => void }) => {
+  const { user } = useAuth()
+  const games = useQuery(
+    api.games.historyForUser,
+    user ? { userId: user.id } : 'skip',
+  )
+  const directory = useQuery(api.profiles.directory, {}) ?? []
+  const [selectedGame, setSelectedGame] = useState<Doc<'games'> | null>(null)
 
-const loadGameHistory=async()=>{
-try{
-// First get games
-const{data: gamesData,error: gamesError}=await supabase
-.from('games')
-.select('*')
-.or(`white_player_id.eq.${user?.id},black_player_id.eq.${user?.id}`)
-.in('status',['completed','game_over'])
-.order('created_at',{ascending:false})
-.limit(50);
+  const nameOf = (userId: string | null): string =>
+    directory.find((profile) => profile.userId === userId)?.username ??
+    'Unknown'
 
-if(gamesError)throw gamesError;
-
-// Get player profiles for each game
-const gamesWithPlayers = await Promise.all((gamesData || []).map(async (game) => {
-  let whitePlayer = null;
-  let blackPlayer = null;
-  
-  if (game.white_player_id) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('username')
-      .eq('id', game.white_player_id)
-      .single();
-    whitePlayer = data;
+  const resultFor = (game: Doc<'games'>): string => {
+    if (!user) {
+      return ''
+    }
+    const isWhite = game.whitePlayerId === user.id
+    if (game.result === GameResult.Draw) {
+      return 'Draw'
+    }
+    if (game.result === GameResult.WhiteWins) {
+      return isWhite ? 'Win' : 'Loss'
+    }
+    if (game.result === GameResult.BlackWins) {
+      return isWhite ? 'Loss' : 'Win'
+    }
+    return 'Abandoned'
   }
-  
-  if (game.black_player_id) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('username')
-      .eq('id', game.black_player_id)
-      .single();
-    blackPlayer = data;
+
+  const resultClass = (game: Doc<'games'>): string =>
+    resultFor(game).toLowerCase()
+
+  if (selectedGame) {
+    return (
+      <GameViewer game={selectedGame} onClose={() => setSelectedGame(null)} />
+    )
   }
-  
-  return {
-    ...game,
-    white_player: whitePlayer,
-    black_player: blackPlayer
-  };
-}));
 
-setGames(gamesWithPlayers);
-}catch(error){
-console.error('Failed to load game history:',error);
-toast.error('Failed to load game history');
-}finally{
-setLoading(false);
+  return (
+    <div className="game-history-overlay" onClick={onClose}>
+      <div className="game-history-modal" onClick={(event) => event.stopPropagation()}>
+        <div className="game-history-header">
+          <h3>Game History</h3>
+          <button className="close-btn" onClick={onClose}>×</button>
+        </div>
+        <div className="game-history-content">
+          {games === undefined ? (
+            <div className="loading">Loading games...</div>
+          ) : (
+            <div className="games-list">
+              {games.length === 0 ? (
+                <div className="no-games">No games played yet</div>
+              ) : (
+                games.map((game) => (
+                  <div
+                    key={game._id}
+                    className="game-item"
+                    onClick={() => setSelectedGame(game)}
+                  >
+                    <div className="game-players">
+                      <div className="player white">
+                        <span className="piece">♔</span>
+                        {nameOf(game.whitePlayerId)}
+                      </div>
+                      <div className="vs">vs</div>
+                      <div className="player black">
+                        <span className="piece">♚</span>
+                        {nameOf(game.blackPlayerId)}
+                      </div>
+                    </div>
+                    <div className="game-info">
+                      <div className={`result ${resultClass(game)}`}>
+                        {resultFor(game)}
+                      </div>
+                      <div className="time-control">{game.timeControl}</div>
+                      <div className="date">
+                        {game.finishedAt
+                          ? new Date(game.finishedAt).toLocaleDateString()
+                          : ''}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 }
-};
 
-const getGameResult=(game:any)=>{
-if(!user)return'';
-const isWhite=game.white_player_id===user.id;
-if(game.result==='draw')return'Draw';
-if(game.result==='white_wins')return isWhite?'Win':'Loss';
-if(game.result==='black_wins')return isWhite?'Loss':'Win';
-return'Abandoned';
-};
-
-const getResultClass=(game:any)=>{
-const result=getGameResult(game);
-if(result==='Win')return'win';
-if(result==='Loss')return'loss';
-if(result==='Draw')return'draw';
-return'abandoned';
-};
-
-if(selectedGame){
-return<GameViewer game={selectedGame}onClose={()=>setSelectedGame(null)}/>;
-}
-
-return(
-<div className="game-history-overlay"onClick={onClose}>
-<div className="game-history-modal"onClick={e=>e.stopPropagation()}>
-<div className="game-history-header">
-<h3>Game History</h3>
-<button className="close-btn"onClick={onClose}>×</button>
-</div>
-<div className="game-history-content">
-{loading?(
-<div className="loading">Loading games...</div>
-):(
-<div className="games-list">
-{games.length===0?(
-<div className="no-games">No games played yet</div>
-):(
-games.map(game=>(
-<div key={game.id}className="game-item"onClick={()=>setSelectedGame(game)}>
-<div className="game-players">
-<div className="player white">
-<span className="piece">♔</span>
-{game.white_player?.username||'Unknown'}
-</div>
-<div className="vs">vs</div>
-<div className="player black">
-<span className="piece">♚</span>
-{game.black_player?.username||'Unknown'}
-</div>
-</div>
-<div className="game-info">
-<div className={`result ${getResultClass(game)}`}>
-{getGameResult(game)}
-</div>
-<div className="time-control">{game.time_control}</div>
-<div className="date">
-{new Date(game.finished_at).toLocaleDateString()}
-</div>
-</div>
-</div>
-))
-)}
-</div>
-)}
-</div>
-</div>
-</div>
-);
-};
-
-export default GameHistory;
+export default GameHistory

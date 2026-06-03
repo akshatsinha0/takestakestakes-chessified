@@ -36,6 +36,24 @@ presence systems, not by user edits, which keeps authority over each field with 
 that owns it.
 */
 
+export const directory = zQuery({
+  args: {},
+  handler: async (ctx) => {
+    const profiles = await ctx.db.query('profiles').collect()
+    return profiles.sort((first, second) => second.rating - first.rating)
+  },
+})
+
+export const byUserId = zQuery({
+  args: { userId: z.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('profiles')
+      .withIndex('by_userId', (q) => q.eq('userId', args.userId))
+      .unique()
+  },
+})
+
 export const getCurrentProfile = zQuery({
   args: {},
   handler: async (ctx) => {
