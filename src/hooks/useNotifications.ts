@@ -78,7 +78,7 @@ export const useNotifications = () => {
     )
     return [...challengeNotifications, ...friendNotifications]
       .filter((notification) => !dismissed.has(notification.id))
-      .sort(
+      .toSorted(
         (first, second) =>
           new Date(second.created_at).getTime() -
           new Date(first.created_at).getTime(),

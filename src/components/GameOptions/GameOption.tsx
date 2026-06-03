@@ -17,6 +17,24 @@ interface GameOptionProps {
   onClick?: () => void
 }
 
+// Map icon names to imported assets
+const getIconSrc = (iconName: string) => {
+  switch (iconName) {
+    case 'lightning':
+      return lightningIcon
+    case 'robot':
+      return robotIcon
+    case 'handshake':
+      return handshakeIcon
+    case 'trophy':
+      return trophyIcon
+    case 'dice':
+      return diceIcon
+    default:
+      return lightningIcon
+  }
+}
+
 const GameOption: React.FC<GameOptionProps> = ({
   title,
   description,
@@ -24,24 +42,6 @@ const GameOption: React.FC<GameOptionProps> = ({
   color,
   onClick,
 }) => {
-  // Map icon names to imported assets
-  const getIconSrc = (iconName: string) => {
-    switch (iconName) {
-      case 'lightning':
-        return lightningIcon
-      case 'robot':
-        return robotIcon
-      case 'handshake':
-        return handshakeIcon
-      case 'trophy':
-        return trophyIcon
-      case 'dice':
-        return diceIcon
-      default:
-        return lightningIcon
-    }
-  }
-
   return (
     <div className='game-option' onClick={onClick}>
       <div className='option-icon' style={{ backgroundColor: color }}>

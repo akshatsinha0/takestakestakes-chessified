@@ -25,6 +25,27 @@ import {
 import { toast } from 'react-toastify'
 import notiIcon from '../../assets/images/noti.png'
 
+const NAV_ITEMS = [
+  { name: 'Play', path: '/play' },
+  { name: 'Puzzles', path: '/puzzles' },
+  { name: 'Lessons', path: '/lessons' },
+  { name: 'Analysis', path: '/analysis' },
+]
+
+const getInitial = (name: string | undefined) =>
+  name?.charAt(0).toUpperCase() || 'G'
+
+const formatTimeAgo = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMins = Math.floor((now.getTime() - date.getTime()) / 60000)
+  if (diffMins < 1) return 'Just now'
+  if (diffMins < 60) return `${diffMins}m ago`
+  const diffHours = Math.floor(diffMins / 60)
+  if (diffHours < 24) return `${diffHours}h ago`
+  return `${Math.floor(diffHours / 24)}d ago`
+}
+
 const Header: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -43,7 +64,6 @@ const Header: React.FC = () => {
   const respondFriendMutation = useMutation(api.friends.respond)
   const [challengeTarget, setChallengeTarget] = useState<any>(null)
   const [showGameHistory, setShowGameHistory] = useState(false)
-  const [userStats, setUserStats] = useState({ games: 0, wins: 0, winRate: 0 })
   const [notificationDropdownOpen, setNotificationDropdownOpen] =
     useState(false)
   const [viewProfileUserId, setViewProfileUserId] = useState<string | null>(
@@ -55,19 +75,12 @@ const Header: React.FC = () => {
 
   const open = Boolean(anchorEl)
 
-  const navItems = [
-    { name: 'Play', path: '/play' },
-    { name: 'Puzzles', path: '/puzzles' },
-    { name: 'Lessons', path: '/lessons' },
-    { name: 'Analysis', path: '/analysis' },
-  ]
-
   useEffect(() => {
     const path = location.pathname
     if (path !== activeTab) {
       setPrevTab(activeTab)
-      const currentIndex = navItems.findIndex((item) => item.path === path)
-      const prevIndex = navItems.findIndex((item) => item.path === activeTab)
+      const currentIndex = NAV_ITEMS.findIndex((item) => item.path === path)
+      const prevIndex = NAV_ITEMS.findIndex((item) => item.path === activeTab)
       setAnimationDirection(currentIndex > prevIndex ? 'right' : 'left')
       setActiveTab(path)
     }
@@ -97,10 +110,6 @@ const Header: React.FC = () => {
     setAnchorEl(null)
   }
 
-  const getInitial = (name: string | undefined) => {
-    return name?.charAt(0).toUpperCase() || 'G'
-  }
-
   const handleLogout = async () => {
     handleClose()
     await signOut()
@@ -108,7 +117,7 @@ const Header: React.FC = () => {
   }
 
   const handleUserDropdown = () => {
-    setUserDropdownOpen((open) => !open)
+    setUserDropdownOpen((isOpen) => !isOpen)
   }
 
   // Handle notification dropdown toggle
@@ -172,20 +181,6 @@ const Header: React.FC = () => {
     } catch {
       toast.error('Failed to decline friend request')
     }
-  }
-
-  // Format time ago
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-
-    if (diffMins < 1) return 'Just now'
-    if (diffMins < 60) return `${diffMins}m ago`
-    const diffHours = Math.floor(diffMins / 60)
-    if (diffHours < 24) return `${diffHours}h ago`
-    return `${Math.floor(diffHours / 24)}d ago`
   }
 
   return (
@@ -273,7 +268,7 @@ const Header: React.FC = () => {
 
           <nav className='main-nav'>
             <div className='nav-items-container'>
-              {navItems.map((item) => (
+              {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}

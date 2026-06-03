@@ -121,7 +121,7 @@ const Game = () => {
   }
 
   const board = chess.board()
-  const displayBoard = isFlipped ? [...board].reverse() : board
+  const displayBoard = isFlipped ? [...board].toReversed() : board
   const elapsed = Math.floor((now - game.turnStartedAt) / 1000)
   const liveWhite =
     game.currentTurn === PieceColor.White
@@ -175,7 +175,7 @@ const Game = () => {
           <div className='game-board'>
             {displayBoard.map((row, rankIndex) => {
               const actualRank = isFlipped ? rankIndex : 7 - rankIndex
-              const displayRow = isFlipped ? [...row].reverse() : row
+              const displayRow = isFlipped ? [...row].toReversed() : row
               return displayRow.map((square, fileIndex) => {
                 const actualFile = isFlipped ? 7 - fileIndex : fileIndex
                 const notation =

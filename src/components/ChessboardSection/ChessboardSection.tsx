@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
-import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import ChessboardControls from './ChessboardControls'
 import useChessSounds from '../../hooks/useChessSounds'
@@ -38,7 +37,7 @@ interface ChessboardSectionProps {
 
 const DEFAULT_RATING = 1200
 const BOT_MOVE_DELAY_MS = 500
-const CENTER_SQUARES = ['e4', 'e5', 'd4', 'd5', 'c4', 'c5', 'f4', 'f5']
+const CENTER_SQUARES = new Set(['e4', 'e5', 'd4', 'd5', 'c4', 'c5', 'f4', 'f5'])
 
 const pickBotMove = (game: Chess, rating: number) => {
   const moves = game.moves({ verbose: true })
@@ -47,7 +46,7 @@ const pickBotMove = (game: Chess, rating: number) => {
   }
   const captures = moves.filter((move) => move.captured)
   const checks = moves.filter((move) => move.san.includes('+'))
-  const central = moves.filter((move) => CENTER_SQUARES.includes(move.to))
+  const central = moves.filter((move) => CENTER_SQUARES.has(move.to))
   const preferred =
     rating < 1000
       ? moves

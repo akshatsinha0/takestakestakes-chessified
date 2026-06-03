@@ -3,7 +3,6 @@
   "plugins": [
     "typescript",
     "react",
-    "react-perf",
     "unicorn",
     "import",
     "promise",
@@ -22,7 +21,15 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "import/no-named-export": "off",
+    "import/no-unassigned-import": "off",
     "unicorn/no-null": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/no-static-element-interactions": "warn",
+    "jsx-a11y/control-has-associated-label": "warn",
+    "jsx-a11y/label-has-associated-control": "warn",
+    "jsx-a11y/no-autofocus": "warn",
+    "jsx-a11y/no-noninteractive-tabindex": "warn",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }

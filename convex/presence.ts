@@ -49,6 +49,6 @@ export const onlinePlayers = zQuery({
       .filter(
         (profile) => profile.userId !== me && profile.lastActive >= cutoff,
       )
-      .sort((first, second) => second.rating - first.rating)
+      .toSorted((first, second) => second.rating - first.rating)
   },
 })

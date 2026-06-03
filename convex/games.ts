@@ -101,6 +101,6 @@ export const historyForUser = zQuery({
     const games = await gamesForPlayer(ctx, args.userId)
     return games
       .filter((game) => game.status === GameStatus.Completed)
-      .sort((first, second) => second._creationTime - first._creationTime)
+      .toSorted((first, second) => second._creationTime - first._creationTime)
   },
 })

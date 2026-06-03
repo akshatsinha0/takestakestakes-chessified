@@ -63,7 +63,7 @@ const GameOptions: React.FC<{
     else if (id === 'play-friend') setShowFriendInvite(true)
   }
 
-  const handleTimeSelect = (label: string) => {
+  const handleTimeSelect = (_label: string) => {
     setShowTimeModal(false)
     setShowCustom(false)
     setShowQuickMatch(true)

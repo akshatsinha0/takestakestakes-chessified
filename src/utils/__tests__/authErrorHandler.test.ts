@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
 import { authErrorHandler } from '../authErrorHandler'
-import { toast } from 'react-toastify'
 
 vi.mock('react-toastify', () => ({
   toast: {

@@ -40,7 +40,7 @@ export const directory = zQuery({
   args: {},
   handler: async (ctx) => {
     const profiles = await ctx.db.query('profiles').collect()
-    return profiles.sort((first, second) => second.rating - first.rating)
+    return profiles.toSorted((first, second) => second.rating - first.rating)
   },
 })
 

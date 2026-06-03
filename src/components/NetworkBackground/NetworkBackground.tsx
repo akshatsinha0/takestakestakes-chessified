@@ -154,7 +154,7 @@ const NetworkBackground = () => {
       })
 
       // Update connections
-      connections.forEach(({ line, nodeA, nodeB, geometry }) => {
+      connections.forEach(({ nodeA, nodeB, geometry }) => {
         geometry.setFromPoints([nodeA.position, nodeB.position])
         geometry.attributes.position.needsUpdate = true
       })

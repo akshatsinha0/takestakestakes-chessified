@@ -71,7 +71,7 @@ const PasswordGenerator = ({
     }
 
     if (passwordOptions.easyToRead) {
-      charset = charset.replace(/[{}[\]()<>\/\\'"~,;:]/g, '')
+      charset = charset.replace(/[{}[\]()<>/\\'"~,;:]/g, '')
     }
 
     if (charset === '') charset = 'abcdefghijklmnopqrstuvwxyz'

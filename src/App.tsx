@@ -1,10 +1,9 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react'
+import React, { useState, lazy, Suspense } from 'react'
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
-  useNavigate,
 } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -71,7 +70,6 @@ const LoadingFallback = () => (
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null)
-  const { isAuthenticated } = useAuth()
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen)
   const openAuth = (mode: 'login' | 'signup') => setAuthMode(mode)
