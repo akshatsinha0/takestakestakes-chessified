@@ -78,7 +78,7 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background-color: #566573;
+  background-color: var(--brand-slate);
   overflow: hidden;
   margin-right: 1rem;
   display: flex;
@@ -161,7 +161,7 @@
   margin: 0;
   height: auto;
   min-height: 400px;
-  background-color: #512917cd;
+  background-color: var(--overlay-board-amber);
   color: var(--text-primary);
   border-radius: 8px;
   overflow: hidden;
@@ -241,7 +241,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #484644;
+  background-color: var(--brand-slate-dark);
   transition: .4s;
   border-radius: 20px;
 }
@@ -259,7 +259,7 @@
 }
 
 input:checked+.toggle-slider {
-  background-color: #0e2093cf;
+  background-color: var(--overlay-board-navy);
 }
 
 input:checked+.toggle-slider:before {
@@ -402,7 +402,7 @@ input:checked+.toggle-slider:before {
 .review-btn {
   width: 100%;
   padding: 12px;
-  background-color: #0e2093cf;
+  background-color: var(--overlay-board-navy);
   color: white;
   border: none;
   border-radius: 4px;
@@ -417,7 +417,7 @@ input:checked+.toggle-slider:before {
 }
 
 .review-btn:hover {
-  background-color: #4c95afad;
+  background-color: var(--overlay-board-teal);
 }
 
 /* ===== MOVE CONTROLS ===== */

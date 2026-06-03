@@ -69,6 +69,23 @@ re-exports for type-safe use in TSX inline styles and the MUI theme.
   --brand-board-light: #f0d9b5;
   --brand-board-dark: #b58863;
 
+  /* ---- Primitives: decorative visuals (background animations) ---- */
+  --brand-teal: #00d4aa;
+  --brand-cyan: #00b8d4;
+  --brand-cyan-light: #26c6da;
+
+  /* ---- Primitives: misc UI accents ---- */
+  --brand-link: #535bf2;
+  --brand-link-hover: #747bff;
+  --brand-slate: #566573;
+  --brand-slate-dark: #484644;
+  --text-ink-slate: #213547;
+
+  /* ---- Primitives: translucent board overlays (baked alpha) ---- */
+  --overlay-board-amber: #512917cd;
+  --overlay-board-navy: #0e2093cf;
+  --overlay-board-teal: #4c95afad;
+
   /* ---- Primitives: alpha overlays ---- */
   --alpha-white-02: rgba(255, 255, 255, 0.02);
   --alpha-white-05: rgba(255, 255, 255, 0.05);

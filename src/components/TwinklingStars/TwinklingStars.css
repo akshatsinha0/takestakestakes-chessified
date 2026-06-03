@@ -11,19 +11,19 @@
 
 .star {
   position: absolute;
-  background: #00d4aa;
+  background: var(--brand-teal);
   border-radius: 50%;
   animation: gentle-twinkle 4s infinite ease-in-out;
   box-shadow: 0 0 3px rgba(0, 212, 170, 0.6);
 }
 
 .star:nth-child(3n) {
-  background: #00b8d4;
+  background: var(--brand-cyan);
   box-shadow: 0 0 3px rgba(0, 184, 212, 0.6);
 }
 
 .star:nth-child(5n) {
-  background: #26c6da;
+  background: var(--brand-cyan-light);
   box-shadow: 0 0 3px rgba(38, 198, 218, 0.6);
 }
 
