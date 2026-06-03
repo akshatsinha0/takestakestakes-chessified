@@ -1,39 +1,29 @@
-name: Code Formatting
+name: Format Check
 
+# Verifies that all committed code is formatted with oxfmt using the same
+# .oxfmtrc.json the local pre-commit hook uses. This is the CI guard (Part B):
+# it does not modify code, it fails the check if anything is unformatted so an
+# unformatted PR cannot merge. The local pre-commit hook (lint-staged + oxfmt
+# --write) is what actually formats changed files before they are pushed.
 on:
-  schedule:
-    # Run twice a week: Tuesday and Friday at 2 PM UTC
-    - cron: '0 14 * * 2,5'
-  workflow_dispatch:
-
-permissions:
-  contents: write
+  pull_request:
+  push:
+    branches:
+      - main
+      - migrate-to-convex
 
 jobs:
-  format-code:
+  format-check:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: bun install --frozen-lockfile
 
-      - name: Run ESLint with auto-fix
-        run: npm run lint -- --fix || true
-        continue-on-error: true
-
-      - name: Commit formatting changes
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add -A
-          git diff --quiet && git diff --staged --quiet || (git commit -m "style: apply automated code formatting [skip ci]" && git push)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check formatting with oxfmt
+        run: bunx oxfmt --check .
