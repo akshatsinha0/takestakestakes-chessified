@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useSupabaseAuthContext } from '../context/SupabaseAuthContext';
+import { useAuth } from '../context/AuthContext';
 import { getProfile, updateProfile } from '../utils/profileApi';
 import styles from './MyAccount.module.css';
 import { Navigate } from 'react-router-dom';
 
 const MyAccount: React.FC = () => {
-  const { user, profile: authProfile, loading: authLoading } = useSupabaseAuthContext();
+  const { user, profile: authProfile, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [username, setUsername] = useState('');
   const [saving, setSaving] = useState(false);
@@ -50,8 +50,8 @@ const MyAccount: React.FC = () => {
       <div className={styles['account-card']}>
         <div className={styles['account-header']}>
           <div className={styles['account-avatar']}>
-            {profile.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.username} />
+            {profile.avatarUrl ? (
+              <img src={profile.avatarUrl} alt={profile.username} />
             ) : (
               <span className="avatar-fallback">{profile.username?.charAt(0)?.toUpperCase() || 'U'}</span>
             )}

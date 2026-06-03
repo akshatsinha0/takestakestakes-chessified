@@ -1,6 +1,6 @@
 import{useState,useEffect}from'react';
 import{useParams,useNavigate}from'react-router-dom';
-import{useSupabaseAuthContext}from'../context/SupabaseAuthContext';
+import{useAuth}from'../context/AuthContext';
 import{supabase}from'../lib/supabase';
 import{Chess}from'chess.js';
 import{makeMove}from'../utils/gameApi';
@@ -9,7 +9,7 @@ import'./Game.css';
 
 const Game:React.FC=()=>{
 const{gameId}=useParams<{gameId:string}>();
-const{user}=useSupabaseAuthContext();
+const{user}=useAuth();
 const navigate=useNavigate();
 const[game,setGame]=useState<any>(null);
 const[chess]=useState(new Chess());

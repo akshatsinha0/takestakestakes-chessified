@@ -5,12 +5,12 @@ import ChessboardSection from '../components/ChessboardSection/ChessboardSection
 import GameOptions from '../components/GameOptions/GameOptions';
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification';
 import ActiveGames from '../components/ActiveGames/ActiveGames';
-import { useSupabaseAuthContext } from '../context/SupabaseAuthContext';
+import { useAuth } from '../context/AuthContext';
 import { useUserPresence } from '../hooks/useUserPresence';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
-  const { user } = useSupabaseAuthContext();
+  const { user } = useAuth();
   const [playYourselfMode, setPlayYourselfMode] = useState(false);
   const [playBotMode, setPlayBotMode] = useState(false);
   const [selectedBot, setSelectedBot] = useState<any>(null);

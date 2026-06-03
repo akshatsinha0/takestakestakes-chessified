@@ -1,5 +1,5 @@
 import{useState}from'react';
-import{useSupabaseAuthContext}from'../../context/SupabaseAuthContext';
+import{useAuth}from'../../context/AuthContext';
 import{supabase}from'../../lib/supabase';
 import{toast}from'react-toastify';
 import'./ChallengeModal.css';
@@ -19,7 +19,7 @@ const timeControls=[
 ];
 
 const ChallengeModal:React.FC<ChallengeModalProps>=({targetUser,onClose})=>{
-const{user}=useSupabaseAuthContext();
+const{user}=useAuth();
 const[selectedTimeControl,setSelectedTimeControl]=useState('5+0');
 const[message,setMessage]=useState('');
 const[sending,setSending]=useState(false);

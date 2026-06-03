@@ -1,11 +1,11 @@
 import{useState,useEffect}from'react';
-import{useSupabaseAuthContext}from'../../context/SupabaseAuthContext';
+import{useAuth}from'../../context/AuthContext';
 import{supabase}from'../../lib/supabase';
 import{toast}from'react-toastify';
 import'./ChallengeNotification.css';
 
 const ChallengeNotification:React.FC=()=>{
-const{user}=useSupabaseAuthContext();
+const{user}=useAuth();
 const[challenges,setChallenges]=useState<any[]>([]);
 
 useEffect(()=>{

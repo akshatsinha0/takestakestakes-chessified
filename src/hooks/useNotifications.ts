@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { useSupabaseAuthContext } from '../context/SupabaseAuthContext';
+import { useAuth } from '../context/AuthContext';
 
 export interface Notification {
   id: string;
@@ -13,7 +13,7 @@ export interface Notification {
 }
 
 export const useNotifications = () => {
-  const { user } = useSupabaseAuthContext();
+  const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);

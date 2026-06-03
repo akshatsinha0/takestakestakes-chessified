@@ -1,11 +1,11 @@
 import{useState,useEffect}from'react';
-import{useSupabaseAuthContext}from'../../context/SupabaseAuthContext';
+import{useAuth}from'../../context/AuthContext';
 import{getActiveGames}from'../../utils/gameApi';
 import{useNavigate}from'react-router-dom';
 import'./ActiveGames.css';
 
 const ActiveGames:React.FC=()=>{
-const{user}=useSupabaseAuthContext();
+const{user}=useAuth();
 const[activeGames,setActiveGames]=useState<any[]>([]);
 const[loading,setLoading]=useState(true);
 const navigate=useNavigate();

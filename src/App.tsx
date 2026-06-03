@@ -4,7 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
-import { SupabaseAuthProvider, useSupabaseAuthContext } from './context/SupabaseAuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Lazy load components
 const Sidebar = lazy(() => import('./components/Sidebar/Sidebar'));
@@ -18,7 +18,7 @@ const Game = lazy(() => import('./pages/Game'));
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
-  const { isAuthenticated, loading } = useSupabaseAuthContext();
+  const { isAuthenticated, loading } = useAuth();
   
   if (loading) {
     return <LoadingFallback />;
@@ -33,7 +33,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
 
 // Public route that redirects authenticated users to dashboard
 const PublicRoute = ({ children }: { children: React.ReactElement }) => {
-  const { isAuthenticated, loading } = useSupabaseAuthContext();
+  const { isAuthenticated, loading } = useAuth();
   
   if (loading) {
     return <LoadingFallback />;
@@ -63,7 +63,7 @@ const LoadingFallback = () => (
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup' | null>(null);
-  const { isAuthenticated } = useSupabaseAuthContext();
+  const { isAuthenticated } = useAuth();
   
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const openAuth = (mode: 'login' | 'signup') => setAuthMode(mode);
@@ -171,9 +171,9 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <SupabaseAuthProvider>
+      <AuthProvider>
         <AppContent />
-      </SupabaseAuthProvider>
+      </AuthProvider>
     </Router>
   );
 }

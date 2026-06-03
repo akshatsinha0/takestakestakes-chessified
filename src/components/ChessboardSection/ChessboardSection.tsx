@@ -1,4 +1,4 @@
-import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext';
+import { useAuth } from '../../context/AuthContext';
 import React, { useState, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
@@ -45,7 +45,7 @@ const ChessboardSection: React.FC<ChessboardSectionProps> = ({
   botTimeControl,
   onExitBotMode
 }) => {
-  const { user, profile } = useSupabaseAuthContext();
+  const { user, profile } = useAuth();
   const [game, setGame] = useState(new Chess());
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);

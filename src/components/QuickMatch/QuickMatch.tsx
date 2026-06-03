@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { joinMatchmakingQueue, leaveMatchmakingQueue, subscribeToGame } from '../../services/matchmakingService';
 import './QuickMatch.css';
 
 const QuickMatch: React.FC = () => {
-  const { user, profile } = useSupabaseAuthContext();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [searching, setSearching] = useState(false);
   const [selectedTime, setSelectedTime] = useState('5+0');

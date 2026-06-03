@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import './FriendInvite.css';
 
@@ -26,7 +26,7 @@ const TIME_CONTROLS = [
 ];
 
 const FriendInvite: React.FC<FriendInviteProps> = ({ onClose, onGameCreated }) => {
-  const { user } = useSupabaseAuthContext();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Profile[]>([]);
   const [selectedFriend, setSelectedFriend] = useState<Profile | null>(null);

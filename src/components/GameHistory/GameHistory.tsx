@@ -1,5 +1,5 @@
 import{useState,useEffect}from'react';
-import{useSupabaseAuthContext}from'../../context/SupabaseAuthContext';
+import{useAuth}from'../../context/AuthContext';
 import{supabase}from'../../lib/supabase';
 import{toast}from'react-toastify';
 import GameViewer from'../GameViewer/GameViewer';
@@ -10,7 +10,7 @@ onClose:()=>void;
 }
 
 const GameHistory:React.FC<GameHistoryProps>=({onClose})=>{
-const{user}=useSupabaseAuthContext();
+const{user}=useAuth();
 const[games,setGames]=useState<any[]>([]);
 const[loading,setLoading]=useState(true);
 const[selectedGame,setSelectedGame]=useState<any>(null);

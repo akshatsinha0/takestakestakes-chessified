@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext'
-import { authErrorHandler } from '../../utils/authErrorHandler'
+import { useAuth } from '../../context/AuthContext'
 import './Forms.css'
 import googleLogo from '../../assets/GoogleLogo.png'
 import facebookLogo from '../../assets/FacebookLogo.png'
@@ -10,111 +9,99 @@ import visibilityOn from '../../assets/VisibilityON.png'
 import visibilityOff from '../../assets/VisibilityOFF.png'
 import PasswordGenerator from './PasswordGenerator'
 
-const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
+/*
+(1.) Account creation form backed by the Convex + Better Auth `useAuth` context. `signUp`
+     creates the account and provisions the profile in one normalized call returning
+     `{ error: string | null }`; a null error means the session is active and the user is
+     routed to the dashboard.
+(2.) Client-side guards reject mismatched passwords and too-short usernames before calling
+     the backend, giving immediate feedback, while the backend remains the authoritative
+     validator of credential and uniqueness rules.
+(3.) An optional password generator can fill both password fields, and social sign-up reuses
+     the same OAuth entry points as login so a new user can onboard with one click; the
+     submit button is disabled while the request is in flight.
+
+This component is the presentational onboarding entry point. It depends only on the auth
+context contract rather than any backend SDK, so the provider can change without edits here,
+and it keeps no credential state beyond the live form, clearing naturally when the modal
+closes.
+*/
+
+const MINIMUM_USERNAME_LENGTH = 3
+
+const SignupForm = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate()
-  const { signUp, signInWithGoogle, signInWithFacebook } = useSupabaseAuthContext()
-  
+  const { signUp, signInWithGoogle, signInWithFacebook } = useAuth()
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    agreeTerms: false
+    agreeTerms: false,
   })
-  
   const [showPasswordGenerator, setShowPasswordGenerator] = useState(false)
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = event.target
+    setFormData((previous) => ({
+      ...previous,
+      [name]: type === 'checkbox' ? checked : value,
     }))
   }
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords don't match")
       return
     }
-    
-    if (formData.username.length < 3) {
-      toast.error("Username must be at least 3 characters long")
+    if (formData.username.length < MINIMUM_USERNAME_LENGTH) {
+      toast.error('Username must be at least 3 characters long')
       return
     }
-    
-    setIsLoading(true)
-    
-    try {
-      const { data, error } = await signUp(formData.email, formData.password, formData.username)
-      
-      if (error) {
-        authErrorHandler.showError(error)
-        return
-      }
-      
-      if (data.user) {
-        if (data.session) {
-          toast.success('Account created successfully!')
-          onClose()
-          setTimeout(() => {
-            navigate('/dashboard')
-          }, 100)
-        } else {
-          toast.info('Please check your email to confirm your account')
-          onClose()
-        }
-      }
-    } catch (error) {
-      console.error('[SignupForm] Unexpected error:', error)
-      authErrorHandler.showError(error)
-    } finally {
-      setIsLoading(false)
+    setIsSubmitting(true)
+    const { error } = await signUp(
+      formData.email,
+      formData.password,
+      formData.username,
+    )
+    setIsSubmitting(false)
+    if (error) {
+      toast.error(error)
+      return
     }
+    toast.success('Account created successfully!')
+    onClose()
+    navigate('/dashboard', { replace: true })
   }
-  
+
   const handleGeneratedPassword = (password: string) => {
-    setFormData(prev => ({
-      ...prev,
+    setFormData((previous) => ({
+      ...previous,
       password,
-      confirmPassword: password
+      confirmPassword: password,
     }))
     setShowPasswordGenerator(false)
   }
-  
+
   const handleGoogleSignup = async () => {
-    try {
-      const { error } = await signInWithGoogle()
-      if (error) {
-        toast.error(error.message || 'Google signup failed')
-      }
-    } catch (error) {
-      toast.error('Google signup failed')
-      console.error('Google signup error:', error)
-    }
+    const { error } = await signInWithGoogle()
+    if (error) toast.error(error)
   }
-  
+
   const handleFacebookSignup = async () => {
-    try {
-      const { error } = await signInWithFacebook()
-      if (error) {
-        toast.error(error.message || 'Facebook signup failed')
-      }
-    } catch (error) {
-      toast.error('Facebook signup failed')
-      console.error('Facebook signup error:', error)
-    }
+    const { error } = await signInWithFacebook()
+    if (error) toast.error(error)
   }
-  
+
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
       <h2 className="form-title">Join the Grandmasters</h2>
-      
+
       <div className="form-group">
         <label htmlFor="username">Username</label>
         <input
@@ -129,7 +116,7 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
           maxLength={20}
         />
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="signup-email">Email</label>
         <input
@@ -142,12 +129,12 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
           required
         />
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="signup-password">Password</label>
         <div className="password-input-container">
           <input
-            type={passwordVisible ? "text" : "password"}
+            type={passwordVisible ? 'text' : 'password'}
             id="signup-password"
             name="password"
             value={formData.password}
@@ -156,33 +143,33 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
             required
             minLength={6}
           />
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="password-generate-button"
             onClick={() => setShowPasswordGenerator(true)}
           >
             Generate
           </button>
-          <button 
+          <button
             type="button"
             className="visibility-toggle"
-            onClick={() => setPasswordVisible(!passwordVisible)}
-            aria-label={passwordVisible ? "Hide password" : "Show password"}
+            onClick={() => setPasswordVisible((visible) => !visible)}
+            aria-label={passwordVisible ? 'Hide password' : 'Show password'}
           >
-            <img 
-              src={passwordVisible ? visibilityOn : visibilityOff} 
-              alt={passwordVisible ? "Hide password" : "Show password"} 
-              className="visibility-icon" 
+            <img
+              src={passwordVisible ? visibilityOn : visibilityOff}
+              alt={passwordVisible ? 'Hide password' : 'Show password'}
+              className="visibility-icon"
             />
           </button>
         </div>
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="confirm-password">Confirm Password</label>
         <div className="password-input-container">
           <input
-            type={confirmPasswordVisible ? "text" : "password"}
+            type={confirmPasswordVisible ? 'text' : 'password'}
             id="confirm-password"
             name="confirmPassword"
             value={formData.confirmPassword}
@@ -190,21 +177,23 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
             placeholder="Verify your password"
             required
           />
-          <button 
+          <button
             type="button"
             className="visibility-toggle"
-            onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
-            aria-label={confirmPasswordVisible ? "Hide password" : "Show password"}
+            onClick={() => setConfirmPasswordVisible((visible) => !visible)}
+            aria-label={
+              confirmPasswordVisible ? 'Hide password' : 'Show password'
+            }
           >
-            <img 
-              src={confirmPasswordVisible ? visibilityOn : visibilityOff} 
-              alt={confirmPasswordVisible ? "Hide password" : "Show password"} 
-              className="visibility-icon" 
+            <img
+              src={confirmPasswordVisible ? visibilityOn : visibilityOff}
+              alt={confirmPasswordVisible ? 'Hide password' : 'Show password'}
+              className="visibility-icon"
             />
           </button>
         </div>
       </div>
-      
+
       <div className="form-options">
         <label className="checkbox-label">
           <input
@@ -214,31 +203,30 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
             onChange={handleChange}
             required
           />
-          <span>I agree to the <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a></span>
+          <span>
+            I agree to the <a href="#terms">Terms of Service</a> and{' '}
+            <a href="#privacy">Privacy Policy</a>
+          </span>
         </label>
       </div>
-      
-      <button 
-        type="submit" 
-        className="submit-button"
-        disabled={isLoading}
-      >
-        {isLoading ? "Creating Account..." : "Begin Your Journey"}
+
+      <button type="submit" className="submit-button" disabled={isSubmitting}>
+        {isSubmitting ? 'Creating Account...' : 'Begin Your Journey'}
       </button>
-      
+
       <div className="social-login">
         <p>Or sign up with</p>
         <div className="social-buttons">
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="social-button google"
             onClick={handleGoogleSignup}
           >
             <img src={googleLogo} alt="Google" className="social-icon" />
             <span>Google</span>
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="social-button facebook"
             onClick={handleFacebookSignup}
           >
@@ -247,9 +235,9 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
           </button>
         </div>
       </div>
-      
+
       {showPasswordGenerator && (
-        <PasswordGenerator 
+        <PasswordGenerator
           onClose={() => setShowPasswordGenerator(false)}
           onSelectPassword={handleGeneratedPassword}
         />
@@ -258,4 +246,4 @@ const SupabaseSignupForm = ({ onClose }: { onClose: () => void }) => {
   )
 }
 
-export default SupabaseSignupForm
+export default SignupForm

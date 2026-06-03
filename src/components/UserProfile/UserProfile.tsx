@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import './UserProfile.css';
 
@@ -33,7 +33,7 @@ interface GameStats {
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({ userId, onClose }) => {
-  const { user } = useSupabaseAuthContext();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [gameStats, setGameStats] = useState<GameStats>({ total_games: 0, wins: 0, losses: 0, draws: 0 });
   const [friendRequest, setFriendRequest] = useState<FriendRequest | null>(null);

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import './Header.css';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useSupabaseAuthContext } from '../../context/SupabaseAuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { Avatar, Menu, MenuItem, IconButton, Badge, Fade } from '@mui/material';
 import { 
   AccountCircle, 
@@ -25,7 +25,7 @@ import notiIcon from '../../assets/images/noti.png';
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, profile, signOut } = useSupabaseAuthContext();
+  const { user, profile, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState('/play');
   const [prevTab, setPrevTab] = useState<string | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -349,8 +349,8 @@ const Header: React.FC = () => {
           <div className="user-section">
             <div className="user-profile" onClick={handleMenu}>
               <div className="avatar-container">
-                {profile?.avatar_url ? (
-                  <Avatar src={profile.avatar_url} alt={profile.username} className="user-avatar" />
+                {profile?.avatarUrl ? (
+                  <Avatar src={profile.avatarUrl} alt={profile.username} className="user-avatar" />
                 ) : (
                   <div className="avatar">
                     {profile ? getInitial(profile.username) : 'G'}
@@ -391,8 +391,8 @@ const Header: React.FC = () => {
                   <>
                     <div className="dropdown-header">
                       <div className="user-avatar-large">
-                        {profile?.avatar_url ? (
-                          <Avatar src={profile.avatar_url} alt={profile.username || 'User'} />
+                        {profile?.avatarUrl ? (
+                          <Avatar src={profile.avatarUrl} alt={profile.username || 'User'} />
                         ) : (
                           <div className="avatar-fallback">{profile?.username?.charAt(0) || 'U'}</div>
                         )}

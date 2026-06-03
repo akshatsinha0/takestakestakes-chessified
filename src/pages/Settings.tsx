@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSupabaseAuthContext } from '../context/SupabaseAuthContext';
+import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'react-toastify';
 import Header from '../components/Header/Header';
@@ -7,7 +7,7 @@ import DashboardLayout from '../components/DashboardLayout/DashboardLayout';
 import './Settings.css';
 
 const Settings: React.FC = () => {
-  const { user, profile } = useSupabaseAuthContext();
+  const { user, profile } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   
   // Profile settings
