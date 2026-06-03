@@ -3,7 +3,6 @@
  * Provides user-friendly error messages and recovery strategies
  */
 
-import { AuthError } from '@supabase/supabase-js'
 import { toast } from 'react-toastify'
 
 export interface AuthErrorInfo {
@@ -17,7 +16,7 @@ export const authErrorHandler = {
   /**
    * Parse and handle authentication errors
    */
-  handleAuthError(error: AuthError | Error | unknown): AuthErrorInfo {
+  handleAuthError(error: Error | unknown): AuthErrorInfo {
     const errorMessage = error instanceof Error ? error.message : String(error)
     
     console.error('[AuthErrorHandler] Handling error:', errorMessage)
@@ -102,7 +101,7 @@ export const authErrorHandler = {
   /**
    * Display error toast with appropriate message
    */
-  showError(error: AuthError | Error | unknown): AuthErrorInfo {
+  showError(error: Error | unknown): AuthErrorInfo {
     const errorInfo = this.handleAuthError(error)
     toast.error(errorInfo.message)
     
@@ -117,7 +116,7 @@ export const authErrorHandler = {
   /**
    * Check if error is recoverable
    */
-  isRecoverable(error: AuthError | Error | unknown): boolean {
+  isRecoverable(error: Error | unknown): boolean {
     const errorInfo = this.handleAuthError(error)
     return errorInfo.shouldRetry
   },
@@ -125,7 +124,7 @@ export const authErrorHandler = {
   /**
    * Check if session should be cleared
    */
-  shouldClearSession(error: AuthError | Error | unknown): boolean {
+  shouldClearSession(error: Error | unknown): boolean {
     const errorInfo = this.handleAuthError(error)
     return errorInfo.shouldClearSession
   }
