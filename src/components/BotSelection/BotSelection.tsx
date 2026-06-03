@@ -18,7 +18,7 @@ const BOTS: Bot[] = [
     rating: 800,
     level: 'Beginner',
     description: 'Perfect for learning the basics',
-    color: '#4caf50',
+    color: 'var(--success)',
     icon: 'R'
   },
   {
@@ -27,7 +27,7 @@ const BOTS: Bot[] = [
     rating: 1000,
     level: 'Easy',
     description: 'Makes occasional mistakes',
-    color: '#8bc34a',
+    color: 'var(--success)',
     icon: 'C'
   },
   {
@@ -36,7 +36,7 @@ const BOTS: Bot[] = [
     rating: 1200,
     level: 'Intermediate',
     description: 'Solid fundamental play',
-    color: '#ffc107',
+    color: 'var(--brand-amber-soft)',
     icon: 'S'
   },
   {
@@ -45,7 +45,7 @@ const BOTS: Bot[] = [
     rating: 1500,
     level: 'Advanced',
     description: 'Strong tactical awareness',
-    color: '#ff9800',
+    color: 'var(--color-warning)',
     icon: 'E'
   },
   {
@@ -54,7 +54,7 @@ const BOTS: Bot[] = [
     rating: 1800,
     level: 'Master',
     description: 'Near-perfect play',
-    color: '#f44336',
+    color: 'var(--error)',
     icon: 'M'
   },
   {
@@ -63,7 +63,7 @@ const BOTS: Bot[] = [
     rating: 2200,
     level: 'Grandmaster',
     description: 'Unforgiving and precise',
-    color: '#9c27b0',
+    color: 'var(--brand-purple)',
     icon: 'G'
   }
 ];
@@ -148,8 +148,8 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
                 onClick={() => setSelectedTime(time)}
                 style={{
                   borderRadius: 0,
-                  background: selectedTime.value === time.value ? '#e5a356' : 'rgba(42, 67, 97, 0.4)',
-                  color: selectedTime.value === time.value ? '#0f1419' : '#f5f5f5'
+                  background: selectedTime.value === time.value ? 'var(--color-accent)' : 'var(--alpha-surface-40)',
+                  color: selectedTime.value === time.value ? 'var(--color-bg-deep)' : 'var(--text-primary)'
                 }}
               >
                 {time.label}
@@ -167,7 +167,7 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
             onClick={handlePlayBot}
             disabled={!selectedBot}
             style={{
-              background: selectedBot ? selectedBot.color : '#666',
+              background: selectedBot ? selectedBot.color : 'var(--brand-gray-500)',
               cursor: selectedBot ? 'pointer' : 'not-allowed',
               borderRadius: 0
             }}

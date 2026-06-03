@@ -35,7 +35,7 @@ backdrop-filter:blur(12px);
 }
 
 .challenge-modal{
-background:linear-gradient(145deg,#1a2332 0%,#0f1419 100%);
+background:linear-gradient(145deg,var(--color-surface) 0%,var(--color-bg-deep) 100%);
 border-radius:16px;
 padding:1rem 1.25rem;
 width:420px !important;
@@ -45,7 +45,7 @@ overflow-y:auto;
 border:2px solid rgba(212,141,59,0.3);
 box-shadow:0 25px 50px rgba(0,0,0,0.7),
 0 0 100px rgba(212,141,59,0.1),
-inset 0 1px 0 rgba(255,255,255,0.1);
+inset 0 1px 0 var(--alpha-white-10);
 animation:modalSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
 position:relative !important;
 box-sizing:border-box !important;
@@ -82,11 +82,11 @@ justify-content:space-between;
 align-items:center;
 margin-bottom:0.75rem;
 padding-bottom:0.6rem;
-border-bottom:1px solid rgba(255,255,255,0.1);
+border-bottom:1px solid var(--alpha-white-10);
 }
 
 .challenge-header h3{
-color:#f5f5f5;
+color:var(--text-primary);
 font-size:1.1rem;
 margin:0;
 font-weight:700;
@@ -95,9 +95,9 @@ text-shadow:0 2px 10px rgba(212,141,59,0.3);
 }
 
 .close-btn{
-background:rgba(255,255,255,0.05);
-border:1px solid rgba(255,255,255,0.1);
-color:rgba(255,255,255,0.7);
+background:var(--alpha-white-05);
+border:1px solid var(--alpha-white-10);
+color:var(--alpha-white-70);
 font-size:1.5rem;
 cursor:pointer;
 padding:0;
@@ -113,13 +113,13 @@ transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
 .close-btn:hover{
 background:rgba(244,67,54,0.2);
 border-color:rgba(244,67,54,0.5);
-color:#f44336;
+color:var(--error);
 transform:rotate(90deg) scale(1.1);
 box-shadow:0 0 20px rgba(244,67,54,0.3);
 }
 
 .challenge-content h4{
-color:#f5f5f5;
+color:var(--text-primary);
 margin:0 0 0.6rem 0;
 font-size:0.85rem;
 font-weight:600;
@@ -134,8 +134,8 @@ margin-bottom:0.75rem;
 }
 
 .time-control-card{
-background:rgba(42,67,97,0.4);
-border:2px solid rgba(255,255,255,0.1);
+background:var(--alpha-surface-40);
+border:2px solid var(--alpha-white-10);
 border-radius:8px;
 padding:0.5rem 0.3rem;
 text-align:center;
@@ -161,7 +161,7 @@ transition:opacity 0.3s;
 background:rgba(42,67,97,0.6);
 border-color:rgba(212,141,59,0.5);
 transform:translateY(-4px) scale(1.02);
-box-shadow:0 8px 20px rgba(0,0,0,0.4);
+box-shadow:0 8px 20px var(--alpha-black-40);
 }
 
 .time-control-card:hover::before{
@@ -169,8 +169,8 @@ opacity:1;
 }
 
 .time-control-card.selected{
-background:linear-gradient(135deg,rgba(212,141,59,0.3),rgba(229,163,86,0.2));
-border-color:#d48d3b;
+background:linear-gradient(135deg,rgba(212,141,59,0.3),var(--alpha-accent-20));
+border-color:var(--color-accent-strong);
 box-shadow:0 0 30px rgba(212,141,59,0.4),
 inset 0 0 20px rgba(212,141,59,0.1);
 transform:translateY(-2px) scale(1.05);
@@ -181,7 +181,7 @@ opacity:1;
 }
 
 .time-control-name{
-color:#e5a356;
+color:var(--color-accent);
 font-weight:700;
 font-size:0.65rem;
 margin-bottom:0.15rem;
@@ -190,11 +190,11 @@ letter-spacing:0.5px;
 }
 
 .time-control-time{
-color:#f5f5f5;
+color:var(--text-primary);
 font-size:0.9rem;
 font-weight:700;
 margin-bottom:0.1rem;
-text-shadow:0 2px 10px rgba(0,0,0,0.3);
+text-shadow:0 2px 10px var(--shadow-strong);
 }
 
 .time-control-increment{
@@ -209,11 +209,11 @@ margin-bottom:0.75rem;
 
 .challenge-message textarea{
 width:100%;
-background:rgba(42,67,97,0.4);
-border:2px solid rgba(255,255,255,0.1);
+background:var(--alpha-surface-40);
+border:2px solid var(--alpha-white-10);
 border-radius:6px;
 padding:0.5rem;
-color:#f5f5f5;
+color:var(--text-primary);
 font-family:inherit;
 font-size:0.85rem;
 resize:vertical;
@@ -228,7 +228,7 @@ color:rgba(255,255,255,0.4);
 
 .challenge-message textarea:focus{
 outline:none;
-border-color:#d48d3b;
+border-color:var(--color-accent-strong);
 background:rgba(42,67,97,0.6);
 box-shadow:0 0 20px rgba(212,141,59,0.2),
 inset 0 0 10px rgba(212,141,59,0.05);
@@ -239,7 +239,7 @@ display:flex;
 gap:0.6rem;
 justify-content:flex-end;
 padding-top:0.6rem;
-border-top:1px solid rgba(255,255,255,0.1);
+border-top:1px solid var(--alpha-white-10);
 }
 
 .cancel-btn,.send-btn{
@@ -254,27 +254,27 @@ letter-spacing:0.5px;
 }
 
 .cancel-btn{
-background:rgba(255,255,255,0.05);
-color:#f5f5f5;
-border:2px solid rgba(255,255,255,0.2);
+background:var(--alpha-white-05);
+color:var(--text-primary);
+border:2px solid var(--alpha-white-20);
 }
 
 .cancel-btn:hover{
-background:rgba(255,255,255,0.1);
+background:var(--alpha-white-10);
 border-color:rgba(255,255,255,0.4);
 transform:translateY(-2px);
-box-shadow:0 4px 12px rgba(0,0,0,0.3);
+box-shadow:0 4px 12px var(--shadow-strong);
 }
 
 .send-btn{
-background:linear-gradient(135deg,#d48d3b 0%,#e5a356 100%);
-color:#0f1419;
+background:linear-gradient(135deg,var(--color-accent-strong) 0%,var(--color-accent) 100%);
+color:var(--color-bg-deep);
 border:2px solid transparent;
 box-shadow:0 4px 15px rgba(212,141,59,0.4);
 }
 
 .send-btn:hover:not(:disabled){
-background:linear-gradient(135deg,#e5a356 0%,#f0b366 100%);
+background:linear-gradient(135deg,var(--color-accent) 0%,var(--brand-gold-soft) 100%);
 transform:translateY(-3px) scale(1.02);
 box-shadow:0 8px 25px rgba(212,141,59,0.6);
 }
@@ -292,7 +292,7 @@ width:8px;
 }
 
 .challenge-modal::-webkit-scrollbar-track{
-background:rgba(255,255,255,0.05);
+background:var(--alpha-white-05);
 border-radius:10px;
 }
 

@@ -13,13 +13,13 @@ backdrop-filter:blur(5px);
 }
 
 .game-viewer-modal{
-background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);
+background:linear-gradient(135deg,var(--color-surface) 0%,var(--brand-navy-700) 100%);
 border-radius:20px;
 padding:2rem;
 max-width:1200px;
 width:95%;
 max-height:90vh;
-border:1px solid rgba(255,255,255,0.2);
+border:1px solid var(--alpha-white-20);
 box-shadow:0 20px 40px rgba(0,0,0,0.5);
 display:flex;
 flex-direction:column;
@@ -70,11 +70,11 @@ position:relative;
 }
 
 .square.light{
-background:#f0d9b5;
+background:var(--board-light);
 }
 
 .square.dark{
-background:#b58863;
+background:var(--board-dark);
 }
 
 .piece{
@@ -89,7 +89,7 @@ margin-top:1rem;
 }
 
 .game-controls button{
-background:rgba(255,255,255,0.1);
+background:var(--alpha-white-10);
 border:1px solid rgba(255,255,255,0.3);
 color:white;
 padding:0.5rem 1rem;
@@ -99,7 +99,7 @@ transition:all 0.3s;
 }
 
 .game-controls button:hover:not(:disabled){
-background:rgba(255,255,255,0.2);
+background:var(--alpha-white-20);
 }
 
 .game-controls button:disabled{
@@ -119,8 +119,8 @@ margin:0 0 1rem 0;
 }
 
 .moves-list{
-background:rgba(255,255,255,0.05);
-border:1px solid rgba(255,255,255,0.2);
+background:var(--alpha-white-05);
+border:1px solid var(--alpha-white-20);
 border-radius:8px;
 padding:1rem;
 flex:1;
@@ -142,12 +142,12 @@ transition:all 0.2s;
 }
 
 .move-item:hover{
-background:rgba(255,255,255,0.1);
+background:var(--alpha-white-10);
 }
 
 .move-item.active{
 background:rgba(255,165,0,0.3);
-border:1px solid #ffa500;
+border:1px solid var(--color-warning);
 }
 
 .move-number{
@@ -167,7 +167,7 @@ width:6px;
 }
 
 .moves-list::-webkit-scrollbar-track{
-background:rgba(255,255,255,0.1);
+background:var(--alpha-white-10);
 border-radius:3px;
 }
 

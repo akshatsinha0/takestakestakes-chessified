@@ -4,7 +4,7 @@
   padding: 1.5rem;
   background-color: var(--primary);
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px var(--shadow-soft);
   margin-bottom: 2rem;
   overflow: hidden;
   box-sizing: border-box;
@@ -33,7 +33,7 @@
   width: 100%;
   max-width: 600px;
   aspect-ratio: 1/1;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 36px var(--shadow-strong);
   border-radius: 8px;
   overflow: visible;
   background-color: var(--primary-dark);
@@ -138,7 +138,7 @@
 /* ===== THEATER MODE ===== */
 .theater-mode {
   position: relative;
-  background-color: #111a29;
+  background-color: var(--primary-dark);
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
@@ -162,7 +162,7 @@
   height: auto;
   min-height: 400px;
   background-color: #512917cd;
-  color: #fff;
+  color: var(--text-primary);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(140, 10, 26, 0.3);
@@ -178,7 +178,7 @@
 
 .analysis-header {
   padding: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--alpha-white-10);
 }
 
 .analysis-tabs {
@@ -199,7 +199,7 @@
 
 .tab.active {
   opacity: 1;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .tab span {
@@ -279,8 +279,8 @@ input:checked+.toggle-slider:before {
 
 .upgrade-banner {
   padding: 10px;
-  background-color: #1e1e1e;
-  color: #00a1ff;
+  background-color: var(--color-bg);
+  color: var(--color-info);
   font-size: 13px;
   display: flex;
   align-items: center;
@@ -289,7 +289,7 @@ input:checked+.toggle-slider:before {
 }
 
 .diamond-icon {
-  color: #00a1ff;
+  color: var(--color-info);
   font-size: 16px;
 }
 
@@ -302,7 +302,7 @@ input:checked+.toggle-slider:before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--alpha-white-10);
 }
 
 .opening-name {
@@ -322,7 +322,7 @@ input:checked+.toggle-slider:before {
   overflow-y: auto;
   padding: 8px 12px;
   scrollbar-width: thin;
-  scrollbar-color: #444 #222;
+  scrollbar-color: var(--brand-gray-600) var(--brand-gray-700);
   display: grid;
   grid-template-columns: auto 1fr 1fr;
   gap: 10px;
@@ -333,11 +333,11 @@ input:checked+.toggle-slider:before {
 }
 
 .moves-container::-webkit-scrollbar-track {
-  background: #222;
+  background: var(--brand-gray-700);
 }
 
 .moves-container::-webkit-scrollbar-thumb {
-  background-color: #444;
+  background-color: var(--brand-gray-600);
   border-radius: 6px;
 }
 
@@ -349,7 +349,7 @@ input:checked+.toggle-slider:before {
   grid-column: 1;
   width: auto;
   padding-right: 10px;
-  color: #888;
+  color: var(--brand-gray-500);
   font-size: 13px;
 }
 
@@ -360,7 +360,7 @@ input:checked+.toggle-slider:before {
   padding: 8px 12px;
   border-radius: 4px;
   margin-right: 4px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--alpha-white-05);
   cursor: pointer;
   transition: background-color 0.2s;
   width: auto;
@@ -376,7 +376,7 @@ input:checked+.toggle-slider:before {
 }
 
 .move:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--alpha-white-10);
 }
 
 .piece-symbol {
@@ -390,7 +390,7 @@ input:checked+.toggle-slider:before {
 
 .move-time {
   font-size: 11px;
-  color: #888;
+  color: var(--brand-gray-500);
   margin-left: auto;
 }
 
@@ -423,7 +423,7 @@ input:checked+.toggle-slider:before {
 /* ===== MOVE CONTROLS ===== */
 .move-controls {
   padding: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--alpha-white-10);
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -439,16 +439,16 @@ input:checked+.toggle-slider:before {
 .move-btn {
   flex: 1;
   padding: 10px;
-  background-color: #333;
+  background-color: var(--text-dark);
   border: none;
   border-radius: 4px;
-  color: #fff;
+  color: var(--text-primary);
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .move-btn:hover {
-  background-color: #444;
+  background-color: var(--brand-gray-600);
 }
 
 .navigation-controls {
@@ -461,10 +461,10 @@ input:checked+.toggle-slider:before {
 .nav-btn {
   width: 32px;
   height: 32px;
-  background-color: #333;
+  background-color: var(--text-dark);
   border: none;
   border-radius: 4px;
-  color: #fff;
+  color: var(--text-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -473,14 +473,14 @@ input:checked+.toggle-slider:before {
 }
 
 .nav-btn:hover {
-  background-color: #444;
+  background-color: var(--brand-gray-600);
 }
 
 /* ===== GAME STATUS ===== */
 .game-status {
   padding: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: #1e1e1e;
+  border-top: 1px solid var(--alpha-white-10);
+  background-color: var(--color-bg);
 }
 
 .game-result {
@@ -497,7 +497,7 @@ input:checked+.toggle-slider:before {
 .rating-change {
   font-size: 13px;
   margin-bottom: 4px;
-  color: #ccc;
+  color: var(--brand-gray-200);
 }
 
 .opponent-feedback {
@@ -516,20 +516,20 @@ input:checked+.toggle-slider:before {
 
 .feedback-btn {
   padding: 8px 12px;
-  background-color: #333;
+  background-color: var(--text-dark);
   border: none;
   border-radius: 4px;
-  color: #fff;
+  color: var(--text-primary);
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .feedback-btn.like:hover {
-  background-color: #4caf50;
+  background-color: var(--success);
 }
 
 .feedback-btn.dislike:hover {
-  background-color: #f44336;
+  background-color: var(--error);
 }
 
 .message-input {
@@ -541,24 +541,24 @@ input:checked+.toggle-slider:before {
 .message-input input {
   flex: 1;
   padding: 8px 12px;
-  background-color: #333;
+  background-color: var(--text-dark);
   border: none;
   border-radius: 4px;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .emoji-btn {
   padding: 8px;
   background: none;
   border: none;
-  color: #888;
+  color: var(--brand-gray-500);
   font-size: 16px;
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .emoji-btn:hover {
-  color: #fff;
+  color: var(--text-primary);
 }
 
 /* ===== RESPONSIVE STYLES ===== */

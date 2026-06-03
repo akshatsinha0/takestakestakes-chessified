@@ -14,7 +14,7 @@
     align-items: center;
     padding: 0 2rem;
     background-color: var(--primary-dark);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px var(--shadow-soft);
     position: sticky;
     top: 0;
     z-index: 10;
@@ -156,13 +156,13 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px var(--shadow-soft);
   }
   
   .cta-button:hover {
     background-color: var(--accent-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 12px var(--shadow-strong);
   }
   
   .hero-visual {
@@ -181,7 +181,7 @@
     max-width: 100%;
     height: auto;
     border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px var(--shadow-strong);
     transition: all 0.3s ease;
   }
   

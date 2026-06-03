@@ -28,7 +28,7 @@
   right: -17.1px;
   top: 46%;
   transform: translateY(-50%);
-  background-color: #2a4361;
+  background-color: var(--primary-light);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-left: none;
   border-radius: 0 8px 8px 0;
@@ -42,12 +42,12 @@
 }
 
 .toggle-button:hover {
-  background-color: #32527a;
+  background-color: var(--brand-navy-400);
   transform: translateY(-50%) scale(1.05);
 }
 
 .arrow-icon {
-  color: #d48d3b;
+  color: var(--color-accent-strong);
   font-size: 14px;
   transition: transform 0.3s ease;
 }
@@ -60,7 +60,7 @@
   padding: 4px 4px;
   background-color: rgba(29, 45, 68, 0.95);
   border-radius: 0 12px 12px 0;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 0 20px var(--alpha-black-40);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-left: none;
@@ -72,8 +72,8 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background-color: #2a4361;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: var(--primary-light);
+  border: 1px solid var(--alpha-white-20);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -96,8 +96,8 @@
 
 .control-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-  background-color: #32527a;
+  box-shadow: 0 6px 12px var(--alpha-black-40);
+  background-color: var(--brand-navy-400);
 }
 
 .control-button:hover::before {
@@ -105,7 +105,7 @@
 }
 
 .control-button.active {
-  background-color: #d48d3b;
+  background-color: var(--color-accent-strong);
   box-shadow: 0 0 20px rgba(212, 141, 59, 0.6);
 }
 
@@ -133,8 +133,8 @@
 .control-tooltip {
   position: absolute;
   left: 56px;
-  background-color: #111a29;
-  color: #f5f5f5;
+  background-color: var(--primary-dark);
+  color: var(--text-primary);
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -143,8 +143,8 @@
   opacity: 0;
   transform: translateX(-10px);
   transition: all 0.3s ease;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 12px var(--shadow-strong);
+  border: 1px solid var(--alpha-white-10);
 }
 
 .control-button:hover .control-tooltip {
@@ -212,7 +212,7 @@
 /* Theater mode adjustments */
 .theater-mode-active .chessboard-controls {
   background-color: rgba(13, 21, 32, 0.9);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--alpha-white-20);
 }
 
 /* Focus mode adjustments */

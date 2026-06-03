@@ -25,8 +25,8 @@
   .form-group input {
     padding: 0.75rem 1rem;
     border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--alpha-white-10);
+    background-color: var(--alpha-white-05);
     color: var(--text-light);
     font-size: 1rem;
     transition: all 0.2s ease;
@@ -111,7 +111,7 @@
     top: 50%;
     width: 30%;
     height: 1px;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--alpha-white-10);
   }
   
   .social-login p::before {
@@ -130,8 +130,8 @@
   
   .social-button {
     padding: 0.75rem 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--alpha-white-10);
+    background-color: var(--alpha-white-05);
     color: var(--text-light);
     border-radius: 4px;
     cursor: pointer;
@@ -139,15 +139,15 @@
   }
   
   .social-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--alpha-white-10);
   }
   
   .social-button.google {
-    color: #ea4335;
+    color: var(--brand-google);
   }
   
   .social-button.facebook {
-    color: #1877f2;
+    color: var(--brand-facebook);
   }
   
   @keyframes shake {
@@ -169,8 +169,8 @@
   justify-content: center;
   gap: 10px;
   padding: 0.75rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--alpha-white-10);
+  background-color: var(--alpha-white-05);
   color: var(--text-light);
   border-radius: 4px;
   cursor: pointer;
@@ -185,15 +185,15 @@
 
 /* Keep your existing hover states */
 .social-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--alpha-white-10);
 }
 
 .social-button.google {
-  color: #ea4335;
+  color: var(--brand-google);
 }
 
 .social-button.facebook {
-  color: #1877f2;
+  color: var(--brand-facebook);
 }
 
 .password-input-container {

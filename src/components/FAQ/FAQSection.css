@@ -1,13 +1,13 @@
 .faq-section {
     padding: 4rem 2rem;
-    background: linear-gradient(45deg, #1a2c42 0%, #0d1824 100%);
+    background: linear-gradient(45deg, var(--primary) 0%, var(--brand-navy-950) 100%);
   }
   
   .faq-title {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 3rem;
-    background: linear-gradient(45deg, #d48d3b, #f0d9b5);
+    background: linear-gradient(45deg, var(--color-accent-strong), var(--board-light));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -18,7 +18,7 @@
   }
   
   .faq-item {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--alpha-white-05);
     border-radius: 12px;
     margin-bottom: 1.5rem;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -28,7 +28,7 @@
   .faq-item.open {
     background: rgba(255, 255, 255, 0.08);
     transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 15px var(--shadow-soft);
   }
   
   .faq-question {
@@ -40,7 +40,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: #f0d9b5;
+    color: var(--board-light);
     font-size: 1.1rem;
     text-align: left;
   }
@@ -55,7 +55,7 @@
   
   .icon-line {
     position: absolute;
-    background: #d48d3b;
+    background: var(--color-accent-strong);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
@@ -110,7 +110,7 @@
   
   .particle {
     position: absolute;
-    background: #d48d3b;
+    background: var(--color-accent-strong);
     width: 4px;
     height: 4px;
     border-radius: 50%;

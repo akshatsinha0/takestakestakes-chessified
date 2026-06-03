@@ -197,10 +197,10 @@ const ChessboardSection = ({
                 boardOrientation={isBoardFlipped ? 'black' : 'white'}
                 customBoardStyle={{
                   borderRadius: '8px',
-                  boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+                  boxShadow: '0 8px 16px var(--shadow-soft)',
                 }}
-                customDarkSquareStyle={{ backgroundColor: '#7b8a9b' }}
-                customLightSquareStyle={{ backgroundColor: '#e2e8f0' }}
+                customDarkSquareStyle={{ backgroundColor: 'var(--brand-navy-400)' }}
+                customLightSquareStyle={{ backgroundColor: 'var(--brand-gray-200)' }}
               />
             </div>
             <div className="players-sidebar">

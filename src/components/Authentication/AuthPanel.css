@@ -24,7 +24,7 @@
     max-width: 480px;
     background-color: var(--primary-light);
     border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px var(--shadow-strong);
     position: relative;
     padding: 2rem;
     transform: scale(0.95);
@@ -57,7 +57,7 @@
   .auth-tabs {
     display: flex;
     margin-bottom: 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--alpha-white-10);
   }
   
   .auth-tab {
@@ -113,7 +113,7 @@
 }
 
 .auth-content::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--alpha-white-10);
 }
 
 

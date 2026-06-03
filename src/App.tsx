@@ -53,8 +53,8 @@ const LoadingFallback = () => (
     justifyContent: 'center', 
     alignItems: 'center', 
     height: '100vh',
-    backgroundColor: 'var(--primary-dark, #1a1d29)',
-    color: 'var(--text-light, #fff)'
+    backgroundColor: 'var(--primary-dark)',
+    color: 'var(--text-light)'
   }}>
     <div>Loading...</div>
   </div>

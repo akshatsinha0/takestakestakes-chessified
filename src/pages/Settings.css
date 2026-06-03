@@ -12,11 +12,11 @@
 }
 
 .settings-title {
-  color: #e5a356;
+  color: var(--color-accent);
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
-  text-shadow: 0 2px 10px rgba(229, 163, 86, 0.3);
+  text-shadow: 0 2px 10px var(--alpha-accent-30);
 }
 
 .settings-tabs {
@@ -38,19 +38,19 @@
 }
 
 .settings-tab.active {
-  color: #e5a356;
+  color: var(--color-accent);
   border-bottom: 3px dotted white;
 }
 
 .settings-content {
-  background: linear-gradient(145deg, #1a2332 0%, #0f1419 100%);
-  border: 2px solid rgba(229, 163, 86, 0.2);
+  background: linear-gradient(145deg, var(--color-surface) 0%, var(--color-bg-deep) 100%);
+  border: 2px solid var(--alpha-accent-20);
   border-radius: 12px;
   padding: 2rem;
 }
 
 .settings-section h2 {
-  color: #f5f5f5;
+  color: var(--text-primary);
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 2rem;
@@ -62,7 +62,7 @@
 
 .settings-group label {
   display: block;
-  color: #e5a356;
+  color: var(--color-accent);
   font-size: 0.95rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
@@ -70,7 +70,7 @@
 
 .settings-group small {
   display: block;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--alpha-white-50);
   font-size: 0.85rem;
   margin-top: 0.25rem;
 }
@@ -80,11 +80,11 @@
 .settings-group textarea,
 .settings-group select {
   width: 100%;
-  background: rgba(42, 67, 97, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: var(--alpha-surface-40);
+  border: 2px solid var(--alpha-white-10);
   border-radius: 8px;
   padding: 0.75rem;
-  color: #f5f5f5;
+  color: var(--text-primary);
   font-size: 1rem;
   font-family: inherit;
   transition: all 0.3s;
@@ -95,9 +95,9 @@
 .settings-group textarea:focus,
 .settings-group select:focus {
   outline: none;
-  border-color: #e5a356;
+  border-color: var(--color-accent);
   background: rgba(42, 67, 97, 0.6);
-  box-shadow: 0 0 20px rgba(229, 163, 86, 0.2);
+  box-shadow: 0 0 20px var(--alpha-accent-20);
 }
 
 .settings-group input:disabled {
@@ -117,7 +117,7 @@
   padding: 1rem;
   background: rgba(42, 67, 97, 0.3);
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--alpha-white-10);
 }
 
 .settings-toggle > div {
@@ -149,7 +149,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--alpha-white-20);
   transition: 0.4s;
   border-radius: 26px;
 }
@@ -167,7 +167,7 @@
 }
 
 input:checked + .toggle-slider {
-  background-color: #e5a356;
+  background-color: var(--color-accent);
 }
 
 input:checked + .toggle-slider:before {
@@ -175,8 +175,8 @@ input:checked + .toggle-slider:before {
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #d48d3b 0%, #e5a356 100%);
-  color: #0f1419;
+  background: linear-gradient(135deg, var(--color-accent-strong) 0%, var(--color-accent) 100%);
+  color: var(--color-bg-deep);
   border: none;
   border-radius: 8px;
   padding: 0.75rem 2rem;

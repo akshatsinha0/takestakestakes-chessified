@@ -417,7 +417,7 @@ const Header: React.FC = () => {
                 sx={{
                   '& .MuiBadge-badge': {
                     animation: unreadCount > 0 ? 'pulse 2s infinite' : 'none',
-                    backgroundColor: '#e53e3e',
+                    backgroundColor: 'var(--color-danger)',
                     color: 'white',
                     fontWeight: 'bold'
                   }
@@ -436,23 +436,23 @@ const Header: React.FC = () => {
                 marginTop: '0.5rem',
                 width: '380px',
                 maxHeight: '500px',
-                background: 'linear-gradient(145deg, #1a2332 0%, #0f1419 100%)',
+                background: 'linear-gradient(145deg, var(--color-surface) 0%, var(--color-bg-deep) 100%)',
                 borderRadius: '12px',
-                border: '2px solid rgba(229, 163, 86, 0.3)',
-                boxShadow: '0 15px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(229, 163, 86, 0.1)',
+                border: '2px solid var(--alpha-accent-30)',
+                boxShadow: '0 15px 40px var(--alpha-black-40), 0 0 60px var(--alpha-accent-10)',
                 zIndex: 10000,
                 overflow: 'hidden'
               }}>
                 {/* Header */}
                 <div style={{
                   padding: '1rem 1.25rem',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderBottom: '1px solid var(--alpha-white-10)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
                   <h3 style={{ 
-                    color: '#f5f5f5', 
+                    color: 'var(--text-primary)', 
                     margin: 0, 
                     fontSize: '1.1rem',
                     fontWeight: '600',
@@ -472,7 +472,7 @@ const Header: React.FC = () => {
                     Notifications
                     {unreadCount > 0 && (
                       <span style={{
-                        background: '#e53e3e',
+                        background: 'var(--color-danger)',
                         color: 'white',
                         fontSize: '0.75rem',
                         padding: '0.15rem 0.5rem',
@@ -486,7 +486,7 @@ const Header: React.FC = () => {
                   <IconButton 
                     size="small" 
                     onClick={() => setNotificationDropdownOpen(false)}
-                    sx={{ color: 'rgba(255,255,255,0.6)' }}
+                    sx={{ color: 'var(--alpha-white-70)' }}
                   >
                     <CloseIcon fontSize="small" />
                   </IconButton>
@@ -502,7 +502,7 @@ const Header: React.FC = () => {
                     <div style={{
                       padding: '2rem',
                       textAlign: 'center',
-                      color: 'rgba(255, 255, 255, 0.5)'
+                      color: 'var(--alpha-white-50)'
                     }}>
                       <div style={{ marginBottom: '0.75rem' }}>
                         <img 
@@ -526,11 +526,11 @@ const Header: React.FC = () => {
                       <div 
                         key={notification.id}
                         style={{
-                          background: 'rgba(42, 67, 97, 0.4)',
+                          background: 'var(--alpha-surface-40)',
                           borderRadius: '10px',
                           padding: '1rem',
                           marginBottom: '0.5rem',
-                          border: '1px solid rgba(229, 163, 86, 0.2)',
+                          border: '1px solid var(--alpha-accent-20)',
                           transition: 'all 0.2s ease'
                         }}
                       >
@@ -546,13 +546,13 @@ const Header: React.FC = () => {
                             width: '45px',
                             height: '45px',
                             borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #d48d3b, #e5a356)',
+                            background: 'linear-gradient(135deg, var(--color-accent-strong), var(--color-accent))',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             fontSize: '1.2rem',
                             fontWeight: '700',
-                            color: '#0f1419',
+                            color: 'var(--color-bg-deep)',
                             flexShrink: 0
                           }}>
                             {notification.data?.sender?.username?.charAt(0)?.toUpperCase() || '?'}
@@ -561,7 +561,7 @@ const Header: React.FC = () => {
                           {/* Info */}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{
-                              color: '#e5a356',
+                              color: 'var(--color-accent)',
                               fontSize: '0.85rem',
                               fontWeight: '600',
                               marginBottom: '0.2rem',
@@ -581,14 +581,14 @@ const Header: React.FC = () => {
                               {notification.title}
                             </div>
                             <div style={{
-                              color: '#f5f5f5',
+                              color: 'var(--text-primary)',
                               fontSize: '0.9rem',
                               lineHeight: '1.4'
                             }}>
                               {notification.message}
                             </div>
                             <div style={{
-                              color: 'rgba(255, 255, 255, 0.5)',
+                              color: 'var(--alpha-white-50)',
                               fontSize: '0.75rem',
                               marginTop: '0.3rem'
                             }}>
@@ -609,7 +609,7 @@ const Header: React.FC = () => {
                               style={{
                                 flex: 1,
                                 padding: '0.6rem',
-                                background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
+                                background: 'linear-gradient(135deg, var(--color-success) 0%, var(--success) 100%)',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '6px',
@@ -626,9 +626,9 @@ const Header: React.FC = () => {
                               style={{
                                 flex: 1,
                                 padding: '0.6rem',
-                                background: 'rgba(229, 62, 62, 0.2)',
-                                color: '#fc8181',
-                                border: '1px solid rgba(229, 62, 62, 0.4)',
+                                background: 'var(--alpha-accent-20)',
+                                color: 'var(--brand-red-soft)',
+                                border: '1px solid var(--alpha-accent-30)',
                                 borderRadius: '6px',
                                 fontSize: '0.85rem',
                                 fontWeight: '600',
@@ -651,8 +651,8 @@ const Header: React.FC = () => {
                               style={{
                                 flex: 1,
                                 padding: '0.6rem',
-                                background: 'linear-gradient(135deg, #d48d3b 0%, #e5a356 100%)',
-                                color: '#0f1419',
+                                background: 'linear-gradient(135deg, var(--color-accent-strong) 0%, var(--color-accent) 100%)',
+                                color: 'var(--color-bg-deep)',
                                 border: 'none',
                                 borderRadius: '6px',
                                 fontSize: '0.85rem',
@@ -668,9 +668,9 @@ const Header: React.FC = () => {
                               style={{
                                 flex: 1,
                                 padding: '0.6rem',
-                                background: 'rgba(229, 62, 62, 0.2)',
-                                color: '#fc8181',
-                                border: '1px solid rgba(229, 62, 62, 0.4)',
+                                background: 'var(--alpha-accent-20)',
+                                color: 'var(--brand-red-soft)',
+                                border: '1px solid var(--alpha-accent-30)',
                                 borderRadius: '6px',
                                 fontSize: '0.85rem',
                                 fontWeight: '600',

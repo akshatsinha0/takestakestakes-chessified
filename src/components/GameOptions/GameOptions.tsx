@@ -12,7 +12,7 @@ const TIME_FORMATS = [
       { label: '1|0', desc: '1 min', min: 1, increment: 0 },
       { label: '2|1', desc: '2 min + 1s', min: 2, increment: 1 },
     ],
-    color: '#ffc107',
+    color: 'var(--brand-amber-soft)',
   },
   {
     label: 'Blitz',
@@ -22,7 +22,7 @@ const TIME_FORMATS = [
       { label: '5|0', desc: '5 min', min: 5, increment: 0 },
       { label: '5|3', desc: '5 min + 3s', min: 5, increment: 3 },
     ],
-    color: '#3f87f5',
+    color: 'var(--color-info)',
   },
   {
     label: 'Rapid',
@@ -31,7 +31,7 @@ const TIME_FORMATS = [
       { label: '10|5', desc: '10 min + 5s', min: 10, increment: 5 },
       { label: '15|10', desc: '15 min + 10s', min: 15, increment: 10 },
     ],
-    color: '#4caf50',
+    color: 'var(--success)',
   },
   {
     label: 'Classical',
@@ -39,7 +39,7 @@ const TIME_FORMATS = [
       { label: '30|0', desc: '30 min', min: 30, increment: 0 },
       { label: '30|20', desc: '30 min + 20s', min: 30, increment: 20 },
     ],
-    color: '#e5a356',
+    color: 'var(--color-accent)',
   },
 ];
 
@@ -75,35 +75,35 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any
           title: 'Play Online',
           description: 'Play vs a person of similar skill',
           icon: 'lightning',
-          color: '#ffc107',
+          color: 'var(--brand-amber-soft)',
         },
         {
           id: 'play-bots',
           title: 'Play Bots',
           description: 'Challenge a bot from Easy to Master',
           icon: 'robot',
-          color: '#3f87f5',
+          color: 'var(--color-info)',
         },
         {
           id: 'play-friend',
           title: 'Play a Friend',
           description: 'Invite a friend to a game of chess',
           icon: 'handshake',
-          color: '#f5813f',
+          color: 'var(--color-accent)',
         },
         {
           id: 'tournaments',
           title: 'Tournaments',
           description: 'Join an Arena where anyone can win',
           icon: 'trophy',
-          color: '#e5a356',
+          color: 'var(--color-accent)',
         },
         {
           id: 'chess-variants',
           title: 'Chess Variants',
           description: 'Find fun new ways to play chess',
           icon: 'dice',
-          color: '#4caf50',
+          color: 'var(--success)',
         },
         // New Play Yourself option
         {
@@ -111,7 +111,7 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any
           title: 'Play Yourself',
           description: 'Practice by playing both sides',
           icon: 'focus-mode-icon', // Use an existing icon or add a new one
-          color: '#d48d3b',
+          color: 'var(--color-accent-strong)',
         }].map(option => (
           <GameOption
             key={option.id}
@@ -151,7 +151,7 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any
                 </div>
               ))}
               <div className="time-format-group custom-group">
-                <div className="format-label" style={{ color: '#d48d3b' }}>Custom</div>
+                <div className="format-label" style={{ color: 'var(--color-accent-strong)' }}>Custom</div>
                 <div className="format-times">
                   {!showCustom ? (
                     <button className="time-btn custom-btn" onClick={() => setShowCustom(true)}>
@@ -211,7 +211,7 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any
                       />
                       <button
                         className="time-btn confirm-btn"
-                        style={{ background: '#d48d3b', color: 'var(--primary-dark)' }}
+                        style={{ background: 'var(--color-accent-strong)', color: 'var(--primary-dark)' }}
                         onClick={() => handleTimeSelect(`Custom (${customHour}h ${customMin}m ${customSec}s | +${customInc})`)}
                       >
                         Confirm

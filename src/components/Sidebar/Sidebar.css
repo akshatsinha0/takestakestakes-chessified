@@ -40,7 +40,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--alpha-white-10);
   }
   
   .sidebar-logo {
@@ -79,7 +79,7 @@
   }
   
   .nav-item a:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--alpha-white-05);
   }
   
   .nav-item.active a {
@@ -109,7 +109,7 @@
   
   .sidebar-footer {
     padding: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--alpha-white-10);
     display: flex;
     flex-direction: column;
     align-items: center;

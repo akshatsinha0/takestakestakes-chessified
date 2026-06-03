@@ -69,7 +69,7 @@
     margin-right: 1rem;
     padding: 0.5rem;
     border-radius: 24px;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--alpha-white-10);
     transition: background-color 0.3s ease;
   }
   
@@ -114,7 +114,7 @@
   .top-navigation {
     background: linear-gradient(to right, rgba(17, 26, 41, 0.95), rgba(26, 44, 66, 0.98));
     backdrop-filter: blur(8px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px var(--shadow-strong);
     height: 70px;
     display: flex;
     align-items: center;
@@ -127,7 +127,7 @@
   }
   
   .top-navigation:hover {
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 25px var(--alpha-black-40);
   }
   
   /* Header.css */
@@ -138,10 +138,10 @@
   z-index: 1000;
   width: 100%;
   background: linear-gradient(to right, var(--primary-dark), var(--primary), var(--primary-dark));
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 25px var(--shadow-strong);
   height: 70px;
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--alpha-white-10);
 }
 
 .header-container {
@@ -318,7 +318,7 @@
 /* MUI Icon Styles - Make icons white */
 .notification-icon svg,
 .settings-icon svg {
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
   transition: color 0.3s ease;
 }
 
@@ -329,7 +329,7 @@
 
 .notification-icon .MuiSvgIcon-root,
 .settings-icon .MuiSvgIcon-root {
-  color: #ffffff !important;
+  color: var(--text-primary) !important;
 }
 
 .notification-icon:hover .MuiSvgIcon-root,
@@ -364,7 +364,7 @@
 }
 
 .notification-dropdown::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--alpha-white-05);
   border-radius: 3px;
 }
 
@@ -399,7 +399,7 @@
   align-items: center;
   gap: 0.8rem;
   padding: 0.5rem 1rem;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--alpha-white-10);
   border-radius: 24px;
   cursor: pointer;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
@@ -407,7 +407,7 @@
 
 .user-profile:hover {
   background-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 15px var(--shadow-soft);
 }
 
 .avatar-container {
@@ -471,10 +471,10 @@
   margin-top: 0.5rem;
   background-color: var(--primary);
   border-radius: 8px;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 25px var(--shadow-strong);
   padding: 0.5rem 0;
   z-index: 1000;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--alpha-white-10);
   animation: dropdownFadeIn 0.2s ease-out forwards;
   transform-origin: top right;
 }
@@ -514,7 +514,7 @@
 }
 
 .dropdown-item.logout {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--alpha-white-10);
   margin-top: 0.5rem;
 }
 
@@ -585,14 +585,14 @@
 }
 
 .enhanced-dropdown .MuiPaper-root {
-  background-color: #1a2c42 !important;
+  background-color: var(--primary) !important;
   border-radius: 12px !important;
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   width: 280px;
   box-shadow: 
-    0 12px 28px rgba(0, 0, 0, 0.3),
-    0 0 30px rgba(0, 0, 0, 0.2),
+    0 12px 28px var(--shadow-strong),
+    0 0 30px var(--shadow-soft),
     0 0 0 1px rgba(255, 255, 255, 0.03),
     inset 0 0 15px rgba(212, 141, 59, 0.03) !important;
   backdrop-filter: blur(10px);
@@ -612,7 +612,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #d48d3b, #e5a356, #d48d3b);
+  background: linear-gradient(90deg, var(--color-accent-strong), var(--color-accent), var(--color-accent-strong));
   z-index: 1;
 }
 
@@ -654,7 +654,7 @@
   height: 50px;
   border: 2px solid var(--accent);
   box-shadow: 0 0 15px rgba(212, 141, 59, 0.3);
-  background-color: #2a4361;
+  background-color: var(--primary-light);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -667,7 +667,7 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: #2a4361;
+  background-color: var(--primary-light);
   color: var(--text-light);
   display: flex;
   align-items: center;
@@ -734,7 +734,7 @@
 }
 
 .dropdown-item:hover {
-  background-color: rgba(255, 255, 255, 0.05) !important;
+  background-color: var(--alpha-white-05) !important;
 }
 
 .dropdown-item:hover::before {
@@ -808,24 +808,24 @@
 }
 
 .logout-item .menu-icon {
-  color: #f44336;
+  color: var(--error);
 }
 
 .logout-item .menu-text {
-  color: #f44336;
+  color: var(--error);
 }
 
 .logout-item .chess-piece {
-  color: #f44336;
+  color: var(--error);
   text-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
 }
 
 .logout-item:hover::before {
-  background-color: #f44336;
+  background-color: var(--error);
 }
 
 .challenge-btn {
-  background: linear-gradient(135deg, #ffa500, #ff8c00);
+  background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
   border: none;
   color: white;
   padding: 0.4rem 0.8rem;
@@ -838,7 +838,7 @@
 }
 
 .challenge-btn:hover {
-  background: linear-gradient(135deg, #ff8c00, #ff7700);
+  background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(255, 165, 0, 0.4);
 }
@@ -852,7 +852,7 @@
 /* Dividers */
 .dropdown-divider {
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(to right, transparent, var(--alpha-white-10), transparent);
   margin: 8px 0;
 }
 
@@ -892,7 +892,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--alpha-white-10);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
@@ -915,7 +915,7 @@
 .user-list-trigger .dropdown-arrow {
   font-size: 1rem;
   margin-left: 0.3rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--alpha-white-70);
   transition: transform 0.3s ease-in-out;
   display: inline-block;
 }
@@ -930,8 +930,8 @@
   left: 0;
   width: 320px;
   margin-top: 0.5rem;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--brand-navy-700) 100%);
+  border: 1px solid var(--alpha-white-20);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   z-index: 1000;
@@ -951,10 +951,10 @@
 
 .user-list-title {
   padding: 1rem 1.5rem 0.5rem;
-  color: #ffa500;
+  color: var(--color-warning);
   font-weight: bold;
   font-size: 1.1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--alpha-white-10);
   margin-bottom: 0.5rem;
 }
 
@@ -977,15 +977,15 @@
   gap: 1rem;
   padding: 1rem;
   margin-bottom: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--alpha-white-05);
+  border: 1px solid var(--alpha-white-10);
   border-radius: 8px;
   transition: all 0.3s;
 }
 
 .user-list-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--alpha-white-10);
+  border-color: var(--alpha-white-20);
   transform: translateY(-1px);
 }
 
@@ -1005,7 +1005,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--brand-indigo) 0%, var(--brand-purple) 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -1022,16 +1022,16 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  border: 2px solid #1a1a2e;
+  border: 2px solid var(--color-surface);
 }
 
 .user-status-dot.online {
-  background: #4caf50;
+  background: var(--success);
   box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
 
 .user-status-dot.offline {
-  background: #757575;
+  background: var(--brand-gray-500);
 }
 
 .user-list-info {
@@ -1048,13 +1048,13 @@
 }
 
 .user-list-rating {
-  color: #ffa500;
+  color: var(--color-warning);
   font-weight: 500;
   font-size: 0.9rem;
 }
 
 .challenge-btn {
-  background: linear-gradient(135deg, #ffa500, #ff8c00);
+  background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
   border: none;
   color: white;
   padding: 0.5rem 1rem;
@@ -1067,7 +1067,7 @@
 }
 
 .challenge-btn:hover {
-  background: linear-gradient(135deg, #ff8c00, #ff7700);
+  background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 165, 0, 0.4);
 }
@@ -1077,7 +1077,7 @@
 }
 
 .user-list-scroll::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--alpha-white-10);
   border-radius: 3px;
 }
 
@@ -1087,7 +1087,7 @@
 }
 
 .user-list-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--alpha-white-50);
 }
 
 .stat-item {
@@ -1105,7 +1105,7 @@
 .stat-label {
   font-size: 0.65rem;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--alpha-white-50);
   letter-spacing: 0.5px;
   margin-top: 3px;
 }
@@ -1271,7 +1271,7 @@
   background: var(--success);
 }
 .user-status-dot.offline {
-  background: #888;
+  background: var(--brand-gray-500);
 }
 .user-list-info {
   display: flex;
@@ -1302,7 +1302,7 @@
 .view-profile-btn {
   background: rgba(229, 163, 86, 0.15);
   color: var(--accent);
-  border: 1px solid rgba(229, 163, 86, 0.3);
+  border: 1px solid var(--alpha-accent-30);
   border-radius: 6px;
   padding: 0.4rem 0.8rem;
   font-size: 0.85rem;
@@ -1317,7 +1317,7 @@
   transform: translateY(-1px);
 }
 .challenge-btn {
-  background: linear-gradient(135deg, #d48d3b 0%, #e5a356 100%);
+  background: linear-gradient(135deg, var(--color-accent-strong) 0%, var(--color-accent) 100%);
   color: var(--primary-dark);
   border: none;
   border-radius: 6px;
@@ -1459,7 +1459,7 @@
     display: block;
     padding: 1rem;
     text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--alpha-white-10);
   }
 }
 
