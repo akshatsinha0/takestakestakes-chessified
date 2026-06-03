@@ -18,12 +18,7 @@
     "browser": true,
     "es2024": true
   },
-  "ignorePatterns": [
-    "dist",
-    "convex/_generated",
-    "node_modules",
-    "coverage"
-  ],
+  "ignorePatterns": ["dist", "convex/_generated", "node_modules", "coverage"],
   "rules": {
     "react/react-in-jsx-scope": "off",
     "import/no-named-export": "off",

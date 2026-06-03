@@ -33,9 +33,7 @@ type AuthAwareCtx = QueryCtx | MutationCtx
 
 export const UNAUTHENTICATED = 'UNAUTHENTICATED'
 
-export async function getAuthUserId(
-  ctx: AuthAwareCtx,
-): Promise<string | null> {
+export async function getAuthUserId(ctx: AuthAwareCtx): Promise<string | null> {
   const user = await authComponent.safeGetAuthUser(ctx)
   return user?._id ?? null
 }

@@ -5,7 +5,7 @@ import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react'
 import { authClient } from './lib/auth-client'
 import './styles/theme.css'
 import './index.css'
-import App from './App';
+import App from './App'
 
 /*
 (1.) Instantiates the app-wide `ConvexReactClient` from `VITE_CONVEX_URL` (the deployment's
@@ -31,15 +31,15 @@ migration both auth systems may briefly coexist beneath this provider; later sta
 the Postgres provider entirely, at which point this remains the sole auth/data boundary.
 Assumes exactly one Convex deployment per build, identified by the Vite-injected env vars.
 */
-const convexUrl = import.meta.env.VITE_CONVEX_URL as string;
+const convexUrl = import.meta.env.VITE_CONVEX_URL as string
 
 if (!convexUrl) {
   throw new Error(
-    'Missing VITE_CONVEX_URL. Run `npx convex dev` and set it in .env.local.'
-  );
+    'Missing VITE_CONVEX_URL. Run `npx convex dev` and set it in .env.local.',
+  )
 }
 
-const convex = new ConvexReactClient(convexUrl);
+const convex = new ConvexReactClient(convexUrl)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

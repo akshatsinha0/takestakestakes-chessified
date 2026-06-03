@@ -56,9 +56,10 @@ export default defineSchema({
     .index('by_toUserId', ['toUserId'])
     .index('by_fromUserId', ['fromUserId']),
 
-  userStats: defineTable(zodToConvexFields(userStatsFields)).index('by_userId', [
-    'userId',
-  ]),
+  userStats: defineTable(zodToConvexFields(userStatsFields)).index(
+    'by_userId',
+    ['userId'],
+  ),
 
   friendRequests: defineTable(zodToConvexFields(friendRequestFields))
     .index('by_receiverId', ['receiverId'])

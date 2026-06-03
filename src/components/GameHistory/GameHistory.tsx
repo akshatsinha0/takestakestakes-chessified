@@ -63,43 +63,48 @@ const GameHistory = ({ onClose }: { onClose: () => void }) => {
   }
 
   return (
-    <div className="game-history-overlay" onClick={onClose}>
-      <div className="game-history-modal" onClick={(event) => event.stopPropagation()}>
-        <div className="game-history-header">
+    <div className='game-history-overlay' onClick={onClose}>
+      <div
+        className='game-history-modal'
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className='game-history-header'>
           <h3>Game History</h3>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className='close-btn' onClick={onClose}>
+            ×
+          </button>
         </div>
-        <div className="game-history-content">
+        <div className='game-history-content'>
           {games === undefined ? (
-            <div className="loading">Loading games...</div>
+            <div className='loading'>Loading games...</div>
           ) : (
-            <div className="games-list">
+            <div className='games-list'>
               {games.length === 0 ? (
-                <div className="no-games">No games played yet</div>
+                <div className='no-games'>No games played yet</div>
               ) : (
                 games.map((game) => (
                   <div
                     key={game._id}
-                    className="game-item"
+                    className='game-item'
                     onClick={() => setSelectedGame(game)}
                   >
-                    <div className="game-players">
-                      <div className="player white">
-                        <span className="piece">♔</span>
+                    <div className='game-players'>
+                      <div className='player white'>
+                        <span className='piece'>♔</span>
                         {nameOf(game.whitePlayerId)}
                       </div>
-                      <div className="vs">vs</div>
-                      <div className="player black">
-                        <span className="piece">♚</span>
+                      <div className='vs'>vs</div>
+                      <div className='player black'>
+                        <span className='piece'>♚</span>
                         {nameOf(game.blackPlayerId)}
                       </div>
                     </div>
-                    <div className="game-info">
+                    <div className='game-info'>
                       <div className={`result ${resultClass(game)}`}>
                         {resultFor(game)}
                       </div>
-                      <div className="time-control">{game.timeControl}</div>
-                      <div className="date">
+                      <div className='time-control'>{game.timeControl}</div>
+                      <div className='date'>
                         {game.finishedAt
                           ? new Date(game.finishedAt).toLocaleDateString()
                           : ''}

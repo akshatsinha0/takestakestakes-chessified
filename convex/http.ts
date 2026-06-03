@@ -1,5 +1,5 @@
-import { httpRouter } from "convex/server";
-import { authComponent, createAuth } from "./auth";
+import { httpRouter } from 'convex/server'
+import { authComponent, createAuth } from './auth'
 
 /*
 (1.) Creates the deployment's HTTP router and delegates all authentication endpoints to
@@ -26,8 +26,8 @@ here. Additional non-auth HTTP actions (e.g. webhooks) can be appended to `http`
 without disturbing the auth wiring. Assumes the SPA origin is permitted by the component's
 trusted-origins/cross-domain configuration.
 */
-const http = httpRouter();
+const http = httpRouter()
 
-authComponent.registerRoutes(http, createAuth, { cors: true });
+authComponent.registerRoutes(http, createAuth, { cors: true })
 
-export default http;
+export default http

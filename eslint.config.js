@@ -33,12 +33,7 @@ incrementally; the goal of this file is to make the strict rules run everywhere 
 
 export default tseslint.config(
   {
-    ignores: [
-      'dist',
-      'coverage',
-      'node_modules',
-      'convex/_generated',
-    ],
+    ignores: ['dist', 'coverage', 'node_modules', 'convex/_generated'],
   },
   {
     files: ['**/*.{ts,tsx}'],

@@ -86,56 +86,63 @@ const FriendInvite = ({ onClose }: FriendInviteProps) => {
   }
 
   return (
-    <div className="friend-invite-overlay" onClick={onClose}>
-      <div className="friend-invite-modal" onClick={(event) => event.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>×</button>
-        <h2 className="modal-title">Play a Friend</h2>
+    <div className='friend-invite-overlay' onClick={onClose}>
+      <div
+        className='friend-invite-modal'
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button className='close-btn' onClick={onClose}>
+          ×
+        </button>
+        <h2 className='modal-title'>Play a Friend</h2>
 
-        <div className="search-section">
+        <div className='search-section'>
           <label>Search for a friend</label>
           <input
-            type="text"
-            className="search-input"
-            placeholder="Enter username..."
+            type='text'
+            className='search-input'
+            placeholder='Enter username...'
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             autoFocus
           />
           {searchResults.length > 0 && (
-            <div className="search-results">
+            <div className='search-results'>
               {searchResults.map((profile) => (
                 <div
                   key={profile._id}
                   className={`search-result-item ${selectedFriend?._id === profile._id ? 'selected' : ''}`}
                   onClick={() => setSelectedFriend(profile)}
                 >
-                  <div className="result-info">
-                    <div className="result-username">{profile.username}</div>
-                    <div className="result-rating">Rating: {profile.rating}</div>
+                  <div className='result-info'>
+                    <div className='result-username'>{profile.username}</div>
+                    <div className='result-rating'>
+                      Rating: {profile.rating}
+                    </div>
                   </div>
                   {selectedFriend?._id === profile._id && (
-                    <span className="check-mark">✓</span>
+                    <span className='check-mark'>✓</span>
                   )}
                 </div>
               ))}
             </div>
           )}
           {searchQuery && searchResults.length === 0 && (
-            <div className="no-results">No users found</div>
+            <div className='no-results'>No users found</div>
           )}
         </div>
 
         {selectedFriend && (
-          <div className="selected-friend">
+          <div className='selected-friend'>
             <span>Playing against:</span>
             <strong>{selectedFriend.username}</strong>
-            <span className="friend-rating">({selectedFriend.rating})</span>
+            <span className='friend-rating'>({selectedFriend.rating})</span>
           </div>
         )}
 
-        <div className="time-control-section">
+        <div className='time-control-section'>
           <label>Time Control</label>
-          <div className="time-control-grid">
+          <div className='time-control-grid'>
             {TIME_CONTROLS.map((control) => (
               <button
                 key={control.value}
@@ -149,7 +156,7 @@ const FriendInvite = ({ onClose }: FriendInviteProps) => {
         </div>
 
         <button
-          className="create-game-btn"
+          className='create-game-btn'
           onClick={handleSend}
           disabled={!selectedFriend || isSending}
         >

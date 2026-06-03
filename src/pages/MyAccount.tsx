@@ -50,7 +50,7 @@ const MyAccount = () => {
   }
 
   if (!user) {
-    return <Navigate to="/" />
+    return <Navigate to='/' />
   }
   if (!profile) {
     return <div className={styles['account-page']}>Loading...</div>
@@ -64,7 +64,7 @@ const MyAccount = () => {
             {profile.avatarUrl ? (
               <img src={profile.avatarUrl} alt={profile.username} />
             ) : (
-              <span className="avatar-fallback">
+              <span className='avatar-fallback'>
                 {profile.username.charAt(0).toUpperCase()}
               </span>
             )}
@@ -79,12 +79,12 @@ const MyAccount = () => {
         <div className={styles['account-fields']}>
           <div className={styles['account-field']}>
             <label>Email</label>
-            <input type="email" value={user.email} disabled />
+            <input type='email' value={user.email} disabled />
           </div>
           <div className={styles['account-field']}>
             <label>Username</label>
             <input
-              type="text"
+              type='text'
               value={username}
               onChange={(event) => setUsername(event.target.value)}
             />

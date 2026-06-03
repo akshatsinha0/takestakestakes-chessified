@@ -64,70 +64,70 @@ const LoginForm = ({ onClose }: { onClose: () => void }) => {
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit}>
-      <h2 className="form-title">Welcome Back, Strategist</h2>
+    <form className='auth-form' onSubmit={handleSubmit}>
+      <h2 className='form-title'>Welcome Back, Strategist</h2>
 
-      <div className="form-group">
-        <label htmlFor="email">Email</label>
+      <div className='form-group'>
+        <label htmlFor='email'>Email</label>
         <input
-          type="email"
-          id="email"
-          name="email"
+          type='email'
+          id='email'
+          name='email'
           value={formData.email}
           onChange={handleChange}
-          placeholder="youremail@example.com"
+          placeholder='youremail@example.com'
           required
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="password">Password</label>
-        <div className="password-input-container">
+      <div className='form-group'>
+        <label htmlFor='password'>Password</label>
+        <div className='password-input-container'>
           <input
             type={passwordVisible ? 'text' : 'password'}
-            id="password"
-            name="password"
+            id='password'
+            name='password'
             value={formData.password}
             onChange={handleChange}
-            placeholder="Your secret key"
+            placeholder='Your secret key'
             required
           />
           <button
-            type="button"
-            className="visibility-toggle"
+            type='button'
+            className='visibility-toggle'
             onClick={() => setPasswordVisible((visible) => !visible)}
             aria-label={passwordVisible ? 'Hide password' : 'Show password'}
           >
             <img
               src={passwordVisible ? visibilityOn : visibilityOff}
               alt={passwordVisible ? 'Hide password' : 'Show password'}
-              className="visibility-icon"
+              className='visibility-icon'
             />
           </button>
         </div>
       </div>
 
-      <button type="submit" className="submit-button" disabled={isSubmitting}>
+      <button type='submit' className='submit-button' disabled={isSubmitting}>
         {isSubmitting ? 'Logging in...' : 'Enter the Arena'}
       </button>
 
-      <div className="social-login">
+      <div className='social-login'>
         <p>Or continue with</p>
-        <div className="social-buttons">
+        <div className='social-buttons'>
           <button
-            type="button"
-            className="social-button google"
+            type='button'
+            className='social-button google'
             onClick={handleGoogleLogin}
           >
-            <img src={googleLogo} alt="Google" className="social-icon" />
+            <img src={googleLogo} alt='Google' className='social-icon' />
             <span>Google</span>
           </button>
           <button
-            type="button"
-            className="social-button facebook"
+            type='button'
+            className='social-button facebook'
             onClick={handleFacebookLogin}
           >
-            <img src={facebookLogo} alt="Facebook" className="social-icon" />
+            <img src={facebookLogo} alt='Facebook' className='social-icon' />
             <span>Facebook</span>
           </button>
         </div>

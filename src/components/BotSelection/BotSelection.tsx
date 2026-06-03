@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import './BotSelection.css';
+import React, { useState } from 'react'
+import './BotSelection.css'
 
 interface Bot {
-  id: string;
-  name: string;
-  rating: number;
-  level: string;
-  description: string;
-  color: string;
-  icon: string;
+  id: string
+  name: string
+  rating: number
+  level: string
+  description: string
+  color: string
+  icon: string
 }
 
 const BOTS: Bot[] = [
@@ -19,7 +19,7 @@ const BOTS: Bot[] = [
     level: 'Beginner',
     description: 'Perfect for learning the basics',
     color: 'var(--success)',
-    icon: 'R'
+    icon: 'R',
   },
   {
     id: 'easy',
@@ -28,7 +28,7 @@ const BOTS: Bot[] = [
     level: 'Easy',
     description: 'Makes occasional mistakes',
     color: 'var(--success)',
-    icon: 'C'
+    icon: 'C',
   },
   {
     id: 'intermediate',
@@ -37,7 +37,7 @@ const BOTS: Bot[] = [
     level: 'Intermediate',
     description: 'Solid fundamental play',
     color: 'var(--brand-amber-soft)',
-    icon: 'S'
+    icon: 'S',
   },
   {
     id: 'advanced',
@@ -46,7 +46,7 @@ const BOTS: Bot[] = [
     level: 'Advanced',
     description: 'Strong tactical awareness',
     color: 'var(--color-warning)',
-    icon: 'E'
+    icon: 'E',
   },
   {
     id: 'master',
@@ -55,7 +55,7 @@ const BOTS: Bot[] = [
     level: 'Master',
     description: 'Near-perfect play',
     color: 'var(--error)',
-    icon: 'M'
+    icon: 'M',
   },
   {
     id: 'grandmaster',
@@ -64,9 +64,9 @@ const BOTS: Bot[] = [
     level: 'Grandmaster',
     description: 'Unforgiving and precise',
     color: 'var(--brand-purple)',
-    icon: 'G'
-  }
-];
+    icon: 'G',
+  },
+]
 
 const TIME_CONTROLS = [
   { label: '1 min', value: '1+0', minutes: 1, increment: 0 },
@@ -75,61 +75,73 @@ const TIME_CONTROLS = [
   { label: '10 min', value: '10+0', minutes: 10, increment: 0 },
   { label: '15 min', value: '15+0', minutes: 15, increment: 0 },
   { label: '30 min', value: '30+0', minutes: 30, increment: 0 },
-  { label: 'Unlimited', value: 'unlimited', minutes: 0, increment: 0 }
-];
+  { label: 'Unlimited', value: 'unlimited', minutes: 0, increment: 0 },
+]
 
 interface BotSelectionProps {
-  onClose: () => void;
-  onSelectBot: (bot: Bot, timeControl: any) => void;
+  onClose: () => void
+  onSelectBot: (bot: Bot, timeControl: any) => void
 }
 
-const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => {
-  const [selectedBot, setSelectedBot] = useState<Bot | null>(null);
-  const [selectedTime, setSelectedTime] = useState(TIME_CONTROLS[3]); // Default 10 min
+const BotSelection: React.FC<BotSelectionProps> = ({
+  onClose,
+  onSelectBot,
+}) => {
+  const [selectedBot, setSelectedBot] = useState<Bot | null>(null)
+  const [selectedTime, setSelectedTime] = useState(TIME_CONTROLS[3]) // Default 10 min
 
   const handleBotClick = (bot: Bot) => {
-    setSelectedBot(bot);
-  };
+    setSelectedBot(bot)
+  }
 
   const handlePlayBot = () => {
     if (selectedBot) {
-      onSelectBot(selectedBot, selectedTime);
-      onClose();
+      onSelectBot(selectedBot, selectedTime)
+      onClose()
     }
-  };
+  }
 
   return (
-    <div className="bot-selection-overlay" onClick={onClose}>
-      <div className="bot-selection-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="bot-modal-header">
+    <div className='bot-selection-overlay' onClick={onClose}>
+      <div className='bot-selection-modal' onClick={(e) => e.stopPropagation()}>
+        <div className='bot-modal-header'>
           <h2>Choose Your Opponent</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className='close-btn' onClick={onClose}>
+            ×
+          </button>
         </div>
 
-        <div className="bot-grid">
+        <div className='bot-grid'>
           {BOTS.map((bot) => (
             <div
               key={bot.id}
               className={`bot-card ${selectedBot?.id === bot.id ? 'selected' : ''}`}
               onClick={() => handleBotClick(bot)}
-              style={{ 
-                borderColor: selectedBot?.id === bot.id ? bot.color : 'transparent',
-                borderRadius: 0
+              style={{
+                borderColor:
+                  selectedBot?.id === bot.id ? bot.color : 'transparent',
+                borderRadius: 0,
               }}
             >
-              <div className="bot-icon" style={{ background: bot.color, borderRadius: 0 }}>
+              <div
+                className='bot-icon'
+                style={{ background: bot.color, borderRadius: 0 }}
+              >
                 {bot.icon}
               </div>
-              <div className="bot-info">
-                <h3 className="bot-name">{bot.name}</h3>
-                <div className="bot-level" style={{ color: bot.color }}>
+              <div className='bot-info'>
+                <h3 className='bot-name'>{bot.name}</h3>
+                <div className='bot-level' style={{ color: bot.color }}>
                   {bot.level}
                 </div>
-                <div className="bot-rating">Rating: {bot.rating}</div>
-                <p className="bot-description">{bot.description}</p>
+                <div className='bot-rating'>Rating: {bot.rating}</div>
+                <p className='bot-description'>{bot.description}</p>
               </div>
               {selectedBot?.id === bot.id && (
-                <div className="selected-indicator" style={{ background: bot.color, borderRadius: 0 }}>
+                <div
+                  className='selected-indicator'
+                  style={{ background: bot.color, borderRadius: 0 }}
+                >
                   ✓
                 </div>
               )}
@@ -138,9 +150,9 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
         </div>
 
         {/* Time Control Selection */}
-        <div className="time-control-section">
-          <h3 className="time-control-title">Time Control</h3>
-          <div className="time-control-grid">
+        <div className='time-control-section'>
+          <h3 className='time-control-title'>Time Control</h3>
+          <div className='time-control-grid'>
             {TIME_CONTROLS.map((time) => (
               <button
                 key={time.value}
@@ -148,8 +160,14 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
                 onClick={() => setSelectedTime(time)}
                 style={{
                   borderRadius: 0,
-                  background: selectedTime.value === time.value ? 'var(--color-accent)' : 'var(--alpha-surface-40)',
-                  color: selectedTime.value === time.value ? 'var(--color-bg-deep)' : 'var(--text-primary)'
+                  background:
+                    selectedTime.value === time.value
+                      ? 'var(--color-accent)'
+                      : 'var(--alpha-surface-40)',
+                  color:
+                    selectedTime.value === time.value
+                      ? 'var(--color-bg-deep)'
+                      : 'var(--text-primary)',
                 }}
               >
                 {time.label}
@@ -158,18 +176,24 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
           </div>
         </div>
 
-        <div className="bot-modal-footer">
-          <button className="cancel-btn" onClick={onClose} style={{ borderRadius: 0 }}>
+        <div className='bot-modal-footer'>
+          <button
+            className='cancel-btn'
+            onClick={onClose}
+            style={{ borderRadius: 0 }}
+          >
             Cancel
           </button>
           <button
-            className="play-btn"
+            className='play-btn'
             onClick={handlePlayBot}
             disabled={!selectedBot}
             style={{
-              background: selectedBot ? selectedBot.color : 'var(--brand-gray-500)',
+              background: selectedBot
+                ? selectedBot.color
+                : 'var(--brand-gray-500)',
               cursor: selectedBot ? 'pointer' : 'not-allowed',
-              borderRadius: 0
+              borderRadius: 0,
             }}
           >
             {selectedBot ? `Play vs ${selectedBot.name}` : 'Select a Bot'}
@@ -177,7 +201,7 @@ const BotSelection: React.FC<BotSelectionProps> = ({ onClose, onSelectBot }) => 
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default BotSelection;
+export default BotSelection

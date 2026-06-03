@@ -1,7 +1,7 @@
 {
   "name": "takestakestakes",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,14 +9,12 @@
     "lint": "oxlint",
     "lint:eslint": "eslint .",
     "lint:all": "oxlint && eslint .",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage"
-  },
-  "engines": {
-    "node": ">=22.0.0",
-    "npm": ">=10.0.0"
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.12.2",
@@ -61,6 +59,7 @@
     "eslint-plugin-unicorn": "^64.0.0",
     "globals": "^15.15.0",
     "jsdom": "^27.4.0",
+    "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.60.0",
@@ -69,5 +68,9 @@
   },
   "overrides": {
     "kysely": "0.28.17"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
   }
 }

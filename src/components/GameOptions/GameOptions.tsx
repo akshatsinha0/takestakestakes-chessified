@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import GameOption from './GameOption';
-import QuickMatch from '../QuickMatch/QuickMatch';
-import BotSelection from '../BotSelection/BotSelection';
-import FriendInvite from '../FriendInvite/FriendInvite';
-import './GameOptions.css';
+import React, { useState } from 'react'
+import GameOption from './GameOption'
+import QuickMatch from '../QuickMatch/QuickMatch'
+import BotSelection from '../BotSelection/BotSelection'
+import FriendInvite from '../FriendInvite/FriendInvite'
+import './GameOptions.css'
 
 const TIME_FORMATS = [
   {
@@ -41,78 +41,83 @@ const TIME_FORMATS = [
     ],
     color: 'var(--color-accent)',
   },
-];
+]
 
-const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any, timeControl: any) => void }> = ({ onPlayYourself, onPlayBot }) => {
-  const [showTimeModal, setShowTimeModal] = useState(false);
-  const [showQuickMatch, setShowQuickMatch] = useState(false);
-  const [showCustom, setShowCustom] = useState(false);
-  const [showBotSelection, setShowBotSelection] = useState(false);
-  const [showFriendInvite, setShowFriendInvite] = useState(false);
-  const [customHour, setCustomHour] = useState(0);
-  const [customMin, setCustomMin] = useState(10);
-  const [customSec, setCustomSec] = useState(0);
-  const [customInc, setCustomInc] = useState(0);
+const GameOptions: React.FC<{
+  onPlayYourself?: () => void
+  onPlayBot?: (bot: any, timeControl: any) => void
+}> = ({ onPlayYourself, onPlayBot }) => {
+  const [showTimeModal, setShowTimeModal] = useState(false)
+  const [showQuickMatch, setShowQuickMatch] = useState(false)
+  const [showCustom, setShowCustom] = useState(false)
+  const [showBotSelection, setShowBotSelection] = useState(false)
+  const [showFriendInvite, setShowFriendInvite] = useState(false)
+  const [customHour, setCustomHour] = useState(0)
+  const [customMin, setCustomMin] = useState(10)
+  const [customSec, setCustomSec] = useState(0)
+  const [customInc, setCustomInc] = useState(0)
 
   const handleOptionClick = (id: string) => {
-    if (id === 'play-online') setShowTimeModal(true);
-    else if (id === 'play-bots') setShowBotSelection(true);
-    else if (id === 'play-friend') setShowFriendInvite(true);
-  };
+    if (id === 'play-online') setShowTimeModal(true)
+    else if (id === 'play-bots') setShowBotSelection(true)
+    else if (id === 'play-friend') setShowFriendInvite(true)
+  }
 
   const handleTimeSelect = (label: string) => {
-    setShowTimeModal(false);
-    setShowCustom(false);
-    setShowQuickMatch(true);
-  };
+    setShowTimeModal(false)
+    setShowCustom(false)
+    setShowQuickMatch(true)
+  }
 
   return (
-    <div className="game-options">
+    <div className='game-options'>
       <h2>Play Chess</h2>
-      <div className="options-container">
-        {[{
-          id: 'play-online',
-          title: 'Play Online',
-          description: 'Play vs a person of similar skill',
-          icon: 'lightning',
-          color: 'var(--brand-amber-soft)',
-        },
-        {
-          id: 'play-bots',
-          title: 'Play Bots',
-          description: 'Challenge a bot from Easy to Master',
-          icon: 'robot',
-          color: 'var(--color-info)',
-        },
-        {
-          id: 'play-friend',
-          title: 'Play a Friend',
-          description: 'Invite a friend to a game of chess',
-          icon: 'handshake',
-          color: 'var(--color-accent)',
-        },
-        {
-          id: 'tournaments',
-          title: 'Tournaments',
-          description: 'Join an Arena where anyone can win',
-          icon: 'trophy',
-          color: 'var(--color-accent)',
-        },
-        {
-          id: 'chess-variants',
-          title: 'Chess Variants',
-          description: 'Find fun new ways to play chess',
-          icon: 'dice',
-          color: 'var(--success)',
-        },
-        // New Play Yourself option
-        {
-          id: 'play-yourself',
-          title: 'Play Yourself',
-          description: 'Practice by playing both sides',
-          icon: 'focus-mode-icon', // Use an existing icon or add a new one
-          color: 'var(--color-accent-strong)',
-        }].map(option => (
+      <div className='options-container'>
+        {[
+          {
+            id: 'play-online',
+            title: 'Play Online',
+            description: 'Play vs a person of similar skill',
+            icon: 'lightning',
+            color: 'var(--brand-amber-soft)',
+          },
+          {
+            id: 'play-bots',
+            title: 'Play Bots',
+            description: 'Challenge a bot from Easy to Master',
+            icon: 'robot',
+            color: 'var(--color-info)',
+          },
+          {
+            id: 'play-friend',
+            title: 'Play a Friend',
+            description: 'Invite a friend to a game of chess',
+            icon: 'handshake',
+            color: 'var(--color-accent)',
+          },
+          {
+            id: 'tournaments',
+            title: 'Tournaments',
+            description: 'Join an Arena where anyone can win',
+            icon: 'trophy',
+            color: 'var(--color-accent)',
+          },
+          {
+            id: 'chess-variants',
+            title: 'Chess Variants',
+            description: 'Find fun new ways to play chess',
+            icon: 'dice',
+            color: 'var(--success)',
+          },
+          // New Play Yourself option
+          {
+            id: 'play-yourself',
+            title: 'Play Yourself',
+            description: 'Practice by playing both sides',
+            icon: 'focus-mode-icon', // Use an existing icon or add a new one
+            color: 'var(--color-accent-strong)',
+          },
+        ].map((option) => (
           <GameOption
             key={option.id}
             title={option.title}
@@ -120,99 +125,137 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any
             icon={option.icon}
             color={option.color}
             onClick={() => {
-              if (option.id === 'play-yourself' && onPlayYourself) onPlayYourself();
-              else handleOptionClick(option.id);
+              if (option.id === 'play-yourself' && onPlayYourself)
+                onPlayYourself()
+              else handleOptionClick(option.id)
             }}
           />
         ))}
       </div>
 
       {showTimeModal && (
-        <div className="time-modal-overlay" onClick={() => setShowTimeModal(false)}>
-          <div className="time-modal" onClick={e => e.stopPropagation()}>
-            <h3 className="modal-title">Choose Time Format</h3>
-            <div className="time-format-groups">
-              {TIME_FORMATS.map(format => (
-                <div key={format.label} className="time-format-group">
-                  <div className="format-label" style={{ color: format.color }}>{format.label}</div>
-                  <div className="format-times">
-                    {format.times.map(t => (
+        <div
+          className='time-modal-overlay'
+          onClick={() => setShowTimeModal(false)}
+        >
+          <div className='time-modal' onClick={(e) => e.stopPropagation()}>
+            <h3 className='modal-title'>Choose Time Format</h3>
+            <div className='time-format-groups'>
+              {TIME_FORMATS.map((format) => (
+                <div key={format.label} className='time-format-group'>
+                  <div className='format-label' style={{ color: format.color }}>
+                    {format.label}
+                  </div>
+                  <div className='format-times'>
+                    {format.times.map((t) => (
                       <button
                         key={t.label}
-                        className="time-btn"
-                        style={{ background: 'var(--primary-light)', color: 'var(--text-light)' }}
-                        onClick={() => handleTimeSelect(`${format.label} (${t.label})`)}
+                        className='time-btn'
+                        style={{
+                          background: 'var(--primary-light)',
+                          color: 'var(--text-light)',
+                        }}
+                        onClick={() =>
+                          handleTimeSelect(`${format.label} (${t.label})`)
+                        }
                       >
-                        <span className="time-label">{t.label}</span>
-                        <span className="time-desc">{t.desc}</span>
+                        <span className='time-label'>{t.label}</span>
+                        <span className='time-desc'>{t.desc}</span>
                       </button>
                     ))}
                   </div>
                 </div>
               ))}
-              <div className="time-format-group custom-group">
-                <div className="format-label" style={{ color: 'var(--color-accent-strong)' }}>Custom</div>
-                <div className="format-times">
+              <div className='time-format-group custom-group'>
+                <div
+                  className='format-label'
+                  style={{ color: 'var(--color-accent-strong)' }}
+                >
+                  Custom
+                </div>
+                <div className='format-times'>
                   {!showCustom ? (
-                    <button className="time-btn custom-btn" onClick={() => setShowCustom(true)}>
-                      <span className="time-label">Custom</span>
-                      <span className="time-desc">Set your own</span>
+                    <button
+                      className='time-btn custom-btn'
+                      onClick={() => setShowCustom(true)}
+                    >
+                      <span className='time-label'>Custom</span>
+                      <span className='time-desc'>Set your own</span>
                     </button>
                   ) : (
-                    <div className="custom-inputs">
-                      <div className="custom-labels">
-                        <span className="custom-label">Hour</span>
-                        <span className="custom-label">Minute</span>
-                        <span className="custom-label">Second</span>
-                        <span className="custom-label">Increment</span>
+                    <div className='custom-inputs'>
+                      <div className='custom-labels'>
+                        <span className='custom-label'>Hour</span>
+                        <span className='custom-label'>Minute</span>
+                        <span className='custom-label'>Second</span>
+                        <span className='custom-label'>Increment</span>
                       </div>
                       <input
-                        type="number"
+                        type='number'
                         min={0}
                         max={12}
                         value={customHour}
-                        onChange={e => setCustomHour(Number(e.target.value))}
-                        className="custom-input"
-                        placeholder="Hour"
-                        style={{ background: 'var(--primary-light)', color: 'var(--text-light)' }}
+                        onChange={(e) => setCustomHour(Number(e.target.value))}
+                        className='custom-input'
+                        placeholder='Hour'
+                        style={{
+                          background: 'var(--primary-light)',
+                          color: 'var(--text-light)',
+                        }}
                       />
-                      <span className="custom-sep">|</span>
+                      <span className='custom-sep'>|</span>
                       <input
-                        type="number"
+                        type='number'
                         min={0}
                         max={59}
                         value={customMin}
-                        onChange={e => setCustomMin(Number(e.target.value))}
-                        className="custom-input"
-                        placeholder="Minute"
-                        style={{ background: 'var(--primary-light)', color: 'var(--text-light)' }}
+                        onChange={(e) => setCustomMin(Number(e.target.value))}
+                        className='custom-input'
+                        placeholder='Minute'
+                        style={{
+                          background: 'var(--primary-light)',
+                          color: 'var(--text-light)',
+                        }}
                       />
-                      <span className="custom-sep">|</span>
+                      <span className='custom-sep'>|</span>
                       <input
-                        type="number"
+                        type='number'
                         min={0}
                         max={59}
                         value={customSec}
-                        onChange={e => setCustomSec(Number(e.target.value))}
-                        className="custom-input"
-                        placeholder="Second"
-                        style={{ background: 'var(--primary-light)', color: 'var(--text-light)' }}
+                        onChange={(e) => setCustomSec(Number(e.target.value))}
+                        className='custom-input'
+                        placeholder='Second'
+                        style={{
+                          background: 'var(--primary-light)',
+                          color: 'var(--text-light)',
+                        }}
                       />
-                      <span className="custom-sep">inc</span>
+                      <span className='custom-sep'>inc</span>
                       <input
-                        type="number"
+                        type='number'
                         min={0}
                         max={60}
                         value={customInc}
-                        onChange={e => setCustomInc(Number(e.target.value))}
-                        className="custom-input"
-                        placeholder="Increment"
-                        style={{ background: 'var(--primary-light)', color: 'var(--text-light)' }}
+                        onChange={(e) => setCustomInc(Number(e.target.value))}
+                        className='custom-input'
+                        placeholder='Increment'
+                        style={{
+                          background: 'var(--primary-light)',
+                          color: 'var(--text-light)',
+                        }}
                       />
                       <button
-                        className="time-btn confirm-btn"
-                        style={{ background: 'var(--color-accent-strong)', color: 'var(--primary-dark)' }}
-                        onClick={() => handleTimeSelect(`Custom (${customHour}h ${customMin}m ${customSec}s | +${customInc})`)}
+                        className='time-btn confirm-btn'
+                        style={{
+                          background: 'var(--color-accent-strong)',
+                          color: 'var(--primary-dark)',
+                        }}
+                        onClick={() =>
+                          handleTimeSelect(
+                            `Custom (${customHour}h ${customMin}m ${customSec}s | +${customInc})`,
+                          )
+                        }
                       >
                         Confirm
                       </button>
@@ -221,38 +264,48 @@ const GameOptions: React.FC<{ onPlayYourself?: () => void; onPlayBot?: (bot: any
                 </div>
               </div>
             </div>
-            <button className="close-modal-btn" onClick={() => setShowTimeModal(false)}>×</button>
+            <button
+              className='close-modal-btn'
+              onClick={() => setShowTimeModal(false)}
+            >
+              ×
+            </button>
           </div>
         </div>
       )}
-      
+
       {showQuickMatch && (
-        <div className="quick-match-container">
+        <div className='quick-match-container'>
           <QuickMatch />
-          <button className="close-quick-match" onClick={() => setShowQuickMatch(false)}>Back to Options</button>
+          <button
+            className='close-quick-match'
+            onClick={() => setShowQuickMatch(false)}
+          >
+            Back to Options
+          </button>
         </div>
       )}
-      
+
       {showBotSelection && (
         <BotSelection
           onClose={() => setShowBotSelection(false)}
           onSelectBot={(bot, timeControl) => {
-            if (onPlayBot) onPlayBot(bot, timeControl);
+            if (onPlayBot) onPlayBot(bot, timeControl)
           }}
         />
       )}
-      
+
       {showFriendInvite && (
         <FriendInvite
           onClose={() => setShowFriendInvite(false)}
           onGameCreated={(gameId) => {
-            console.log('Game created:', gameId);
-            setShowFriendInvite(false);
+            console.log('Game created:', gameId)
+            setShowFriendInvite(false)
           }}
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default GameOptions;
+export default GameOptions

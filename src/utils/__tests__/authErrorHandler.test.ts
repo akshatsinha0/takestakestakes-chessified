@@ -4,8 +4,8 @@ import { toast } from 'react-toastify'
 
 vi.mock('react-toastify', () => ({
   toast: {
-    error: vi.fn()
-  }
+    error: vi.fn(),
+  },
 }))
 
 describe('AuthErrorHandler', () => {
@@ -13,7 +13,7 @@ describe('AuthErrorHandler', () => {
     it('should handle invalid credentials error', () => {
       const error = new Error('Invalid login credentials')
       const result = authErrorHandler.handleAuthError(error)
-      
+
       expect(result.message).toContain('Invalid email or password')
       expect(result.shouldRetry).toBe(false)
       expect(result.shouldClearSession).toBe(false)
@@ -22,7 +22,7 @@ describe('AuthErrorHandler', () => {
     it('should handle email not confirmed error', () => {
       const error = new Error('Email not confirmed')
       const result = authErrorHandler.handleAuthError(error)
-      
+
       expect(result.message).toContain('check your email')
       expect(result.shouldRetry).toBe(false)
     })
@@ -30,7 +30,7 @@ describe('AuthErrorHandler', () => {
     it('should handle rate limiting error', () => {
       const error = new Error('Too many requests')
       const result = authErrorHandler.handleAuthError(error)
-      
+
       expect(result.message).toContain('Too many login attempts')
       expect(result.shouldRetry).toBe(true)
     })
@@ -38,7 +38,7 @@ describe('AuthErrorHandler', () => {
     it('should handle network error', () => {
       const error = new Error('Failed to fetch')
       const result = authErrorHandler.handleAuthError(error)
-      
+
       expect(result.message).toContain('Network error')
       expect(result.shouldRetry).toBe(true)
     })
@@ -46,7 +46,7 @@ describe('AuthErrorHandler', () => {
     it('should handle session expired error', () => {
       const error = new Error('session expired')
       const result = authErrorHandler.handleAuthError(error)
-      
+
       expect(result.message).toContain('session has expired')
       expect(result.shouldClearSession).toBe(true)
     })
@@ -54,7 +54,7 @@ describe('AuthErrorHandler', () => {
     it('should handle 400 error', () => {
       const error = new Error('400 Bad Request')
       const result = authErrorHandler.handleAuthError(error)
-      
+
       expect(result.shouldClearSession).toBe(true)
       expect(result.recoveryAction).toBeDefined()
     })

@@ -43,7 +43,11 @@
 }
 
 .settings-content {
-  background: linear-gradient(145deg, var(--color-surface) 0%, var(--color-bg-deep) 100%);
+  background: linear-gradient(
+    145deg,
+    var(--color-surface) 0%,
+    var(--color-bg-deep) 100%
+  );
   border: 2px solid var(--alpha-accent-20);
   border-radius: 12px;
   padding: 2rem;
@@ -75,8 +79,8 @@
   margin-top: 0.25rem;
 }
 
-.settings-group input[type="text"],
-.settings-group input[type="email"],
+.settings-group input[type='text'],
+.settings-group input[type='email'],
 .settings-group textarea,
 .settings-group select {
   width: 100%;
@@ -90,8 +94,8 @@
   transition: all 0.3s;
 }
 
-.settings-group input[type="text"]:focus,
-.settings-group input[type="email"]:focus,
+.settings-group input[type='text']:focus,
+.settings-group input[type='email']:focus,
 .settings-group textarea:focus,
 .settings-group select:focus {
   outline: none;
@@ -156,7 +160,7 @@
 
 .toggle-slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 18px;
   width: 18px;
   left: 4px;
@@ -175,7 +179,11 @@ input:checked + .toggle-slider:before {
 }
 
 .save-btn {
-  background: linear-gradient(135deg, var(--color-accent-strong) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-strong) 0%,
+    var(--color-accent) 100%
+  );
   color: var(--color-bg-deep);
   border: none;
   border-radius: 8px;

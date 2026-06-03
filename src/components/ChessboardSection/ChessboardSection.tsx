@@ -56,7 +56,11 @@ const pickBotMove = (game: Chess, rating: number) => {
         : rating < 1600
           ? [...captures, ...checks, ...moves]
           : [...captures, ...checks, ...central, ...moves]
-  return preferred[Math.floor(Math.random() * Math.min(preferred.length, moves.length))] ?? moves[0]
+  return (
+    preferred[
+      Math.floor(Math.random() * Math.min(preferred.length, moves.length))
+    ] ?? moves[0]
+  )
 }
 
 const ChessboardSection = ({
@@ -168,19 +172,19 @@ const ChessboardSection = ({
     }
   }
 
-  const opponentName = playBotMode ? selectedBot?.name ?? 'Bot' : 'You'
+  const opponentName = playBotMode ? (selectedBot?.name ?? 'Bot') : 'You'
   const opponentRating = playBotMode
-    ? selectedBot?.rating ?? DEFAULT_RATING
-    : profile?.rating ?? DEFAULT_RATING
+    ? (selectedBot?.rating ?? DEFAULT_RATING)
+    : (profile?.rating ?? DEFAULT_RATING)
 
   return (
     <div
       className={`chessboard-section ${isTheaterMode ? 'theater-mode-active' : ''} ${isFocusMode ? 'focus-mode-active' : ''}`}
     >
-      <div className="theater-mode">
-        <div className="board-and-players-container">
-          <div className="board-sidebar-wrapper">
-            <div className="chessboard-container">
+      <div className='theater-mode'>
+        <div className='board-and-players-container'>
+          <div className='board-sidebar-wrapper'>
+            <div className='chessboard-container'>
               <ChessboardControls
                 isTheaterMode={isTheaterMode}
                 isFocusMode={isFocusMode}
@@ -191,7 +195,7 @@ const ChessboardSection = ({
                 onOpenSettings={() => undefined}
               />
               <Chessboard
-                id="PlayChess"
+                id='PlayChess'
                 position={game.fen()}
                 onPieceDrop={handleDrop}
                 boardOrientation={isBoardFlipped ? 'black' : 'white'}
@@ -199,42 +203,50 @@ const ChessboardSection = ({
                   borderRadius: '8px',
                   boxShadow: '0 8px 16px var(--shadow-soft)',
                 }}
-                customDarkSquareStyle={{ backgroundColor: 'var(--brand-navy-400)' }}
-                customLightSquareStyle={{ backgroundColor: 'var(--brand-gray-200)' }}
+                customDarkSquareStyle={{
+                  backgroundColor: 'var(--brand-navy-400)',
+                }}
+                customLightSquareStyle={{
+                  backgroundColor: 'var(--brand-gray-200)',
+                }}
               />
             </div>
-            <div className="players-sidebar">
-              <div className="player-info opponent">
-                <div className="player-details">
-                  <div className="player-name">{opponentName}</div>
-                  <div className="player-rating">{opponentRating}</div>
+            <div className='players-sidebar'>
+              <div className='player-info opponent'>
+                <div className='player-details'>
+                  <div className='player-name'>{opponentName}</div>
+                  <div className='player-rating'>{opponentRating}</div>
                 </div>
               </div>
-              <div className="player-info user">
-                <div className="player-details">
-                  <div className="player-name">{profile?.username ?? 'Guest'}</div>
-                  <div className="player-rating">{profile?.rating ?? DEFAULT_RATING}</div>
+              <div className='player-info user'>
+                <div className='player-details'>
+                  <div className='player-name'>
+                    {profile?.username ?? 'Guest'}
+                  </div>
+                  <div className='player-rating'>
+                    {profile?.rating ?? DEFAULT_RATING}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="game-analysis-container">
-            <div className="analysis-panel">
-              <div className="moves-container" ref={movesContainerRef}>
+          <div className='game-analysis-container'>
+            <div className='analysis-panel'>
+              <div className='moves-container' ref={movesContainerRef}>
                 {moves.map((san, index) => (
-                  <span key={`${index}-${san}`} className="move-notation">
+                  <span key={`${index}-${san}`} className='move-notation'>
                     {index % 2 === 0 ? `${Math.floor(index / 2) + 1}. ` : ''}
                     {san}{' '}
                   </span>
                 ))}
               </div>
-              {gameStatus && <div className="game-status">{gameStatus}</div>}
+              {gameStatus && <div className='game-status'>{gameStatus}</div>}
             </div>
           </div>
         </div>
         {(playYourselfMode || playBotMode) && (
           <div style={{ textAlign: 'center', margin: '1.5rem 0' }}>
-            <button className="review-btn" onClick={handleExit}>
+            <button className='review-btn' onClick={handleExit}>
               {playBotMode ? 'Exit Bot Game' : 'Exit'}
             </button>
           </div>

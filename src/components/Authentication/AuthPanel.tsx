@@ -1,64 +1,70 @@
-import { useState, useEffect } from 'react';
-import './AuthPanel.css';
-import LoginForm from './LoginForm';
-import SignupForm from './SignupForm';
+import { useState, useEffect } from 'react'
+import './AuthPanel.css'
+import LoginForm from './LoginForm'
+import SignupForm from './SignupForm'
 
 interface AuthPanelProps {
-  mode: 'login' | 'signup';
-  closePanel: () => void;
-  switchMode: (mode: 'login' | 'signup') => void;
+  mode: 'login' | 'signup'
+  closePanel: () => void
+  switchMode: (mode: 'login' | 'signup') => void
 }
 
 const AuthPanel = ({ mode, closePanel, switchMode }: AuthPanelProps) => {
-  const [animatedIn, setAnimatedIn] = useState(false);
-  
+  const [animatedIn, setAnimatedIn] = useState(false)
+
   useEffect(() => {
     setTimeout(() => {
-      setAnimatedIn(true);
-    }, 10);
-    
+      setAnimatedIn(true)
+    }, 10)
+
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closePanel();
-    };
-    
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [closePanel]);
+      if (e.key === 'Escape') closePanel()
+    }
+
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [closePanel])
 
   const handleClose = () => {
-    setAnimatedIn(false);
-    setTimeout(closePanel, 300);
-  };
+    setAnimatedIn(false)
+    setTimeout(closePanel, 300)
+  }
 
   return (
-    <div className={`auth-overlay ${animatedIn ? 'visible' : ''}`} onClick={handleClose}>
-      <div className="auth-panel" onClick={e => e.stopPropagation()}>
-        <button className="close-auth" onClick={handleClose}>×</button>
-        
-        <div className="auth-tabs">
-          <button 
+    <div
+      className={`auth-overlay ${animatedIn ? 'visible' : ''}`}
+      onClick={handleClose}
+    >
+      <div className='auth-panel' onClick={(e) => e.stopPropagation()}>
+        <button className='close-auth' onClick={handleClose}>
+          ×
+        </button>
+
+        <div className='auth-tabs'>
+          <button
             className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
             onClick={() => switchMode('login')}
           >
             Log In
           </button>
-          <button 
+          <button
             className={`auth-tab ${mode === 'signup' ? 'active' : ''}`}
             onClick={() => switchMode('signup')}
           >
             Sign Up
           </button>
         </div>
-        
-        <div className="auth-content">
-          {mode === 'login' ?
-            <LoginForm onClose={handleClose} /> :
+
+        <div className='auth-content'>
+          {mode === 'login' ? (
+            <LoginForm onClose={handleClose} />
+          ) : (
             <SignupForm onClose={handleClose} />
-          }
+          )}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AuthPanel;
+export default AuthPanel

@@ -1,9 +1,9 @@
-import { betterAuth } from "better-auth";
-import { createClient, type GenericCtx } from "@convex-dev/better-auth";
-import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
-import { components } from "./_generated/api";
-import type { DataModel } from "./_generated/dataModel";
-import authConfig from "./auth.config";
+import { betterAuth } from 'better-auth'
+import { createClient, type GenericCtx } from '@convex-dev/better-auth'
+import { convex, crossDomain } from '@convex-dev/better-auth/plugins'
+import { components } from './_generated/api'
+import type { DataModel } from './_generated/dataModel'
+import authConfig from './auth.config'
 
 /*
 (1.) `authComponent` is the typed backend handle for the Better Auth component, created
@@ -37,28 +37,28 @@ consistent. Assumes `SITE_URL` and (optionally) the provider credentials are set
 `npx convex env set`. Future extensibility: add 2FA, magic links, or more providers by
 extending the options object without altering consumers.
 */
-const siteUrl = process.env.SITE_URL as string;
+const siteUrl = process.env.SITE_URL as string
 
-type ProviderCredentials = { clientId: string; clientSecret: string };
+type ProviderCredentials = { clientId: string; clientSecret: string }
 
 const enabledSocialProviders = (): Record<string, ProviderCredentials> => {
-  const providers: Record<string, ProviderCredentials> = {};
+  const providers: Record<string, ProviderCredentials> = {}
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     providers.google = {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    };
+    }
   }
   if (process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_SECRET) {
     providers.facebook = {
       clientId: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    };
+    }
   }
-  return providers;
-};
+  return providers
+}
 
-export const authComponent = createClient<DataModel>(components.betterAuth);
+export const authComponent = createClient<DataModel>(components.betterAuth)
 
 export const createAuth = (ctx: GenericCtx<DataModel>) =>
   betterAuth({
@@ -70,6 +70,6 @@ export const createAuth = (ctx: GenericCtx<DataModel>) =>
     },
     socialProviders: enabledSocialProviders(),
     plugins: [convex({ authConfig }), crossDomain({ siteUrl })],
-  });
+  })
 
-export const { getAuthUser } = authComponent.clientApi();
+export const { getAuthUser } = authComponent.clientApi()

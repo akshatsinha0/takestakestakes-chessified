@@ -58,41 +58,54 @@ const ChallengeModal = ({ targetUser, onClose }: ChallengeModalProps) => {
   }
 
   return (
-    <div className="challenge-overlay" onClick={onClose}>
-      <div className="challenge-modal" onClick={(event) => event.stopPropagation()}>
-        <div className="challenge-header">
+    <div className='challenge-overlay' onClick={onClose}>
+      <div
+        className='challenge-modal'
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className='challenge-header'>
           <h3>Challenge {targetUser.username}</h3>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className='close-btn' onClick={onClose}>
+            ×
+          </button>
         </div>
-        <div className="challenge-content">
-          <div className="time-controls">
+        <div className='challenge-content'>
+          <div className='time-controls'>
             <h4>Select Time Control</h4>
-            <div className="time-grid">
+            <div className='time-grid'>
               {TIME_CONTROLS.map((control) => (
                 <div
                   key={control.id}
                   className={`time-control-card ${selectedTimeControl === control.id ? 'selected' : ''}`}
                   onClick={() => setSelectedTimeControl(control.id)}
                 >
-                  <div className="time-control-name">{control.name}</div>
-                  <div className="time-control-time">{control.time}</div>
-                  <div className="time-control-increment">+{control.increment}</div>
+                  <div className='time-control-name'>{control.name}</div>
+                  <div className='time-control-time'>{control.time}</div>
+                  <div className='time-control-increment'>
+                    +{control.increment}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="challenge-message">
+          <div className='challenge-message'>
             <h4>Message (Optional)</h4>
             <textarea
               value={message}
               onChange={(event) => setMessage(event.target.value)}
-              placeholder="Good luck!"
+              placeholder='Good luck!'
               maxLength={100}
             />
           </div>
-          <div className="challenge-actions">
-            <button className="cancel-btn" onClick={onClose}>Cancel</button>
-            <button className="send-btn" onClick={handleSend} disabled={sending}>
+          <div className='challenge-actions'>
+            <button className='cancel-btn' onClick={onClose}>
+              Cancel
+            </button>
+            <button
+              className='send-btn'
+              onClick={handleSend}
+              disabled={sending}
+            >
               {sending ? 'Sending...' : 'Send Challenge'}
             </button>
           </div>

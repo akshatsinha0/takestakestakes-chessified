@@ -27,8 +27,10 @@ these as plain async functions returning normalized results makes them trivial t
 event handlers and to reason about without inspecting SDK internals at each site.
 */
 
-const messageFrom = (error: { message?: string } | null, fallback: string): string =>
-  error?.message ?? fallback
+const messageFrom = (
+  error: { message?: string } | null,
+  fallback: string,
+): string => error?.message ?? fallback
 
 const callbackURL = (): string => `${window.location.origin}/dashboard`
 
@@ -59,7 +61,9 @@ export function useAuthActions() {
       provider,
       callbackURL: callbackURL(),
     })
-    return { error: error ? messageFrom(error, 'Social sign in failed.') : null }
+    return {
+      error: error ? messageFrom(error, 'Social sign in failed.') : null,
+    }
   }
 
   return {

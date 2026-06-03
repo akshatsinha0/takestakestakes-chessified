@@ -14,7 +14,11 @@
 }
 
 .friend-invite-modal {
-  background: linear-gradient(145deg, var(--color-surface) 0%, var(--color-bg-deep) 100%);
+  background: linear-gradient(
+    145deg,
+    var(--color-surface) 0%,
+    var(--color-bg-deep) 100%
+  );
   border: 2px solid var(--alpha-accent-30);
   border-radius: 16px;
   padding: 2rem;
@@ -143,7 +147,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -286,7 +291,11 @@
 
 .create-game-btn {
   width: 100%;
-  background: linear-gradient(135deg, var(--color-accent-strong) 0%, var(--color-accent) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-strong) 0%,
+    var(--color-accent) 100%
+  );
   color: var(--color-bg-deep);
   border: none;
   border-radius: 8px;

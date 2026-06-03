@@ -33,7 +33,8 @@ export const SocialProvider = {
   Facebook: 'facebook',
 } as const
 
-export type SocialProvider = (typeof SocialProvider)[keyof typeof SocialProvider]
+export type SocialProvider =
+  (typeof SocialProvider)[keyof typeof SocialProvider]
 
 const convexSiteUrl = import.meta.env.VITE_CONVEX_SITE_URL as string
 

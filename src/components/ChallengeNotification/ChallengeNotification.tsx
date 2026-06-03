@@ -53,28 +53,32 @@ const ChallengeNotification = () => {
   }
 
   return (
-    <div className="challenge-notifications">
+    <div className='challenge-notifications'>
       {challenges.map(({ invitation, sender }) => (
-        <div key={invitation._id} className="challenge-notification">
-          <div className="challenge-info">
-            <div className="challenger-name">{sender?.username ?? 'Someone'}</div>
-            <div className="challenge-details">
-              <span className="time-control">{invitation.timeControl}</span>
-              <span className="rating">({sender?.rating ?? 1200})</span>
+        <div key={invitation._id} className='challenge-notification'>
+          <div className='challenge-info'>
+            <div className='challenger-name'>
+              {sender?.username ?? 'Someone'}
+            </div>
+            <div className='challenge-details'>
+              <span className='time-control'>{invitation.timeControl}</span>
+              <span className='rating'>({sender?.rating ?? 1200})</span>
             </div>
             {invitation.message && (
-              <div className="challenge-message">&quot;{invitation.message}&quot;</div>
+              <div className='challenge-message'>
+                &quot;{invitation.message}&quot;
+              </div>
             )}
           </div>
-          <div className="challenge-actions">
+          <div className='challenge-actions'>
             <button
-              className="accept-btn"
+              className='accept-btn'
               onClick={() => handleAccept(invitation._id)}
             >
               Accept
             </button>
             <button
-              className="decline-btn"
+              className='decline-btn'
               onClick={() => handleDecline(invitation._id)}
             >
               Decline

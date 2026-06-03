@@ -13,6 +13,7 @@ Auth is handled by the **Better Auth** Convex component
 Facebook social login.
 
 ### Why migrate
+
 - The existing Supabase project is paused for >90 days and cannot be restored via the
   dashboard. Data is throwaway test data.
 - Convex is CLI-first: `npx convex dev` provisions the deployment and pushes
@@ -51,14 +52,14 @@ Facebook social login.
 Better Auth owns its own user/session tables inside the component. App domain tables are
 keyed by the Better Auth user id.
 
-| Convex table      | Replaces            | Key fields / notes                                                            |
-|-------------------|---------------------|-------------------------------------------------------------------------------|
-| `profiles`        | `profiles`          | `userId` (Better Auth), `username`, `rating`, `avatarUrl`, `lastActive`       |
-| `games`           | `games`             | full game state; **adds the missing `increment` field**                       |
-| `moves`           | `moves`             | `gameId`, `moveNumber`, `playerColor`, `san`, `fen`, `timeTaken`              |
-| `gameInvitations` | `game_invitations`  | challenges: `fromUserId`, `toUserId`, `timeControl`, `status`, `expiresAt`    |
-| `userStats`       | `user_stats`        | highest rating, streaks, counters                                             |
-| `friendRequests`  | friend-requests SQL | `fromUserId`, `toUserId`, `status`                                            |
+| Convex table      | Replaces            | Key fields / notes                                                         |
+| ----------------- | ------------------- | -------------------------------------------------------------------------- |
+| `profiles`        | `profiles`          | `userId` (Better Auth), `username`, `rating`, `avatarUrl`, `lastActive`    |
+| `games`           | `games`             | full game state; **adds the missing `increment` field**                    |
+| `moves`           | `moves`             | `gameId`, `moveNumber`, `playerColor`, `san`, `fen`, `timeTaken`           |
+| `gameInvitations` | `game_invitations`  | challenges: `fromUserId`, `toUserId`, `timeControl`, `status`, `expiresAt` |
+| `userStats`       | `user_stats`        | highest rating, streaks, counters                                          |
+| `friendRequests`  | friend-requests SQL | `fromUserId`, `toUserId`, `status`                                         |
 
 Indexes (`by_status`, `by_game`, `by_player`, etc.) replace Postgres indexes. Row
 authorization moves into the Convex functions: each query/mutation checks
@@ -100,7 +101,7 @@ Files: `convex/convex.config.ts`, `convex/auth.config.ts`, `convex/auth.ts`,
   `authComponent.getAuthUser(ctx)`.
 - `http.ts`: `authComponent.registerRoutes(http, createAuth, { cors: true })`.
 - `src/lib/auth-client.ts`: `createAuthClient({ baseURL: VITE_CONVEX_SITE_URL,
-  plugins: [convexClient(), crossDomainClient()] })`.
+plugins: [convexClient(), crossDomainClient()] })`.
 - `main.tsx`: wrap app in `<ConvexBetterAuthProvider client={convex} authClient={authClient}>`.
 - `useSupabaseAuth` / `SupabaseAuthContext` → thin context backed by `authClient` +
   `getCurrentUser`; the app `profiles` row is created via mutation on first sign-in.

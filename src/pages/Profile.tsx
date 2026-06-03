@@ -21,31 +21,31 @@ const Profile = () => {
   const { user, profile, loading } = useAuth()
 
   if (loading) {
-    return <div className="profile-page">Loading...</div>
+    return <div className='profile-page'>Loading...</div>
   }
   if (!user) {
-    return <Navigate to="/" />
+    return <Navigate to='/' />
   }
   if (!profile) {
-    return <div className="profile-page">Profile not found.</div>
+    return <div className='profile-page'>Profile not found.</div>
   }
 
   return (
-    <div className="profile-page">
-      <div className="profile-card">
-        <div className="profile-avatar">
+    <div className='profile-page'>
+      <div className='profile-card'>
+        <div className='profile-avatar'>
           {profile.avatarUrl ? (
             <img src={profile.avatarUrl} alt={profile.username} />
           ) : (
-            <span className="avatar-fallback">
+            <span className='avatar-fallback'>
               {profile.username.charAt(0).toUpperCase()}
             </span>
           )}
         </div>
-        <div className="profile-info">
+        <div className='profile-info'>
           <h2>{profile.username}</h2>
-          <div className="profile-email">{user.email}</div>
-          <div className="profile-rating">
+          <div className='profile-email'>{user.email}</div>
+          <div className='profile-rating'>
             ELO: <span>{profile.rating}</span>
           </div>
         </div>

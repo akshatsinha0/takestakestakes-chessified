@@ -147,7 +147,8 @@ export const list = zQuery({
     )
     return await Promise.all(
       accepted.map(async (edge) => {
-        const otherUserId = edge.senderId === me ? edge.receiverId : edge.senderId
+        const otherUserId =
+          edge.senderId === me ? edge.receiverId : edge.senderId
         return await ctx.db
           .query('profiles')
           .withIndex('by_userId', (q) => q.eq('userId', otherUserId))

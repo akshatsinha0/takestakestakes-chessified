@@ -78,9 +78,9 @@ const QuickMatch = () => {
   const searching = searchingGameId !== null
 
   return (
-    <div className="quick-match">
+    <div className='quick-match'>
       <h3>Quick Match</h3>
-      <div className="time-selector">
+      <div className='time-selector'>
         {TIME_CONTROLS.map((control) => (
           <button
             key={control.id}
@@ -88,22 +88,22 @@ const QuickMatch = () => {
             onClick={() => setSelectedTime(control.id)}
             disabled={searching}
           >
-            <div className="time-name">{control.name}</div>
-            <div className="time-duration">{control.time}</div>
+            <div className='time-name'>{control.name}</div>
+            <div className='time-duration'>{control.time}</div>
           </button>
         ))}
       </div>
 
       {searching ? (
-        <div className="searching-container">
-          <div className="searching-spinner" />
-          <p className="searching-text">Searching for opponent...</p>
-          <button className="cancel-search-btn" onClick={cancelSearch}>
+        <div className='searching-container'>
+          <div className='searching-spinner' />
+          <p className='searching-text'>Searching for opponent...</p>
+          <button className='cancel-search-btn' onClick={cancelSearch}>
             Cancel
           </button>
         </div>
       ) : (
-        <button className="find-match-btn" onClick={findMatch}>
+        <button className='find-match-btn' onClick={findMatch}>
           Find Match
         </button>
       )}

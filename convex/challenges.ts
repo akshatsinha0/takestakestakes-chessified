@@ -105,7 +105,12 @@ export const accept = zMutation({
     await ctx.db.patch(invitation._id, { status: RequestStatus.Accepted })
     return await ctx.db.insert(
       'games',
-      buildActiveGame(invitation.fromUserId, userId, invitation.timeControl, Date.now()),
+      buildActiveGame(
+        invitation.fromUserId,
+        userId,
+        invitation.timeControl,
+        Date.now(),
+      ),
     )
   },
 })

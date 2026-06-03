@@ -2,9 +2,9 @@ name: Test Coverage
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
   pull_request:
-    branches: ["main"]
+    branches: ['main']
   schedule:
     # Run tests twice daily at 9 AM and 9 PM UTC
     - cron: '0 9,21 * * *'

@@ -1,5 +1,5 @@
-import { getAuthConfigProvider } from "@convex-dev/better-auth/auth-config";
-import type { AuthConfig } from "convex/server";
+import { getAuthConfigProvider } from '@convex-dev/better-auth/auth-config'
+import type { AuthConfig } from 'convex/server'
 
 /*
 (1.) Declares the JWT auth provider Convex uses to validate identities on every
@@ -26,4 +26,4 @@ fetch, at the cost of a network lookup that the static-JWKS path can later elimi
 */
 export default {
   providers: [getAuthConfigProvider()],
-} satisfies AuthConfig;
+} satisfies AuthConfig

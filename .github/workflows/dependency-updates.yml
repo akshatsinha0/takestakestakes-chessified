@@ -13,7 +13,7 @@ permissions:
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
         if: steps.outdated.outputs.has_updates == 'true'
         run: |
           npm update --save
-          
+
       - name: Commit dependency updates
         if: steps.outdated.outputs.has_updates == 'true'
         run: |

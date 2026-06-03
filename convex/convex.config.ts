@@ -1,5 +1,5 @@
-import { defineApp } from "convex/server";
-import betterAuth from "@convex-dev/better-auth/convex.config";
+import { defineApp } from 'convex/server'
+import betterAuth from '@convex-dev/better-auth/convex.config'
 
 /*
 (1.) Registers the Better Auth component (`@convex-dev/better-auth`) into this Convex
@@ -21,7 +21,7 @@ and makes it trivial to add, remove, or upgrade components without touching appl
 logic. The design assumes exactly one Better Auth component per deployment, which matches
 the single-tenant authentication model this chess application requires.
 */
-const app = defineApp();
-app.use(betterAuth);
+const app = defineApp()
+app.use(betterAuth)
 
-export default app;
+export default app

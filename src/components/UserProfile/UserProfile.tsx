@@ -53,9 +53,12 @@ const UserProfile = ({ userId, onClose }: UserProfileProps) => {
 
   if (profile === undefined) {
     return (
-      <div className="user-profile-overlay" onClick={onClose}>
-        <div className="user-profile-modal" onClick={(event) => event.stopPropagation()}>
-          <div className="loading-spinner">Loading...</div>
+      <div className='user-profile-overlay' onClick={onClose}>
+        <div
+          className='user-profile-modal'
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className='loading-spinner'>Loading...</div>
         </div>
       </div>
     )
@@ -90,14 +93,20 @@ const UserProfile = ({ userId, onClose }: UserProfileProps) => {
     }
     if (!relationship) {
       return (
-        <button className="action-btn friend-request-btn" onClick={handleAddFriend}>
+        <button
+          className='action-btn friend-request-btn'
+          onClick={handleAddFriend}
+        >
           Add Friend
         </button>
       )
     }
     if (relationship.status === FriendStatus.Accepted) {
       return (
-        <button className="action-btn remove-friend-btn" onClick={handleRemoveEdge}>
+        <button
+          className='action-btn remove-friend-btn'
+          onClick={handleRemoveEdge}
+        >
           Remove Friend
         </button>
       )
@@ -106,7 +115,7 @@ const UserProfile = ({ userId, onClose }: UserProfileProps) => {
       const sentByMe = relationship.senderId === user?.id
       return (
         <button
-          className="action-btn pending-btn"
+          className='action-btn pending-btn'
           onClick={handleRemoveEdge}
           disabled={!sentByMe}
         >
@@ -118,66 +127,71 @@ const UserProfile = ({ userId, onClose }: UserProfileProps) => {
   }
 
   return (
-    <div className="user-profile-overlay" onClick={onClose}>
-      <div className="user-profile-modal" onClick={(event) => event.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>×</button>
-        <div className="profile-header">
-          <div className="profile-avatar-large">
-            <div className="avatar-circle">
+    <div className='user-profile-overlay' onClick={onClose}>
+      <div
+        className='user-profile-modal'
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button className='close-btn' onClick={onClose}>
+          ×
+        </button>
+        <div className='profile-header'>
+          <div className='profile-avatar-large'>
+            <div className='avatar-circle'>
               {profile.username.charAt(0).toUpperCase()}
             </div>
-            {isOnline && <span className="online-indicator" />}
+            {isOnline && <span className='online-indicator' />}
           </div>
-          <div className="profile-info">
-            <h2 className="profile-username">{profile.username}</h2>
-            <div className="profile-rating">
-              <span className="rating-label">Rating:</span>
-              <span className="rating-value">{profile.rating}</span>
+          <div className='profile-info'>
+            <h2 className='profile-username'>{profile.username}</h2>
+            <div className='profile-rating'>
+              <span className='rating-label'>Rating:</span>
+              <span className='rating-value'>{profile.rating}</span>
             </div>
-            <div className="profile-status">
+            <div className='profile-status'>
               {isOnline ? (
-                <span className="status-online">● Online</span>
+                <span className='status-online'>● Online</span>
               ) : (
-                <span className="status-offline">● Offline</span>
+                <span className='status-offline'>● Offline</span>
               )}
             </div>
           </div>
         </div>
 
         {profile.bio && (
-          <div className="profile-bio">
+          <div className='profile-bio'>
             <h3>About</h3>
             <p>{profile.bio}</p>
           </div>
         )}
 
-        <div className="profile-stats">
+        <div className='profile-stats'>
           <h3>Statistics</h3>
-          <div className="stats-grid">
-            <div className="stat-item">
-              <span className="stat-value">{stats.total}</span>
-              <span className="stat-label">Games</span>
+          <div className='stats-grid'>
+            <div className='stat-item'>
+              <span className='stat-value'>{stats.total}</span>
+              <span className='stat-label'>Games</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-value">{stats.wins}</span>
-              <span className="stat-label">Wins</span>
+            <div className='stat-item'>
+              <span className='stat-value'>{stats.wins}</span>
+              <span className='stat-label'>Wins</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-value">{stats.losses}</span>
-              <span className="stat-label">Losses</span>
+            <div className='stat-item'>
+              <span className='stat-value'>{stats.losses}</span>
+              <span className='stat-label'>Losses</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-value">{stats.draws}</span>
-              <span className="stat-label">Draws</span>
+            <div className='stat-item'>
+              <span className='stat-value'>{stats.draws}</span>
+              <span className='stat-label'>Draws</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-value">{stats.winRate}%</span>
-              <span className="stat-label">Win Rate</span>
+            <div className='stat-item'>
+              <span className='stat-value'>{stats.winRate}%</span>
+              <span className='stat-label'>Win Rate</span>
             </div>
           </div>
         </div>
 
-        <div className="profile-actions">{renderFriendAction()}</div>
+        <div className='profile-actions'>{renderFriendAction()}</div>
       </div>
     </div>
   )

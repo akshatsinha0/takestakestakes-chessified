@@ -1,111 +1,120 @@
-import { useRef, useEffect } from 'react';
-import './Sidebar.css';
-import logo from '../../assets/WebsiteLogo.png';
-import lessonsLogo from '../../assets/LessonsLogo.png';
-import puzzlesLogo from '../../assets/PuzzlesLogo.png';
-import eventsLogo from '../../assets/ChessEventsLogo.png';
-import membersLogo from '../../assets/MembersLogo.png';
+import { useRef, useEffect } from 'react'
+import './Sidebar.css'
+import logo from '../../assets/WebsiteLogo.png'
+import lessonsLogo from '../../assets/LessonsLogo.png'
+import puzzlesLogo from '../../assets/PuzzlesLogo.png'
+import eventsLogo from '../../assets/ChessEventsLogo.png'
+import membersLogo from '../../assets/MembersLogo.png'
 
 interface SidebarProps {
-  isOpen: boolean;
-  toggleSidebar: () => void;
-  openLogin: () => void;
+  isOpen: boolean
+  toggleSidebar: () => void
+  openLogin: () => void
 }
 
 const Sidebar = ({ isOpen, toggleSidebar, openLogin }: SidebarProps) => {
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  
+  const sidebarRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (isOpen && 
-          sidebarRef.current && 
-          !sidebarRef.current.contains(event.target as Node)) {
-        toggleSidebar();
+      if (
+        isOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        toggleSidebar()
       }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, toggleSidebar]);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen, toggleSidebar])
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = 'auto'
     }
-    
+
     return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, [isOpen]);
+      document.body.style.overflow = 'auto'
+    }
+  }, [isOpen])
 
   const handleSignInClick = () => {
-    toggleSidebar();
-    openLogin();
-  };
+    toggleSidebar()
+    openLogin()
+  }
 
   return (
     <>
-      <div className={`sidebar-overlay ${isOpen ? 'visible' : ''}`} onClick={toggleSidebar}></div>
+      <div
+        className={`sidebar-overlay ${isOpen ? 'visible' : ''}`}
+        onClick={toggleSidebar}
+      ></div>
       <aside ref={sidebarRef} className={`sidebar ${isOpen ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <img src={logo} alt="TakesTakesTakes" className="sidebar-logo" />
-          <button className="close-sidebar" onClick={toggleSidebar}>×</button>
+        <div className='sidebar-header'>
+          <img src={logo} alt='TakesTakesTakes' className='sidebar-logo' />
+          <button className='close-sidebar' onClick={toggleSidebar}>
+            ×
+          </button>
         </div>
-        
-        <nav className="sidebar-nav">
+
+        <nav className='sidebar-nav'>
           <ul>
-            <li className="nav-item active">
-              <a href="#play">
-                <div className="nav-icon">♟️</div>
-                <span className="nav-text">Play Chess</span>
+            <li className='nav-item active'>
+              <a href='#play'>
+                <div className='nav-icon'>♟️</div>
+                <span className='nav-text'>Play Chess</span>
               </a>
             </li>
-            <li className="nav-item">
-              <a href="#puzzles">
-                <div className="nav-icon">
-                  <img src={puzzlesLogo} alt="Puzzles" />
+            <li className='nav-item'>
+              <a href='#puzzles'>
+                <div className='nav-icon'>
+                  <img src={puzzlesLogo} alt='Puzzles' />
                 </div>
-                <span className="nav-text">Daily Puzzles</span>
+                <span className='nav-text'>Daily Puzzles</span>
               </a>
             </li>
-            <li className="nav-item">
-              <a href="#lessons">
-                <div className="nav-icon">
-                  <img src={lessonsLogo} alt="Lessons" />
+            <li className='nav-item'>
+              <a href='#lessons'>
+                <div className='nav-icon'>
+                  <img src={lessonsLogo} alt='Lessons' />
                 </div>
-                <span className="nav-text">Strategic Lessons</span>
+                <span className='nav-text'>Strategic Lessons</span>
               </a>
             </li>
-            <li className="nav-item">
-              <a href="#events">
-                <div className="nav-icon">
-                  <img src={eventsLogo} alt="Events" />
+            <li className='nav-item'>
+              <a href='#events'>
+                <div className='nav-icon'>
+                  <img src={eventsLogo} alt='Events' />
                 </div>
-                <span className="nav-text">Tournaments</span>
+                <span className='nav-text'>Tournaments</span>
               </a>
             </li>
-            <li className="nav-item">
-              <a href="#community">
-                <div className="nav-icon">
-                  <img src={membersLogo} alt="Community" />
+            <li className='nav-item'>
+              <a href='#community'>
+                <div className='nav-icon'>
+                  <img src={membersLogo} alt='Community' />
                 </div>
-                <span className="nav-text">Community</span>
+                <span className='nav-text'>Community</span>
               </a>
             </li>
           </ul>
         </nav>
-        
-        <div className="sidebar-footer">
+
+        <div className='sidebar-footer'>
           <p>Already a member?</p>
-          <button className="sidebar-login" onClick={handleSignInClick}>Sign In</button>
+          <button className='sidebar-login' onClick={handleSignInClick}>
+            Sign In
+          </button>
         </div>
       </aside>
     </>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

@@ -1,6 +1,10 @@
 .profile-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--color-surface) 0%, var(--brand-navy-700) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-surface) 0%,
+    var(--brand-navy-700) 100%
+  );
   padding: 2rem;
   display: flex;
   justify-content: center;
@@ -38,7 +42,11 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--brand-indigo) 0%, var(--brand-purple) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--brand-indigo) 0%,
+    var(--brand-purple) 100%
+  );
   color: white;
   font-size: 3rem;
   font-weight: bold;

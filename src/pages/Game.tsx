@@ -30,8 +30,18 @@ sacrificing an authoritative timer.
 */
 
 const PIECE_SYMBOLS: Record<string, string> = {
-  wp: '♙', wr: '♖', wn: '♘', wb: '♗', wq: '♕', wk: '♔',
-  bp: '♟', br: '♜', bn: '♞', bb: '♝', bq: '♛', bk: '♚',
+  wp: '♙',
+  wr: '♖',
+  wn: '♘',
+  wb: '♗',
+  wq: '♕',
+  wk: '♔',
+  bp: '♟',
+  br: '♜',
+  bn: '♞',
+  bb: '♝',
+  bq: '♛',
+  bk: '♚',
 }
 
 const formatClock = (seconds: number): string => {
@@ -59,10 +69,10 @@ const Game = () => {
   }, [])
 
   if (data === undefined) {
-    return <div className="game-loading">Loading game...</div>
+    return <div className='game-loading'>Loading game...</div>
   }
   if (data === null) {
-    return <div className="game-loading">Game not found.</div>
+    return <div className='game-loading'>Game not found.</div>
   }
 
   const { game, moves, whitePlayer, blackPlayer } = data
@@ -84,7 +94,11 @@ const Game = () => {
     }
     if (selectedSquare && possibleMoves.includes(square)) {
       try {
-        const move = chess.move({ from: selectedSquare, to: square, promotion: 'q' })
+        const move = chess.move({
+          from: selectedSquare,
+          to: square,
+          promotion: 'q',
+        })
         void submitMove({ gameId: game._id, san: move.san, fen: chess.fen() })
       } catch {
         // Illegal attempts are ignored; the board stays on authoritative server state.
@@ -119,48 +133,53 @@ const Game = () => {
       : game.blackTimeRemaining
 
   return (
-    <div className="game-page">
-      <div className="game-header">
-        <button className="back-btn" onClick={() => navigate('/dashboard')}>
+    <div className='game-page'>
+      <div className='game-header'>
+        <button className='back-btn' onClick={() => navigate('/dashboard')}>
           ← Back to Dashboard
         </button>
-        <div className="game-info">
-          <span className="time-control">{game.timeControl}</span>
-          <span className="game-status">{game.status.replace('_', ' ')}</span>
+        <div className='game-info'>
+          <span className='time-control'>{game.timeControl}</span>
+          <span className='game-status'>{game.status.replace('_', ' ')}</span>
         </div>
       </div>
-      <div className="game-content">
-        <div className="game-sidebar">
-          <div className="player-info black">
-            <div className="player-name">{blackPlayer?.username ?? 'Waiting...'}</div>
-            <div className="player-rating">({blackPlayer?.rating ?? 1200})</div>
-            <div className="player-time">{formatClock(liveBlack)}</div>
+      <div className='game-content'>
+        <div className='game-sidebar'>
+          <div className='player-info black'>
+            <div className='player-name'>
+              {blackPlayer?.username ?? 'Waiting...'}
+            </div>
+            <div className='player-rating'>({blackPlayer?.rating ?? 1200})</div>
+            <div className='player-time'>{formatClock(liveBlack)}</div>
           </div>
-          <div className="move-history">
+          <div className='move-history'>
             <h4>Moves</h4>
-            <div className="moves-list">
+            <div className='moves-list'>
               {moves.map((move, index) => (
-                <span key={move._id} className="move-notation">
+                <span key={move._id} className='move-notation'>
                   {Math.floor(index / 2) + 1}
                   {index % 2 === 0 ? '.' : ''} {move.san}
                 </span>
               ))}
             </div>
           </div>
-          <div className="player-info white">
-            <div className="player-name">{whitePlayer?.username ?? 'Waiting...'}</div>
-            <div className="player-rating">({whitePlayer?.rating ?? 1200})</div>
-            <div className="player-time">{formatClock(liveWhite)}</div>
+          <div className='player-info white'>
+            <div className='player-name'>
+              {whitePlayer?.username ?? 'Waiting...'}
+            </div>
+            <div className='player-rating'>({whitePlayer?.rating ?? 1200})</div>
+            <div className='player-time'>{formatClock(liveWhite)}</div>
           </div>
         </div>
-        <div className="board-container">
-          <div className="game-board">
+        <div className='board-container'>
+          <div className='game-board'>
             {displayBoard.map((row, rankIndex) => {
               const actualRank = isFlipped ? rankIndex : 7 - rankIndex
               const displayRow = isFlipped ? [...row].reverse() : row
               return displayRow.map((square, fileIndex) => {
                 const actualFile = isFlipped ? 7 - fileIndex : fileIndex
-                const notation = String.fromCharCode(97 + actualFile) + (actualRank + 1)
+                const notation =
+                  String.fromCharCode(97 + actualFile) + (actualRank + 1)
                 const isLight = (actualRank + actualFile) % 2 === 0
                 const piece = square ? `${square.color}${square.type}` : null
                 return (
@@ -175,14 +194,14 @@ const Game = () => {
                       </div>
                     )}
                     {possibleMoves.includes(notation) && (
-                      <div className="move-indicator" />
+                      <div className='move-indicator' />
                     )}
                   </div>
                 )
               })
             })}
           </div>
-          {isMyTurn && <div className="turn-indicator">Your Turn</div>}
+          {isMyTurn && <div className='turn-indicator'>Your Turn</div>}
         </div>
       </div>
     </div>

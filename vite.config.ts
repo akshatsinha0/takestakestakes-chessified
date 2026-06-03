@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
@@ -15,16 +15,21 @@ export default defineConfig({
         manualChunks: {
           // Vendor chunks
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'mui-vendor': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
+          'mui-vendor': [
+            '@mui/material',
+            '@mui/icons-material',
+            '@emotion/react',
+            '@emotion/styled',
+          ],
           'chess-vendor': ['chess.js', 'react-chessboard'],
           'three-vendor': ['three'],
           'convex-vendor': ['convex', '@convex-dev/better-auth', 'better-auth'],
-          'utils': ['react-toastify']
-        }
-      }
-    }
+          utils: ['react-toastify'],
+        },
+      },
+    },
   },
   optimizeDeps: {
-    include: ['three', 'chess.js', 'convex'] // Pre-bundle for faster builds
-  }
-});
+    include: ['three', 'chess.js', 'convex'], // Pre-bundle for faster builds
+  },
+})

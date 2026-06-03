@@ -22,8 +22,18 @@ authoritative against the stored notation without depending on any per-move boar
 */
 
 const PIECE_SYMBOLS: Record<string, string> = {
-  wp: '♙', wr: '♖', wn: '♘', wb: '♗', wq: '♕', wk: '♔',
-  bp: '♟', br: '♜', bn: '♞', bb: '♝', bq: '♛', bk: '♚',
+  wp: '♙',
+  wr: '♖',
+  wn: '♘',
+  wb: '♗',
+  wq: '♕',
+  wk: '♔',
+  bp: '♟',
+  br: '♜',
+  bn: '♞',
+  bb: '♝',
+  bq: '♛',
+  bk: '♚',
 }
 
 const GameViewer = ({
@@ -56,15 +66,20 @@ const GameViewer = ({
   const board = chess.board()
 
   return (
-    <div className="game-viewer-overlay" onClick={onClose}>
-      <div className="game-viewer-modal" onClick={(event) => event.stopPropagation()}>
-        <div className="game-viewer-header">
+    <div className='game-viewer-overlay' onClick={onClose}>
+      <div
+        className='game-viewer-modal'
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className='game-viewer-header'>
           <h3>Game Review</h3>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className='close-btn' onClick={onClose}>
+            ×
+          </button>
         </div>
-        <div className="game-viewer-content">
-          <div className="board-section">
-            <div className="chess-board">
+        <div className='game-viewer-content'>
+          <div className='board-section'>
+            <div className='chess-board'>
               {board.map((row, rankIndex) =>
                 row.map((square, fileIndex) => {
                   const isLight = (rankIndex + fileIndex) % 2 === 0
@@ -84,27 +99,47 @@ const GameViewer = ({
                 }),
               )}
             </div>
-            <div className="game-controls">
-              <button onClick={() => goToMove(-1)} disabled={currentMoveIndex === -1}>⏮</button>
-              <button onClick={() => goToMove(currentMoveIndex - 1)} disabled={currentMoveIndex === -1}>◀</button>
-              <button onClick={() => goToMove(currentMoveIndex + 1)} disabled={currentMoveIndex >= moves.length - 1}>▶</button>
-              <button onClick={() => goToMove(moves.length - 1)} disabled={currentMoveIndex >= moves.length - 1}>⏭</button>
+            <div className='game-controls'>
+              <button
+                onClick={() => goToMove(-1)}
+                disabled={currentMoveIndex === -1}
+              >
+                ⏮
+              </button>
+              <button
+                onClick={() => goToMove(currentMoveIndex - 1)}
+                disabled={currentMoveIndex === -1}
+              >
+                ◀
+              </button>
+              <button
+                onClick={() => goToMove(currentMoveIndex + 1)}
+                disabled={currentMoveIndex >= moves.length - 1}
+              >
+                ▶
+              </button>
+              <button
+                onClick={() => goToMove(moves.length - 1)}
+                disabled={currentMoveIndex >= moves.length - 1}
+              >
+                ⏭
+              </button>
             </div>
           </div>
-          <div className="moves-section">
+          <div className='moves-section'>
             <h4>Moves</h4>
-            <div className="moves-list">
+            <div className='moves-list'>
               {moves.map((move, index) => (
                 <div
                   key={move._id}
                   className={`move-item ${index === currentMoveIndex ? 'active' : ''}`}
                   onClick={() => goToMove(index)}
                 >
-                  <span className="move-number">
+                  <span className='move-number'>
                     {Math.floor(index / 2) + 1}
                     {index % 2 === 0 ? '.' : ''}
                   </span>
-                  <span className="move-san">{move.san}</span>
+                  <span className='move-san'>{move.san}</span>
                 </div>
               ))}
             </div>

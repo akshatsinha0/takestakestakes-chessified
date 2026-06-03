@@ -5,7 +5,12 @@ import { zQuery, zMutation } from './lib/functions'
 import { requireAuthUserId } from './lib/identity'
 import { computeNewRating } from './lib/elo'
 import { GameStatus, zGameResult, GameResult } from './lib/domain'
-import { DEFAULT_RATING, SCORE_WIN, SCORE_DRAW, SCORE_LOSS } from './lib/constants'
+import {
+  DEFAULT_RATING,
+  SCORE_WIN,
+  SCORE_DRAW,
+  SCORE_LOSS,
+} from './lib/constants'
 import type { MutationCtx } from './_generated/server'
 
 /*
