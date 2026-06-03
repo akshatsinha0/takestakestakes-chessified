@@ -10,7 +10,7 @@ import './ChessboardSection.css'
 /*
 (1.) Renders the local practice board for the dashboard's "play yourself" and "play a bot" modes.
      Authoritative online games are handled by the reactive `/game/:gameId` page, so this component
-     deliberately holds no server state and no Supabase coupling; it is a self-contained chess.js
+     deliberately holds no server state and no Postgres coupling; it is a self-contained chess.js
      surface for offline play and analysis.
 (2.) Moves are applied to a chess.js instance held in state, with sound cues for moves, captures,
      castles, and checks, and a running move list; game-over conditions are detected locally to label

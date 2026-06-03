@@ -1,0 +1,122 @@
+/*
+(1.) This file is the SINGLE source of truth for every color value in the application. Raw
+     hex and rgba literals appear here and nowhere else; all CSS and inline styles reference
+     these tokens through var(--token), and the typed mirror in src/theme/colors.ts points at
+     these same names so TypeScript and CSS can never disagree about a color.
+(2.) Tokens are organized in two tiers. PRIMITIVES (--brand-*) are the raw palette scale and
+     carry the only literal hex/rgba in the codebase. SEMANTIC tokens (--color-*, --text-*,
+     --accent, etc.) describe intent ("surface", "danger", "accent") and are defined as
+     references to primitives, so a brand refresh changes a primitive once and propagates to
+     every component without touching component CSS.
+(3.) The legacy token names already in use (--accent, --accent-hover, --primary-dark,
+     --primary-light, --text-light, --success, --error, --board-light, --board-dark, --shadow,
+     and the layout tokens) are preserved and re-pointed at the new primitives, so the existing
+     var() references across the codebase keep working unchanged while gaining a consistent
+     backing palette.
+(4.) Alpha overlays (borders, shadows, accent glows) are tokenized too, because they were the
+     most duplicated values in the audit; centralizing them removes the largest source of
+     near-duplicate scatter and lets elevation and emphasis be tuned globally.
+
+This module is imported once at application startup before any component styles, establishing
+the cascade's root custom properties. Concentrating all color decisions here makes the design
+system auditable and themable from one place, eliminates the maintenance hazard of hex values
+copied across dozens of stylesheets, and provides the stable contract that src/theme/colors.ts
+re-exports for type-safe use in TSX inline styles and the MUI theme.
+*/
+
+:root {
+  /* ---- Primitives: brand gold ---- */
+  --brand-gold: #e5a356;
+  --brand-gold-strong: #d48d3b;
+  --brand-gold-soft: #f0b366;
+
+  /* ---- Primitives: deep navy surface scale ---- */
+  --brand-navy-950: #0d1824;
+  --brand-navy-900: #0f1419;
+  --brand-navy-800: #111a29;
+  --brand-navy-700: #16213e;
+  --brand-navy-600: #1a2332;
+  --brand-navy-550: #1a2c42;
+  --brand-navy-500: #2a4361;
+  --brand-navy-400: #32527a;
+
+  /* ---- Primitives: neutrals ---- */
+  --brand-white: #f5f5f5;
+  --brand-gray-100: #e0e0e0;
+  --brand-gray-400: #9e9e9e;
+  --brand-gray-600: #444444;
+  --brand-ink: #333333;
+
+  /* ---- Primitives: status ---- */
+  --brand-green: #4caf50;
+  --brand-green-strong: #48bb78;
+  --brand-red: #f44336;
+  --brand-red-strong: #e53e3e;
+  --brand-red-soft: #fc8181;
+  --brand-amber: #ffa500;
+  --brand-amber-soft: #ffc107;
+  --brand-blue: #3f87f5;
+
+  /* ---- Primitives: social + board ---- */
+  --brand-google: #ea4335;
+  --brand-facebook: #1877f2;
+  --brand-board-light: #f0d9b5;
+  --brand-board-dark: #b58863;
+
+  /* ---- Primitives: alpha overlays ---- */
+  --alpha-white-02: rgba(255, 255, 255, 0.02);
+  --alpha-white-05: rgba(255, 255, 255, 0.05);
+  --alpha-white-10: rgba(255, 255, 255, 0.1);
+  --alpha-white-20: rgba(255, 255, 255, 0.2);
+  --alpha-white-50: rgba(255, 255, 255, 0.5);
+  --alpha-white-70: rgba(255, 255, 255, 0.7);
+  --alpha-black-20: rgba(0, 0, 0, 0.2);
+  --alpha-black-30: rgba(0, 0, 0, 0.3);
+  --alpha-black-40: rgba(0, 0, 0, 0.4);
+  --alpha-accent-10: rgba(229, 163, 86, 0.1);
+  --alpha-accent-20: rgba(229, 163, 86, 0.2);
+  --alpha-accent-30: rgba(229, 163, 86, 0.3);
+  --alpha-surface-40: rgba(42, 67, 97, 0.4);
+
+  /* ---- Semantic: surfaces and text ---- */
+  --color-bg-deep: var(--brand-navy-900);
+  --color-bg: var(--brand-navy-800);
+  --color-surface: var(--brand-navy-600);
+  --color-surface-raised: var(--brand-navy-500);
+  --text-primary: var(--brand-white);
+  --text-muted: var(--brand-gray-400);
+
+  /* ---- Semantic: accent and status ---- */
+  --color-accent: var(--brand-gold);
+  --color-accent-strong: var(--brand-gold-strong);
+  --color-success: var(--brand-green-strong);
+  --color-danger: var(--brand-red-strong);
+  --color-warning: var(--brand-amber);
+  --color-info: var(--brand-blue);
+
+  /* ---- Semantic: borders and elevation ---- */
+  --border-subtle: var(--alpha-white-10);
+  --shadow-soft: var(--alpha-black-20);
+  --shadow-strong: var(--alpha-black-30);
+
+  /* ---- Legacy aliases (preserved for existing var() references) ---- */
+  --font-primary: 'Space Grotesk', sans-serif;
+  --primary: var(--brand-navy-550);
+  --primary-dark: var(--brand-navy-800);
+  --primary-light: var(--brand-navy-500);
+  --accent: var(--brand-gold-strong);
+  --accent-hover: var(--brand-gold);
+  --text-light: var(--brand-white);
+  --text-dark: var(--brand-ink);
+  --success: var(--brand-green);
+  --error: var(--brand-red);
+  --board-light: var(--brand-board-light);
+  --board-dark: var(--brand-board-dark);
+  --shadow: var(--alpha-black-20);
+
+  /* ---- Layout tokens ---- */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 70px;
+  --header-height: 70px;
+  --transition-speed: 0.3s;
+}

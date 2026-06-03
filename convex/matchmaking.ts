@@ -12,7 +12,7 @@ import { GameStatus, PieceColor } from './lib/domain'
      uses the `by_status_and_timeControl` index to read only waiting games of the right cadence
      and excludes the caller's own open game so a player never matches themselves.
 (2.) Because the entire find-or-create runs inside a single Convex mutation transaction, the
-     check-then-act race that the previous Supabase implementation suffered is eliminated: two
+     check-then-act race that the previous Postgres implementation suffered is eliminated: two
      players calling simultaneously cannot both claim the same open seat, since the second
      transaction observes the first's write and falls through to creating its own game.
 (3.) Joining an open game seats the caller as black, records them as the opponent, flips the

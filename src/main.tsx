@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { ConvexReactClient } from 'convex/react'
 import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react'
 import { authClient } from './lib/auth-client'
+import './styles/theme.css'
 import './index.css'
 import App from './App';
 
@@ -10,7 +11,7 @@ import App from './App';
 (1.) Instantiates the app-wide `ConvexReactClient` from `VITE_CONVEX_URL` (the deployment's
      `.convex.cloud` data origin) and mounts it together with the Better Auth client via
      `ConvexBetterAuthProvider`, which becomes the root of the React tree.
-(2.) `ConvexBetterAuthProvider` supersedes the legacy Supabase auth wiring: it injects the
+(2.) `ConvexBetterAuthProvider` supersedes the legacy Postgres auth wiring: it injects the
      authenticated Convex client into context so every descendant `useQuery`/`useMutation`
      runs as the signed-in user, and it reactively tracks auth state via the
      `api.auth.getAuthUser` query exposed in `convex/auth.ts`.
@@ -25,9 +26,9 @@ authentication layer (Better Auth) before any feature code runs, guaranteeing th
 protected routes, and data hooks downstream can assume a configured, auth-aware client.
 Keeping instantiation here — above `App` and outside React's render cycle — yields a stable
 singleton that scales cleanly as the app grows, and isolates environment wiring to one
-file so deployment changes never ripple into components. During the staged Supabase→Convex
+file so deployment changes never ripple into components. During the staged Postgres→Convex
 migration both auth systems may briefly coexist beneath this provider; later stages remove
-the Supabase provider entirely, at which point this remains the sole auth/data boundary.
+the Postgres provider entirely, at which point this remains the sole auth/data boundary.
 Assumes exactly one Convex deployment per build, identified by the Vite-injected env vars.
 */
 const convexUrl = import.meta.env.VITE_CONVEX_URL as string;

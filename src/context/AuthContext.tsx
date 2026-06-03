@@ -8,7 +8,7 @@ import { useAuthActions } from '../hooks/useAuthActions'
 (1.) Provides authentication STATE to the React tree and pairs it with the actions from
      `useAuthActions`, so consumers read `user`/`profile`/`isAuthenticated`/`loading` and call
      `signIn`/`signUp`/social/`signOut`/`updateProfile` from one `useAuth()` hook. This is the
-     Convex + Better Auth replacement for the former Supabase auth context, and no consumer
+     Convex + Better Auth replacement for the former Postgres auth context, and no consumer
      references a backend-specific symbol.
 (2.) Reactive identity comes from `useConvexAuth` (authentication and loading flags), while
      `api.auth.getAuthUser` and `api.profiles.getCurrentProfile` supply the user record and
