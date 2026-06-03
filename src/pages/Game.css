@@ -17,7 +17,7 @@
 
 .back-btn {
   background: var(--alpha-white-10);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid color-mix(in srgb, var(--brand-pure-white) 30%, transparent);
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -36,7 +36,7 @@
 }
 
 .time-control {
-  background: rgba(255, 165, 0, 0.2);
+  background: color-mix(in srgb, var(--color-warning) 20%, transparent);
   color: var(--color-warning);
   padding: 0.3rem 0.8rem;
   border-radius: 6px;
@@ -117,7 +117,7 @@
 }
 
 .move-notation {
-  color: rgba(255, 255, 255, 0.8);
+  color: color-mix(in srgb, var(--brand-pure-white) 80%, transparent);
   font-family: monospace;
   font-size: 0.9rem;
   padding: 0.2rem;
@@ -136,7 +136,7 @@
   grid-template-rows: repeat(8, 1fr);
   width: 500px;
   height: 500px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
+  border: 3px solid color-mix(in srgb, var(--brand-pure-white) 30%, transparent);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -164,7 +164,7 @@
 }
 
 .game-square.possible-move {
-  background: rgba(76, 175, 80, 0.3) !important;
+  background: color-mix(in srgb, var(--success) 30%, transparent) !important;
 }
 
 .game-piece {
@@ -181,14 +181,14 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: rgba(76, 175, 80, 0.8);
+  background: color-mix(in srgb, var(--success) 80%, transparent);
   border: 2px solid var(--success);
 }
 
 .turn-indicator {
   position: absolute;
   bottom: -50px;
-  background: rgba(76, 175, 80, 0.3);
+  background: color-mix(in srgb, var(--success) 30%, transparent);
   color: var(--success);
   padding: 0.5rem 1rem;
   border-radius: 6px;

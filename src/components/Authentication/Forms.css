@@ -19,7 +19,7 @@
 
 .form-group label {
   font-size: 0.9rem;
-  color: rgba(245, 245, 245, 0.8);
+  color: color-mix(in srgb, var(--text-primary) 80%, transparent);
 }
 
 .form-group input {
@@ -35,11 +35,12 @@
 .form-group input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(212, 141, 59, 0.3);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--color-accent-strong) 30%, transparent);
 }
 
 .form-group input::placeholder {
-  color: rgba(245, 245, 245, 0.4);
+  color: color-mix(in srgb, var(--text-primary) 40%, transparent);
 }
 
 .form-options {
@@ -61,7 +62,7 @@
 }
 
 .checkbox-label span {
-  color: rgba(245, 245, 245, 0.8);
+  color: color-mix(in srgb, var(--text-primary) 80%, transparent);
 }
 
 .forgot-password {
@@ -99,7 +100,7 @@
 
 .social-login p {
   font-size: 0.9rem;
-  color: rgba(245, 245, 245, 0.6);
+  color: color-mix(in srgb, var(--text-primary) 60%, transparent);
   margin-bottom: 1rem;
   position: relative;
 }
@@ -248,7 +249,7 @@
   right: 40px;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(212, 141, 59, 0.15);
+  background: color-mix(in srgb, var(--color-accent-strong) 15%, transparent);
   border: none;
   color: var(--accent);
   font-size: 0.8rem;
@@ -259,7 +260,7 @@
 }
 
 .password-generate-button:hover {
-  background: rgba(212, 141, 59, 0.3);
+  background: color-mix(in srgb, var(--color-accent-strong) 30%, transparent);
 }
 
 /* ===== RESPONSIVE FORM STYLES ===== */

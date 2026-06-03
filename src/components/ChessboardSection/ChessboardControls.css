@@ -29,7 +29,7 @@
   top: 46%;
   transform: translateY(-50%);
   background-color: var(--primary-light);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid color-mix(in srgb, var(--brand-pure-white) 15%, transparent);
   border-left: none;
   border-radius: 0 8px 8px 0;
   cursor: pointer;
@@ -58,11 +58,11 @@
   flex-direction: column;
   gap: 8px; /* Reduced gap */
   padding: 4px 4px;
-  background-color: rgba(29, 45, 68, 0.95);
+  background-color: color-mix(in srgb, var(--primary) 95%, transparent);
   border-radius: 0 12px 12px 0;
   box-shadow: 4px 0 20px var(--alpha-black-40);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid color-mix(in srgb, var(--brand-pure-white) 15%, transparent);
   border-left: none;
 }
 
@@ -91,7 +91,7 @@
   height: 100%;
   background: radial-gradient(
     circle at center,
-    rgba(212, 141, 59, 0.4) 0%,
+    color-mix(in srgb, var(--color-accent-strong) 40%, transparent) 0%,
     transparent 70%
   );
   opacity: 0;
@@ -110,7 +110,8 @@
 
 .control-button.active {
   background-color: var(--color-accent-strong);
-  box-shadow: 0 0 20px rgba(212, 141, 59, 0.6);
+  box-shadow: 0 0 20px
+    color-mix(in srgb, var(--color-accent-strong) 60%, transparent);
 }
 
 /* Icon adjustments */
@@ -159,13 +160,14 @@
 /* Active animation */
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(212, 141, 59, 0.7);
+    box-shadow: 0 0 0 0
+      color-mix(in srgb, var(--color-accent-strong) 70%, transparent);
   }
   70% {
-    box-shadow: 0 0 0 12px rgba(212, 141, 59, 0);
+    box-shadow: 0 0 0 12px transparent;
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(212, 141, 59, 0);
+    box-shadow: 0 0 0 0 transparent;
   }
 }
 
@@ -221,7 +223,7 @@
 
 /* Theater mode adjustments */
 .theater-mode-active .chessboard-controls {
-  background-color: rgba(13, 21, 32, 0.9);
+  background-color: color-mix(in srgb, var(--color-bg-deep) 90%, transparent);
   border-color: var(--alpha-white-20);
 }
 

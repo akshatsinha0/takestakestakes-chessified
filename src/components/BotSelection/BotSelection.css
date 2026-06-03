@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: color-mix(in srgb, var(--brand-black) 85%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -27,7 +27,7 @@
   overflow-y: auto;
   border: 2px solid var(--alpha-accent-30);
   box-shadow:
-    0 25px 50px rgba(0, 0, 0, 0.7),
+    0 25px 50px color-mix(in srgb, var(--brand-black) 70%, transparent),
     0 0 100px var(--alpha-accent-10);
   animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -148,7 +148,7 @@
 }
 
 .bot-description {
-  color: rgba(255, 255, 255, 0.6);
+  color: color-mix(in srgb, var(--brand-pure-white) 60%, transparent);
   font-size: 0.85rem;
   line-height: 1.4;
   margin: 0;
@@ -174,7 +174,7 @@
 .time-control-section {
   margin: 1.5rem 0;
   padding: 1.5rem;
-  background: rgba(42, 67, 97, 0.3);
+  background: color-mix(in srgb, var(--primary-light) 30%, transparent);
   border: 1px solid var(--alpha-white-10);
 }
 
@@ -252,12 +252,12 @@
 }
 
 .bot-selection-modal::-webkit-scrollbar-thumb {
-  background: rgba(229, 163, 86, 0.5);
+  background: color-mix(in srgb, var(--color-accent) 50%, transparent);
   border-radius: 10px;
 }
 
 .bot-selection-modal::-webkit-scrollbar-thumb:hover {
-  background: rgba(229, 163, 86, 0.7);
+  background: color-mix(in srgb, var(--color-accent) 70%, transparent);
 }
 
 /* Responsive */

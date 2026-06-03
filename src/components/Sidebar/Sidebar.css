@@ -5,7 +5,7 @@
   height: 100vh;
   width: var(--sidebar-width);
   background-color: var(--primary-dark);
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 4px 0 10px color-mix(in srgb, var(--brand-black) 10%, transparent);
   transform: translateX(-100%);
   transition: transform var(--transition-speed) ease;
   overflow-y: auto;
@@ -22,7 +22,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: color-mix(in srgb, var(--brand-black) 50%, transparent);
   opacity: 0;
   visibility: hidden;
   transition:
@@ -85,7 +85,11 @@
 }
 
 .nav-item.active a {
-  background-color: rgba(212, 141, 59, 0.2);
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-strong) 20%,
+    transparent
+  );
   border-left: 4px solid var(--accent);
 }
 
@@ -120,7 +124,7 @@
 
 .sidebar-footer p {
   font-size: 0.9rem;
-  color: rgba(245, 245, 245, 0.7);
+  color: color-mix(in srgb, var(--text-primary) 70%, transparent);
 }
 
 .sidebar-login {
@@ -136,7 +140,11 @@
 }
 
 .sidebar-login:hover {
-  background-color: rgba(212, 141, 59, 0.1);
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-strong) 10%,
+    transparent
+  );
 }
 
 @media (max-width: 768px) {

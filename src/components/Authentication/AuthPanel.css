@@ -4,7 +4,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: color-mix(in srgb, var(--brand-black) 80%, transparent);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -109,7 +109,11 @@
 }
 
 .auth-content::-webkit-scrollbar-thumb {
-  background-color: rgba(212, 141, 59, 0.5);
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-strong) 50%,
+    transparent
+  );
   border-radius: 3px;
 }
 

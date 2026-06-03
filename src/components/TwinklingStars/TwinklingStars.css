@@ -14,17 +14,18 @@
   background: var(--brand-teal);
   border-radius: 50%;
   animation: gentle-twinkle 4s infinite ease-in-out;
-  box-shadow: 0 0 3px rgba(0, 212, 170, 0.6);
+  box-shadow: 0 0 3px color-mix(in srgb, var(--brand-teal) 60%, transparent);
 }
 
 .star:nth-child(3n) {
   background: var(--brand-cyan);
-  box-shadow: 0 0 3px rgba(0, 184, 212, 0.6);
+  box-shadow: 0 0 3px color-mix(in srgb, var(--brand-cyan) 60%, transparent);
 }
 
 .star:nth-child(5n) {
   background: var(--brand-cyan-light);
-  box-shadow: 0 0 3px rgba(38, 198, 218, 0.6);
+  box-shadow: 0 0 3px
+    color-mix(in srgb, var(--brand-cyan-light) 60%, transparent);
 }
 
 .star:nth-child(7n) {

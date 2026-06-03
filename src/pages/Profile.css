@@ -32,7 +32,7 @@
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid rgba(255, 255, 255, 0.3);
+  border: 4px solid color-mix(in srgb, var(--brand-pure-white) 30%, transparent);
 }
 
 .avatar-fallback {
@@ -50,7 +50,7 @@
   color: white;
   font-size: 3rem;
   font-weight: bold;
-  border: 4px solid rgba(255, 255, 255, 0.3);
+  border: 4px solid color-mix(in srgb, var(--brand-pure-white) 30%, transparent);
 }
 
 .profile-info h2 {

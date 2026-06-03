@@ -30,14 +30,14 @@
 }
 
 .time-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: color-mix(in srgb, var(--brand-pure-white) 15%, transparent);
+  border-color: color-mix(in srgb, var(--brand-pure-white) 40%, transparent);
 }
 
 .time-btn.selected {
-  background: rgba(255, 165, 0, 0.2);
+  background: color-mix(in srgb, var(--color-warning) 20%, transparent);
   border-color: var(--color-warning);
-  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--color-warning) 30%, transparent);
 }
 
 .time-btn:disabled {
@@ -74,7 +74,7 @@
 .find-match-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, var(--brand-green), var(--success));
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 5px 15px color-mix(in srgb, var(--success) 40%, transparent);
 }
 
 .find-match-btn:disabled {
@@ -129,7 +129,7 @@
 }
 
 .cancel-search-btn {
-  background: rgba(244, 67, 54, 0.2);
+  background: color-mix(in srgb, var(--error) 20%, transparent);
   border: 2px solid var(--error);
   color: white;
   padding: 0.75rem 2rem;
@@ -141,9 +141,9 @@
 }
 
 .cancel-search-btn:hover {
-  background: rgba(244, 67, 54, 0.3);
+  background: color-mix(in srgb, var(--error) 30%, transparent);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+  box-shadow: 0 5px 15px color-mix(in srgb, var(--error) 40%, transparent);
 }
 
 @media (max-width: 768px) {

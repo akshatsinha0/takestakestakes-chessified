@@ -18,7 +18,8 @@
   border-radius: 12px;
   padding: 1.5rem;
   min-width: 300px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px
+    color-mix(in srgb, var(--brand-black) 50%, transparent);
   animation: slideIn 0.3s ease-out;
 }
 
@@ -52,7 +53,7 @@
 }
 
 .time-control {
-  background: rgba(255, 165, 0, 0.2);
+  background: color-mix(in srgb, var(--color-warning) 20%, transparent);
   color: var(--color-warning);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
@@ -66,7 +67,7 @@
 }
 
 .challenge-message {
-  color: rgba(255, 255, 255, 0.8);
+  color: color-mix(in srgb, var(--brand-pure-white) 80%, transparent);
   font-style: italic;
   font-size: 0.9rem;
 }
@@ -95,16 +96,16 @@
 .accept-btn:hover {
   background: linear-gradient(135deg, var(--brand-green), var(--success));
   transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--success) 40%, transparent);
 }
 
 .decline-btn {
-  background: rgba(244, 67, 54, 0.2);
+  background: color-mix(in srgb, var(--error) 20%, transparent);
   color: var(--error);
   border: 1px solid var(--error);
 }
 
 .decline-btn:hover {
-  background: rgba(244, 67, 54, 0.3);
+  background: color-mix(in srgb, var(--error) 30%, transparent);
   transform: translateY(-1px);
 }

@@ -2,7 +2,8 @@
   padding: 1.5rem;
   background-color: var(--primary);
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px
+    color-mix(in srgb, var(--brand-black) 15%, transparent);
   color: var(--text-light);
   width: 100%;
   max-width: 100%;
@@ -69,7 +70,7 @@
 .option-content p {
   font-size: 0.9rem;
   margin: 0;
-  color: rgba(255, 255, 255, 0.8);
+  color: color-mix(in srgb, var(--brand-pure-white) 80%, transparent);
 }
 
 @media (max-width: 768px) {
@@ -117,7 +118,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(10, 18, 30, 0.75);
+  background: color-mix(in srgb, var(--color-bg-deep) 75%, transparent);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -127,7 +128,7 @@
 .time-modal {
   background: var(--primary);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--brand-black) 35%, transparent);
   padding: 2rem 2.5rem 1.5rem 2.5rem;
   min-width: 340px;
   max-width: 95vw;
@@ -188,7 +189,7 @@
   font-weight: 500;
   background: var(--primary-light);
   color: var(--text-light);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--brand-black) 8%, transparent);
   cursor: pointer;
   display: flex;
   flex-direction: column;

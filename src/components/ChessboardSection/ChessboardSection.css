@@ -141,7 +141,8 @@
   background-color: var(--primary-dark);
   padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 0 20px
+    color-mix(in srgb, var(--brand-black) 60%, transparent);
 }
 
 /* ===== GAME OPTIONS ===== */
@@ -165,7 +166,8 @@
   color: var(--text-primary);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(140, 10, 26, 0.3);
+  box-shadow: 0 4px 20px
+    color-mix(in srgb, var(--color-danger) 30%, transparent);
   display: flex;
   flex-direction: column;
 }

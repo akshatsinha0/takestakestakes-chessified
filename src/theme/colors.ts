@@ -11,7 +11,7 @@
      string, catching typos that raw hex or free-form var() strings would not.
 
 This module is the TypeScript half of the color system. Inline styles use `colors.accent`
-instead of `'#e5a356'`, and a MUI theme can be assembled from these pointers so Material
+instead of a raw hex literal, and a MUI theme can be assembled from these pointers so Material
 components share the same palette as hand-written CSS. Because every entry resolves to a CSS
 custom property, theming, dark/light variants, and runtime adjustments remain controllable from
 theme.css without recompiling, while TSX retains full type safety over the available tokens.

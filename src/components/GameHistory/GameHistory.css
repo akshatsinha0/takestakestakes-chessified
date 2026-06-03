@@ -6,7 +6,7 @@
   bottom: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.85);
+  background: color-mix(in srgb, var(--brand-black) 85%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,7 +30,7 @@
   max-height: 600px;
   border: 2px solid var(--alpha-accent-30);
   box-shadow:
-    0 25px 50px rgba(0, 0, 0, 0.7),
+    0 25px 50px color-mix(in srgb, var(--brand-black) 70%, transparent),
     0 0 100px var(--alpha-accent-10);
   display: flex;
   flex-direction: column;
@@ -149,25 +149,25 @@
 }
 
 .result.win {
-  background: rgba(76, 175, 80, 0.3);
+  background: color-mix(in srgb, var(--success) 30%, transparent);
   color: var(--success);
   border: 1px solid var(--success);
 }
 
 .result.loss {
-  background: rgba(244, 67, 54, 0.3);
+  background: color-mix(in srgb, var(--error) 30%, transparent);
   color: var(--error);
   border: 1px solid var(--error);
 }
 
 .result.draw {
-  background: rgba(158, 158, 158, 0.3);
+  background: color-mix(in srgb, var(--brand-gray-300) 30%, transparent);
   color: var(--brand-gray-300);
   border: 1px solid var(--brand-gray-300);
 }
 
 .result.abandoned {
-  background: rgba(255, 152, 0, 0.3);
+  background: color-mix(in srgb, var(--color-warning) 30%, transparent);
   color: var(--color-warning);
   border: 1px solid var(--color-warning);
 }
@@ -179,7 +179,7 @@
 }
 
 .date {
-  color: rgba(255, 255, 255, 0.6);
+  color: color-mix(in srgb, var(--brand-pure-white) 60%, transparent);
   font-size: 0.8rem;
 }
 
@@ -193,7 +193,7 @@
 }
 
 .games-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
+  background: color-mix(in srgb, var(--brand-pure-white) 30%, transparent);
   border-radius: 4px;
 }
 

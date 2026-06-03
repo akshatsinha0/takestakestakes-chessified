@@ -103,13 +103,16 @@ body {
 
 @keyframes glow {
   0% {
-    box-shadow: 0 0 15px rgba(212, 141, 59, 0.5);
+    box-shadow: 0 0 15px
+      color-mix(in srgb, var(--color-accent-strong) 50%, transparent);
   }
   50% {
-    box-shadow: 0 0 30px rgba(212, 141, 59, 0.8);
+    box-shadow: 0 0 30px
+      color-mix(in srgb, var(--color-accent-strong) 80%, transparent);
   }
   100% {
-    box-shadow: 0 0 15px rgba(212, 141, 59, 0.5);
+    box-shadow: 0 0 15px
+      color-mix(in srgb, var(--color-accent-strong) 50%, transparent);
   }
 }
 

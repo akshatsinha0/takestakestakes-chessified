@@ -34,7 +34,7 @@
   height: 20px;
   border-radius: 50%;
   background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid color-mix(in srgb, var(--brand-pure-white) 30%, transparent);
   color: var(--brand-gray-500);
   font-size: 12px;
   cursor: pointer;
@@ -108,8 +108,8 @@
 }
 
 .move.active {
-  background-color: rgba(76, 175, 80, 0.15);
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  background-color: color-mix(in srgb, var(--success) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
 }
 
 .move.white {
@@ -175,18 +175,22 @@
 
 .action-button.like:hover {
   color: var(--success);
-  border-color: rgba(76, 175, 80, 0.3);
+  border-color: color-mix(in srgb, var(--success) 30%, transparent);
 }
 
 .action-button.dislike:hover {
   color: var(--error);
-  border-color: rgba(244, 67, 54, 0.3);
+  border-color: color-mix(in srgb, var(--error) 30%, transparent);
 }
 
 /* Animation for new moves */
 @keyframes highlightNew {
   0% {
-    background-color: rgba(255, 215, 0, 0.2);
+    background-color: color-mix(
+      in srgb,
+      var(--brand-gold-soft) 20%,
+      transparent
+    );
   }
   100% {
     background-color: var(--alpha-white-05);

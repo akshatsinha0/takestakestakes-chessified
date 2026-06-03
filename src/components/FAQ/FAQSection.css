@@ -30,11 +30,11 @@
   border-radius: 12px;
   margin-bottom: 1.5rem;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px color-mix(in srgb, var(--brand-black) 10%, transparent);
 }
 
 .faq-item.open {
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--brand-pure-white) 8%, transparent);
   transform: translateY(-3px);
   box-shadow: 0 8px 15px var(--shadow-soft);
 }
@@ -103,7 +103,7 @@
 .answer-content {
   padding: 0 1.5rem 1.5rem;
   position: relative;
-  color: rgba(240, 217, 181, 0.9);
+  color: color-mix(in srgb, var(--board-light) 90%, transparent);
   line-height: 1.6;
 }
 
