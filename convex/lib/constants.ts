@@ -35,3 +35,15 @@ export const DEFAULT_BIO = ''
 export const INVITATION_TTL_MS = 5 * 60 * 1000
 
 export const SECONDS_PER_MINUTE = 60
+
+export const ELO_K_FACTOR = 32
+
+export const ELO_DIVISOR = 400
+
+export const SCORE_WIN = 1
+
+export const SCORE_DRAW = 0.5
+
+export const SCORE_LOSS = 0
+
+export const ONLINE_THRESHOLD_MS = 2 * 60 * 1000

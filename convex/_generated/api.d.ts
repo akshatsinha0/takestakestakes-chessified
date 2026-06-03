@@ -9,13 +9,23 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as challenges from "../challenges.js";
+import type * as friends from "../friends.js";
+import type * as games from "../games.js";
 import type * as http from "../http.js";
 import type * as lib_constants from "../lib/constants.js";
 import type * as lib_domain from "../lib/domain.js";
+import type * as lib_elo from "../lib/elo.js";
 import type * as lib_functions from "../lib/functions.js";
+import type * as lib_gameFactory from "../lib/gameFactory.js";
 import type * as lib_identity from "../lib/identity.js";
 import type * as lib_tables from "../lib/tables.js";
+import type * as lib_time from "../lib/time.js";
+import type * as matchmaking from "../matchmaking.js";
+import type * as moves from "../moves.js";
+import type * as presence from "../presence.js";
 import type * as profiles from "../profiles.js";
+import type * as stats from "../stats.js";
 
 import type {
   ApiFromModules,
@@ -25,13 +35,23 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  challenges: typeof challenges;
+  friends: typeof friends;
+  games: typeof games;
   http: typeof http;
   "lib/constants": typeof lib_constants;
   "lib/domain": typeof lib_domain;
+  "lib/elo": typeof lib_elo;
   "lib/functions": typeof lib_functions;
+  "lib/gameFactory": typeof lib_gameFactory;
   "lib/identity": typeof lib_identity;
   "lib/tables": typeof lib_tables;
+  "lib/time": typeof lib_time;
+  matchmaking: typeof matchmaking;
+  moves: typeof moves;
+  presence: typeof presence;
   profiles: typeof profiles;
+  stats: typeof stats;
 }>;
 
 /**
