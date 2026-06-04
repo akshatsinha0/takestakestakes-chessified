@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import { DEFAULT_RATING } from '../../../convex/lib/constants'
 import { useQuery, useMutation } from 'convex/react'
 import { toast } from 'react-toastify'
@@ -24,7 +23,6 @@ resolution and game creation consistent regardless of which UI the player acts f
 
 const ChallengeNotification = () => {
   const { isAuthenticated } = useAuth()
-  const navigate = useNavigate()
   const challenges =
     useQuery(api.challenges.inbox, isAuthenticated ? {} : 'skip') ?? []
   const acceptChallenge = useMutation(api.challenges.accept)
@@ -32,9 +30,8 @@ const ChallengeNotification = () => {
 
   const handleAccept = async (invitationId: Id<'gameInvitations'>) => {
     try {
-      const gameId = await acceptChallenge({ invitationId })
+      await acceptChallenge({ invitationId })
       toast.success('Challenge accepted! Game starting...')
-      navigate(`/game/${gameId}`)
     } catch {
       toast.error('Failed to accept challenge')
     }

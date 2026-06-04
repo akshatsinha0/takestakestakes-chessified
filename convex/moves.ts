@@ -53,13 +53,13 @@ export const make = zMutation({
     if (game === null) {
       throw new ConvexError({ code: 'NOT_FOUND', message: 'Game not found.' })
     }
-    if (game.status !== GameStatus.InProgress) {
+    if (game.status !== GameStatus.IN_PROGRESS) {
       throw new ConvexError({
         code: 'GAME_NOT_ACTIVE',
         message: 'This game is not in progress.',
       })
     }
-    const moverIsWhite = game.currentTurn === PieceColor.White
+    const moverIsWhite = game.currentTurn === PieceColor.WHITE
     const moverId = moverIsWhite ? game.whitePlayerId : game.blackPlayerId
     if (moverId !== userId) {
       throw new ConvexError({
@@ -96,7 +96,7 @@ export const make = zMutation({
 
     await ctx.db.patch(args.gameId, {
       boardState: args.fen,
-      currentTurn: moverIsWhite ? PieceColor.Black : PieceColor.White,
+      currentTurn: moverIsWhite ? PieceColor.BLACK : PieceColor.WHITE,
       turnStartedAt: now,
       whiteTimeRemaining: moverIsWhite ? newRemaining : game.whiteTimeRemaining,
       blackTimeRemaining: moverIsWhite ? game.blackTimeRemaining : newRemaining,

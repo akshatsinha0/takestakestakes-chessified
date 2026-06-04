@@ -39,7 +39,7 @@ export const completeGame = zMutation({
   handler: async (ctx, args) => {
     const userId = await requireAuthUserId(ctx)
     const game = await ctx.db.get(args.gameId)
-    if (game === null || game.status !== GameStatus.InProgress) {
+    if (game === null || game.status !== GameStatus.IN_PROGRESS) {
       throw new ConvexError({
         code: 'GAME_NOT_ACTIVE',
         message: 'This game cannot be completed.',

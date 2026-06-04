@@ -19,7 +19,6 @@ const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Profile = lazy(() => import('./pages/Profile'))
 const MyAccount = lazy(() => import('./pages/MyAccount'))
 const Settings = lazy(() => import('./pages/Settings'))
-const Game = lazy(() => import('./pages/Game'))
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
@@ -153,15 +152,6 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Settings />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path='/game/:gameId'
-            element={
-              <ProtectedRoute>
-                <Game />
               </ProtectedRoute>
             }
           />

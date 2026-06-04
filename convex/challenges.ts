@@ -45,7 +45,7 @@ export const send = zMutation({
       toUserId: args.toUserId,
       timeControl: args.timeControl,
       message: args.message,
-      status: RequestStatus.Pending,
+      status: RequestStatus.PENDING,
       expiresAt: Date.now() + INVITATION_TTL_MS,
     })
   },
@@ -62,7 +62,7 @@ export const inbox = zQuery({
       .collect()
     const pending = invitations.filter(
       (invitation) =>
-        invitation.status === RequestStatus.Pending &&
+        invitation.status === RequestStatus.PENDING &&
         invitation.expiresAt > now,
     )
     return await Promise.all(
@@ -102,7 +102,7 @@ export const accept = zMutation({
       args.invitationId,
       userId,
     )
-    await ctx.db.patch(invitation._id, { status: RequestStatus.Accepted })
+    await ctx.db.patch(invitation._id, { status: RequestStatus.ACCEPTED })
     return await ctx.db.insert(
       'games',
       buildActiveGame(
@@ -125,7 +125,7 @@ export const decline = zMutation({
       args.invitationId,
       userId,
     )
-    await ctx.db.patch(invitation._id, { status: RequestStatus.Declined })
+    await ctx.db.patch(invitation._id, { status: RequestStatus.DECLINED })
     return null
   },
 })

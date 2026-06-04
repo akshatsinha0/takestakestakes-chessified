@@ -133,13 +133,12 @@ const Header: React.FC = () => {
     const invitation = notification.data.invitation
     if (!invitation) return
     try {
-      const gameId = await acceptChallengeMutation({
+      await acceptChallengeMutation({
         invitationId: invitation._id,
       })
       removeNotification(notification.id)
       setNotificationDropdownOpen(false)
       toast.success('Game started!')
-      navigate(`/game/${gameId}`)
     } catch {
       toast.error('Failed to accept challenge')
     }

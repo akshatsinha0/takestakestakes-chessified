@@ -3,7 +3,7 @@ import { z } from 'zod'
 /*
 (1.) This module is the ONLY location in the entire codebase where the categorical string
      literals of the chess domain are written. Every status, color, result, and request
-     state is declared once as a frozen named object (e.g. `GameStatus.Waiting`), so all
+     state is declared once as a frozen named object (e.g. `GameStatus.WAITING`), so all
      other code, on both the Convex backend and the React frontend, references a named
      member and never an inline string. Hardcoded literals such as 'waiting' or 'white'
      appearing anywhere else are by definition a defect.
@@ -16,7 +16,7 @@ import { z } from 'zod'
      ergonomic value accessors at once.
 (3.) A value and a type intentionally share each name (e.g. `PieceColor` the object and
      `PieceColor` the type) because they occupy different declaration spaces; call sites use
-     `PieceColor.White` for the value and `PieceColor` for annotations without ambiguity.
+     `PieceColor.WHITE` for the value and `PieceColor` for annotations without ambiguity.
 (4.) The file imports only `zod`, which is environment-neutral, so it is safe to import from
      server functions, the Convex schema, and browser components alike without dragging any
      server-only dependency into the client bundle.
@@ -32,35 +32,35 @@ context.
 */
 
 export const PieceColor = {
-  White: 'white',
-  Black: 'black',
+  WHITE: 'white',
+  BLACK: 'black',
 } as const
 
 export const GameStatus = {
-  Waiting: 'waiting',
-  InProgress: 'in_progress',
-  Completed: 'completed',
-  Abandoned: 'abandoned',
+  WAITING: 'waiting',
+  IN_PROGRESS: 'in_progress',
+  COMPLETED: 'completed',
+  ABANDONED: 'abandoned',
 } as const
 
 export const GameResult = {
-  WhiteWins: 'white_wins',
-  BlackWins: 'black_wins',
-  Draw: 'draw',
-  Abandoned: 'abandoned',
+  WHITE_WINS: 'white_wins',
+  BLACK_WINS: 'black_wins',
+  DRAW: 'draw',
+  ABANDONED: 'abandoned',
 } as const
 
 export const RequestStatus = {
-  Pending: 'pending',
-  Accepted: 'accepted',
-  Declined: 'declined',
-  Expired: 'expired',
+  PENDING: 'pending',
+  ACCEPTED: 'accepted',
+  DECLINED: 'declined',
+  EXPIRED: 'expired',
 } as const
 
 export const FriendStatus = {
-  Pending: 'pending',
-  Accepted: 'accepted',
-  Rejected: 'rejected',
+  PENDING: 'pending',
+  ACCEPTED: 'accepted',
+  REJECTED: 'rejected',
 } as const
 
 const valuesOf = <T extends Record<string, string>>(

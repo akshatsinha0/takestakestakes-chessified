@@ -70,7 +70,7 @@ export const request = zMutation({
     return await ctx.db.insert('friendRequests', {
       senderId,
       receiverId: args.receiverId,
-      status: FriendStatus.Pending,
+      status: FriendStatus.PENDING,
     })
   },
 })
@@ -88,7 +88,7 @@ export const respond = zMutation({
       })
     }
     await ctx.db.patch(friendRequest._id, {
-      status: args.accept ? FriendStatus.Accepted : FriendStatus.Rejected,
+      status: args.accept ? FriendStatus.ACCEPTED : FriendStatus.REJECTED,
     })
     return null
   },
@@ -103,7 +103,7 @@ export const incomingRequests = zQuery({
       .withIndex('by_receiverId', (q) => q.eq('receiverId', me))
       .collect()
     const pending = received.filter(
-      (edge) => edge.status === FriendStatus.Pending,
+      (edge) => edge.status === FriendStatus.PENDING,
     )
     return await Promise.all(
       pending.map(async (edge) => {
@@ -143,7 +143,7 @@ export const list = zQuery({
       .withIndex('by_receiverId', (q) => q.eq('receiverId', me))
       .collect()
     const accepted = [...sent, ...received].filter(
-      (edge) => edge.status === FriendStatus.Accepted,
+      (edge) => edge.status === FriendStatus.ACCEPTED,
     )
     return await Promise.all(
       accepted.map(async (edge) => {

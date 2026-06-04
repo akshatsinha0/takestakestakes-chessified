@@ -40,7 +40,7 @@ export const quickMatch = zMutation({
     const waitingGames = await ctx.db
       .query('games')
       .withIndex('by_status_and_timeControl', (q) =>
-        q.eq('status', GameStatus.Waiting).eq('timeControl', args.timeControl),
+        q.eq('status', GameStatus.WAITING).eq('timeControl', args.timeControl),
       )
       .collect()
     const openGame = waitingGames.find(
@@ -51,7 +51,7 @@ export const quickMatch = zMutation({
       await ctx.db.patch(openGame._id, {
         blackPlayerId: userId,
         opponentId: userId,
-        status: GameStatus.InProgress,
+        status: GameStatus.IN_PROGRESS,
         turnStartedAt: now,
       })
       return openGame._id
@@ -65,12 +65,12 @@ export const quickMatch = zMutation({
       whitePlayerId: userId,
       blackPlayerId: null,
       opponentId: null,
-      status: GameStatus.Waiting,
+      status: GameStatus.WAITING,
       result: null,
       winnerId: null,
       timeControl: args.timeControl,
       boardState: INITIAL_FEN,
-      currentTurn: PieceColor.White,
+      currentTurn: PieceColor.WHITE,
       whiteTimeRemaining: initialSeconds,
       blackTimeRemaining: initialSeconds,
       increment: incrementSeconds,
@@ -90,7 +90,7 @@ export const leaveQueue = zMutation({
       .withIndex('by_whitePlayerId', (q) => q.eq('whitePlayerId', userId))
       .collect()
     for (const game of myWaitingGames) {
-      if (game.status === GameStatus.Waiting && game.blackPlayerId === null) {
+      if (game.status === GameStatus.WAITING && game.blackPlayerId === null) {
         await ctx.db.delete(game._id)
       }
     }

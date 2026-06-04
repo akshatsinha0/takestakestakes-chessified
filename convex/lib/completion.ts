@@ -26,8 +26,8 @@ bookkeeping, and the shared-transaction design is what makes move-and-complete a
 */
 
 const scoreForWhite = (result: GameResult): number => {
-  if (result === GameResult.WhiteWins) return SCORE_WIN
-  if (result === GameResult.BlackWins) return SCORE_LOSS
+  if (result === GameResult.WHITE_WINS) return SCORE_WIN
+  if (result === GameResult.BLACK_WINS) return SCORE_LOSS
   return SCORE_DRAW
 }
 
@@ -96,14 +96,14 @@ export const finalizeGame = async (
   const blackRating = blackProfile?.rating ?? DEFAULT_RATING
 
   const winnerId =
-    result === GameResult.WhiteWins
+    result === GameResult.WHITE_WINS
       ? whiteId
-      : result === GameResult.BlackWins
+      : result === GameResult.BLACK_WINS
         ? blackId
         : null
 
   await ctx.db.patch(game._id, {
-    status: GameStatus.Completed,
+    status: GameStatus.COMPLETED,
     result,
     winnerId,
     finishedAt: Date.now(),
@@ -114,7 +114,7 @@ export const finalizeGame = async (
       ctx,
       whiteId,
       computeNewRating(whiteRating, blackRating, whiteScore),
-      result === GameResult.WhiteWins,
+      result === GameResult.WHITE_WINS,
     )
   }
   if (blackId !== null) {
@@ -122,7 +122,7 @@ export const finalizeGame = async (
       ctx,
       blackId,
       computeNewRating(blackRating, whiteRating, SCORE_WIN - whiteScore),
-      result === GameResult.BlackWins,
+      result === GameResult.BLACK_WINS,
     )
   }
 }

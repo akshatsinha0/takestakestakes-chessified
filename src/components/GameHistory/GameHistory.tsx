@@ -41,13 +41,13 @@ const GameHistory = ({ onClose }: { onClose: () => void }) => {
       return ''
     }
     const isWhite = game.whitePlayerId === user.id
-    if (game.result === GameResult.Draw) {
+    if (game.result === GameResult.DRAW) {
       return 'Draw'
     }
-    if (game.result === GameResult.WhiteWins) {
+    if (game.result === GameResult.WHITE_WINS) {
       return isWhite ? 'Win' : 'Loss'
     }
-    if (game.result === GameResult.BlackWins) {
+    if (game.result === GameResult.BLACK_WINS) {
       return isWhite ? 'Loss' : 'Win'
     }
     return 'Abandoned'

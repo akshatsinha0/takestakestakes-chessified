@@ -100,7 +100,7 @@ const UserProfile = ({ userId, onClose }: UserProfileProps) => {
         </button>
       )
     }
-    if (relationship.status === FriendStatus.Accepted) {
+    if (relationship.status === FriendStatus.ACCEPTED) {
       return (
         <button
           className='action-btn remove-friend-btn'
@@ -110,7 +110,7 @@ const UserProfile = ({ userId, onClose }: UserProfileProps) => {
         </button>
       )
     }
-    if (relationship.status === FriendStatus.Pending) {
+    if (relationship.status === FriendStatus.PENDING) {
       const sentByMe = relationship.senderId === user?.id
       return (
         <button

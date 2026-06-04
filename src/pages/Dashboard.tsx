@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 import DashboardLayout from '../components/DashboardLayout/DashboardLayout'
 import Header from '../components/Header/Header'
 import ChessboardSection from '../components/ChessboardSection/ChessboardSection'
@@ -6,11 +8,14 @@ import GameOptions from '../components/GameOptions/GameOptions'
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification'
 import { useAuth } from '../context/AuthContext'
 import { useUserPresence } from '../hooks/useUserPresence'
-import { useActiveGameRedirect } from '../hooks/useActiveGameRedirect'
 import './Dashboard.css'
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth()
+  // When an online game is active, the board takes over the dashboard and the
+  // play options / challenge banner are hidden so play happens in place.
+  const currentGame = useQuery(api.games.currentForUser, user ? {} : 'skip')
+  const inGame = Boolean(currentGame)
   const [playYourselfMode, setPlayYourselfMode] = useState(false)
   const [playBotMode, setPlayBotMode] = useState(false)
   const [selectedBot, setSelectedBot] = useState<any>(null)
@@ -18,8 +23,6 @@ const Dashboard: React.FC = () => {
 
   // Track user presence
   useUserPresence(user?.id)
-  // Join a game the moment a sent challenge is accepted (or matchmaking pairs).
-  useActiveGameRedirect(Boolean(user))
 
   const handlePlayYourself = () => setPlayYourselfMode(true)
   const handleExitPlayYourself = () => setPlayYourselfMode(false)
@@ -39,7 +42,7 @@ const Dashboard: React.FC = () => {
   return (
     <DashboardLayout>
       <Header />
-      <ChallengeNotification />
+      {!inGame && <ChallengeNotification />}
       <div className='dashboard-content'>
         <ChessboardSection
           playYourselfMode={playYourselfMode}
@@ -49,10 +52,12 @@ const Dashboard: React.FC = () => {
           botTimeControl={botTimeControl}
           onExitBotMode={handleExitBotMode}
         />
-        <GameOptions
-          onPlayYourself={handlePlayYourself}
-          onPlayBot={handlePlayBot}
-        />
+        {!inGame && (
+          <GameOptions
+            onPlayYourself={handlePlayYourself}
+            onPlayBot={handlePlayBot}
+          />
+        )}
       </div>
     </DashboardLayout>
   )

@@ -4,6 +4,7 @@ import { zQuery, zMutation } from './lib/functions'
 import { requireAuthUserId } from './lib/identity'
 import { buildActiveGame } from './lib/gameFactory'
 import { GameStatus } from './lib/domain'
+import { RESULT_LINGER_MS } from './lib/constants'
 import type { QueryCtx } from './_generated/server'
 
 /*
@@ -89,8 +90,8 @@ export const activeForUser = zQuery({
     const games = await gamesForPlayer(ctx, userId)
     return games.filter(
       (game) =>
-        game.status === GameStatus.Waiting ||
-        game.status === GameStatus.InProgress,
+        game.status === GameStatus.WAITING ||
+        game.status === GameStatus.IN_PROGRESS,
     )
   },
 })
@@ -100,7 +101,39 @@ export const historyForUser = zQuery({
   handler: async (ctx, args) => {
     const games = await gamesForPlayer(ctx, args.userId)
     return games
-      .filter((game) => game.status === GameStatus.Completed)
+      .filter((game) => game.status === GameStatus.COMPLETED)
       .toSorted((first, second) => second._creationTime - first._creationTime)
+  },
+})
+
+// The caller's single board to show on the dashboard: their in-progress game,
+// or a game that finished within the linger window so the result stays visible
+// briefly before the board reverts. Returns the full composite or null.
+export const currentForUser = zQuery({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await requireAuthUserId(ctx)
+    const games = await gamesForPlayer(ctx, userId)
+    const lingerCutoff = Date.now() - RESULT_LINGER_MS
+    const relevant = games
+      .filter(
+        (game) =>
+          game.status === GameStatus.IN_PROGRESS ||
+          (game.status === GameStatus.COMPLETED &&
+            game.finishedAt !== null &&
+            game.finishedAt > lingerCutoff),
+      )
+      .toSorted((first, second) => second._creationTime - first._creationTime)
+    const active = relevant[0]
+    if (active === undefined) {
+      return null
+    }
+    const moves = await ctx.db
+      .query('moves')
+      .withIndex('by_game', (q) => q.eq('gameId', active._id))
+      .collect()
+    const whitePlayer = await loadPlayer(ctx, active.whitePlayerId)
+    const blackPlayer = await loadPlayer(ctx, active.blackPlayerId)
+    return { game: active, moves, whitePlayer, blackPlayer }
   },
 })

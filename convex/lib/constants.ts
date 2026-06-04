@@ -47,3 +47,5 @@ export const SCORE_DRAW = 0.5
 export const SCORE_LOSS = 0
 
 export const ONLINE_THRESHOLD_MS = 2 * 60 * 1000
+
+export const RESULT_LINGER_MS = 20 * 1000

@@ -1,54 +1,33 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useMutation, useQuery } from 'convex/react'
+import { useState } from 'react'
+import { useMutation } from 'convex/react'
 import { toast } from 'react-toastify'
 import { api } from '../../../convex/_generated/api'
-import type { Id } from '../../../convex/_generated/dataModel'
-import { GameStatus } from '../../../convex/lib/domain'
 import { useAuth } from '../../context/AuthContext'
 import { TIME_CONTROLS } from '../../lib/gameConfig'
 import './QuickMatch.css'
 
 /*
 (1.) Drives quick matchmaking through the Convex `matchmaking.quickMatch` mutation, which either
-     joins an existing waiting game or opens a new one and returns its id. The component then watches
-     that game with a reactive `games.get` query and navigates to the board the instant the game
-     becomes in progress, replacing the former realtime channel subscription.
-(2.) Because `quickMatch` is transactional, an immediate pairing returns an already in-progress game
-     so the watch fires and navigates at once, while an unmatched search returns a waiting game and
-     the same watch transitions to navigation automatically when an opponent later joins, with no
-     polling or manual subscription teardown.
-(3.) `cancelSearch` calls `leaveQueue`, which removes the caller's still-waiting game, so abandoning a
-     search leaves no orphaned game; the watch query is skipped until a search id exists, so an idle
-     component issues no reads.
+     joins an existing waiting game or opens a new one. It does not navigate: when a match becomes
+     active, the dashboard's in-place board (driven by `games.currentForUser`) takes over the screen,
+     so play happens on the dashboard rather than a separate page.
+(2.) `findMatch` enters a searching state while waiting for an opponent; an immediate pairing makes the
+     board appear at once, while an unmatched search waits until another player joins, both surfaced by
+     the dashboard board reactively with no polling here.
+(3.) `cancelSearch` calls `leaveQueue`, which removes the caller's still-waiting game so abandoning a
+     search leaves no orphan.
 
-This component is the lobby entry point for ranked play. Expressing "search" as create-or-join plus a
-reactive watch removes the bespoke subscription and immediate-match probing the previous version
-needed, and it leans on Convex reactivity so the move from searching to playing is driven by data
-changes rather than client coordination.
+This component is the ranked-play entry point. Reducing it to create-or-join plus a local searching
+flag keeps it focused; the transition from searching to playing is owned by the dashboard board reading
+the single current-game query, not by navigation or a bespoke watch.
 */
 
 const QuickMatch = () => {
   const { user } = useAuth()
-  const navigate = useNavigate()
   const quickMatch = useMutation(api.matchmaking.quickMatch)
   const leaveQueue = useMutation(api.matchmaking.leaveQueue)
   const [selectedTime, setSelectedTime] = useState('5+0')
-  const [searchingGameId, setSearchingGameId] = useState<Id<'games'> | null>(
-    null,
-  )
-
-  const watchedGame = useQuery(
-    api.games.get,
-    searchingGameId ? { gameId: searchingGameId } : 'skip',
-  )
-
-  useEffect(() => {
-    if (watchedGame && watchedGame.game.status === GameStatus.InProgress) {
-      toast.success('Match found! Starting game...')
-      navigate(`/game/${watchedGame.game._id}`)
-    }
-  }, [watchedGame, navigate])
+  const [searching, setSearching] = useState(false)
 
   const findMatch = async () => {
     if (!user) {
@@ -56,8 +35,8 @@ const QuickMatch = () => {
       return
     }
     try {
-      const gameId = await quickMatch({ timeControl: selectedTime })
-      setSearchingGameId(gameId)
+      await quickMatch({ timeControl: selectedTime })
+      setSearching(true)
     } catch {
       toast.error('Failed to find match')
     }
@@ -65,11 +44,9 @@ const QuickMatch = () => {
 
   const cancelSearch = async () => {
     await leaveQueue({})
-    setSearchingGameId(null)
+    setSearching(false)
     toast.info('Search cancelled')
   }
-
-  const searching = searchingGameId !== null
 
   return (
     <div className='quick-match'>

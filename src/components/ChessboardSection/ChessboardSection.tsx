@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
+import { useQuery } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
 import { useAuth } from '../../context/AuthContext'
 import ChessboardControls from './ChessboardControls'
+import MultiplayerBoard from './MultiplayerBoard'
 import useChessSounds from '../../hooks/useChessSounds'
 import { DEFAULT_RATING } from '../../../convex/lib/constants'
 import { BOT_MOVE_DELAY_MS, BOT_RATING_TIERS } from '../../lib/gameConfig'
@@ -70,7 +73,8 @@ const ChessboardSection = ({
   botTimeControl,
   onExitBotMode,
 }: ChessboardSectionProps) => {
-  const { profile } = useAuth()
+  const { user, profile } = useAuth()
+  const currentGame = useQuery(api.games.currentForUser, user ? {} : 'skip')
   const [game, setGame] = useState(() => new Chess())
   const [moves, setMoves] = useState<string[]>([])
   const [isBoardFlipped, setIsBoardFlipped] = useState(false)
@@ -169,6 +173,11 @@ const ChessboardSection = ({
     if (playBotMode && onExitBotMode) {
       onExitBotMode()
     }
+  }
+
+  // An active online game takes over the board in place; otherwise local play.
+  if (currentGame) {
+    return <MultiplayerBoard data={currentGame} />
   }
 
   const opponentName = playBotMode ? (selectedBot?.name ?? 'Bot') : 'You'
