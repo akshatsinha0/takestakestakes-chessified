@@ -3,6 +3,7 @@ import { useQuery } from 'convex/react'
 import { Chess } from 'chess.js'
 import { api } from '../../../convex/_generated/api'
 import type { Doc } from '../../../convex/_generated/dataModel'
+import { PIECE_SYMBOLS } from '../../lib/gameConfig'
 import './GameViewer.css'
 
 /*
@@ -20,21 +21,6 @@ This component is a self-contained game review. Sourcing moves from a query keye
 the only input it needs is the game document, and replaying from SAN keeps the reconstruction
 authoritative against the stored notation without depending on any per-move board snapshots.
 */
-
-const PIECE_SYMBOLS: Record<string, string> = {
-  wp: '♙',
-  wr: '♖',
-  wn: '♘',
-  wb: '♗',
-  wq: '♕',
-  wk: '♔',
-  bp: '♟',
-  br: '♜',
-  bn: '♞',
-  bb: '♝',
-  bq: '♛',
-  bk: '♚',
-}
 
 const GameViewer = ({
   game,

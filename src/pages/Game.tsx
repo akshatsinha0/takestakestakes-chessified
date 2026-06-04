@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { DEFAULT_RATING } from '../../convex/lib/constants'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from 'convex/react'
 import { Chess, type Square } from 'chess.js'
@@ -6,6 +7,7 @@ import { api } from '../../convex/_generated/api'
 import type { Id } from '../../convex/_generated/dataModel'
 import { PieceColor, GameStatus } from '../../convex/lib/domain'
 import { useAuth } from '../context/AuthContext'
+import { PIECE_SYMBOLS } from '../lib/gameConfig'
 import './Game.css'
 
 /*
@@ -28,21 +30,6 @@ moves through a single transactional mutation gives consistent multiplayer sync 
 keeping the clock display local while the debit stays server-side avoids write amplification without
 sacrificing an authoritative timer.
 */
-
-const PIECE_SYMBOLS: Record<string, string> = {
-  wp: '♙',
-  wr: '♖',
-  wn: '♘',
-  wb: '♗',
-  wq: '♕',
-  wk: '♔',
-  bp: '♟',
-  br: '♜',
-  bn: '♞',
-  bb: '♝',
-  bq: '♛',
-  bk: '♚',
-}
 
 const formatClock = (seconds: number): string => {
   const safe = Math.max(0, seconds)
@@ -149,7 +136,9 @@ const Game = () => {
             <div className='player-name'>
               {blackPlayer?.username ?? 'Waiting...'}
             </div>
-            <div className='player-rating'>({blackPlayer?.rating ?? 1200})</div>
+            <div className='player-rating'>
+              ({blackPlayer?.rating ?? DEFAULT_RATING})
+            </div>
             <div className='player-time'>{formatClock(liveBlack)}</div>
           </div>
           <div className='move-history'>
@@ -167,7 +156,9 @@ const Game = () => {
             <div className='player-name'>
               {whitePlayer?.username ?? 'Waiting...'}
             </div>
-            <div className='player-rating'>({whitePlayer?.rating ?? 1200})</div>
+            <div className='player-rating'>
+              ({whitePlayer?.rating ?? DEFAULT_RATING})
+            </div>
             <div className='player-time'>{formatClock(liveWhite)}</div>
           </div>
         </div>

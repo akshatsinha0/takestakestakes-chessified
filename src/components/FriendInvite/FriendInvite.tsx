@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 import { api } from '../../../convex/_generated/api'
 import type { Doc } from '../../../convex/_generated/dataModel'
 import { useAuth } from '../../context/AuthContext'
+import { TIME_CONTROLS } from '../../lib/gameConfig'
 import './FriendInvite.css'
 
 /*
@@ -27,15 +28,6 @@ interface FriendInviteProps {
   onClose: () => void
   onGameCreated: (gameId: string) => void
 }
-
-const TIME_CONTROLS = [
-  { label: '1 min', value: '1+0' },
-  { label: '3 min', value: '3+0' },
-  { label: '5 min', value: '5+0' },
-  { label: '10 min', value: '10+0' },
-  { label: '15 min', value: '15+0' },
-  { label: '30 min', value: '30+0' },
-]
 
 const FriendInvite = ({ onClose }: FriendInviteProps) => {
   const { user } = useAuth()

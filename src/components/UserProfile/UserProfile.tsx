@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { ONLINE_THRESHOLD_MS } from '../../../convex/lib/constants'
 import { useQuery, useMutation } from 'convex/react'
 import { toast } from 'react-toastify'
 import { api } from '../../../convex/_generated/api'
@@ -29,8 +30,6 @@ interface UserProfileProps {
   userId: string
   onClose: () => void
 }
-
-const ONLINE_WINDOW_MS = 5 * 60 * 1000
 
 const UserProfile = ({ userId, onClose }: UserProfileProps) => {
   const { user } = useAuth()
@@ -68,7 +67,7 @@ const UserProfile = ({ userId, onClose }: UserProfileProps) => {
   }
 
   const isOwnProfile = user?.id === userId
-  const isOnline = Date.now() - profile.lastActive < ONLINE_WINDOW_MS
+  const isOnline = Date.now() - profile.lastActive < ONLINE_THRESHOLD_MS
 
   const handleAddFriend = async () => {
     try {

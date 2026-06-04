@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { DEFAULT_RATING } from '../../../convex/lib/constants'
 import './BotSelection.css'
 
 interface Bot {
@@ -33,7 +34,7 @@ const BOTS: Bot[] = [
   {
     id: 'intermediate',
     name: 'Skilled Bot',
-    rating: 1200,
+    rating: DEFAULT_RATING,
     level: 'Intermediate',
     description: 'Solid fundamental play',
     color: 'var(--brand-amber-soft)',

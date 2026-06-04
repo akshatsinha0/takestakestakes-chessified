@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { DEFAULT_RATING } from '../../../convex/lib/constants'
 import { useQuery, useMutation } from 'convex/react'
 import { toast } from 'react-toastify'
 import { api } from '../../../convex/_generated/api'
@@ -62,7 +63,9 @@ const ChallengeNotification = () => {
             </div>
             <div className='challenge-details'>
               <span className='time-control'>{invitation.timeControl}</span>
-              <span className='rating'>({sender?.rating ?? 1200})</span>
+              <span className='rating'>
+                ({sender?.rating ?? DEFAULT_RATING})
+              </span>
             </div>
             {invitation.message && (
               <div className='challenge-message'>

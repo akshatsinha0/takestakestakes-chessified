@@ -6,6 +6,7 @@ import { api } from '../../../convex/_generated/api'
 import type { Id } from '../../../convex/_generated/dataModel'
 import { GameStatus } from '../../../convex/lib/domain'
 import { useAuth } from '../../context/AuthContext'
+import { TIME_CONTROLS } from '../../lib/gameConfig'
 import './QuickMatch.css'
 
 /*
@@ -26,13 +27,6 @@ reactive watch removes the bespoke subscription and immediate-match probing the 
 needed, and it leans on Convex reactivity so the move from searching to playing is driven by data
 changes rather than client coordination.
 */
-
-const TIME_CONTROLS = [
-  { id: '1+0', name: 'Bullet', time: '1 min' },
-  { id: '3+0', name: 'Blitz', time: '3 min' },
-  { id: '5+0', name: 'Blitz', time: '5 min' },
-  { id: '10+0', name: 'Rapid', time: '10 min' },
-]
 
 const QuickMatch = () => {
   const { user } = useAuth()
@@ -83,13 +77,13 @@ const QuickMatch = () => {
       <div className='time-selector'>
         {TIME_CONTROLS.map((control) => (
           <button
-            key={control.id}
-            className={`time-btn ${selectedTime === control.id ? 'selected' : ''}`}
-            onClick={() => setSelectedTime(control.id)}
+            key={control.value}
+            className={`time-btn ${selectedTime === control.value ? 'selected' : ''}`}
+            onClick={() => setSelectedTime(control.value)}
             disabled={searching}
           >
-            <div className='time-name'>{control.name}</div>
-            <div className='time-duration'>{control.time}</div>
+            <div className='time-name'>{control.category}</div>
+            <div className='time-duration'>{control.label}</div>
           </button>
         ))}
       </div>

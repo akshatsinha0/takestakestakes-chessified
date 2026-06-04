@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { DEFAULT_RATING } from '../../convex/lib/constants'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import type { Doc } from '../../convex/_generated/dataModel'
@@ -59,7 +60,7 @@ export const useNotifications = () => {
         id: invitation._id,
         type: 'challenge',
         title: 'Game Challenge',
-        message: `${sender?.username ?? 'Someone'} (${sender?.rating ?? 1200}) challenged you to a ${invitation.timeControl} game`,
+        message: `${sender?.username ?? 'Someone'} (${sender?.rating ?? DEFAULT_RATING}) challenged you to a ${invitation.timeControl} game`,
         data: { invitation, sender },
         read: false,
         created_at: new Date(invitation._creationTime).toISOString(),

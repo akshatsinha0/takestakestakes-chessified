@@ -3,6 +3,7 @@ import { useMutation } from 'convex/react'
 import { toast } from 'react-toastify'
 import { api } from '../../../convex/_generated/api'
 import type { Doc } from '../../../convex/_generated/dataModel'
+import { TIME_CONTROLS } from '../../lib/gameConfig'
 import './ChallengeModal.css'
 
 /*
@@ -24,15 +25,6 @@ interface ChallengeModalProps {
   targetUser: Doc<'profiles'>
   onClose: () => void
 }
-
-const TIME_CONTROLS = [
-  { id: '1+0', name: 'Bullet', time: '1 min', increment: '0 sec' },
-  { id: '3+0', name: 'Blitz', time: '3 min', increment: '0 sec' },
-  { id: '5+0', name: 'Blitz', time: '5 min', increment: '0 sec' },
-  { id: '10+0', name: 'Rapid', time: '10 min', increment: '0 sec' },
-  { id: '15+10', name: 'Rapid', time: '15 min', increment: '10 sec' },
-  { id: '30+0', name: 'Classical', time: '30 min', increment: '0 sec' },
-]
 
 const ChallengeModal = ({ targetUser, onClose }: ChallengeModalProps) => {
   const sendChallenge = useMutation(api.challenges.send)
@@ -75,12 +67,12 @@ const ChallengeModal = ({ targetUser, onClose }: ChallengeModalProps) => {
             <div className='time-grid'>
               {TIME_CONTROLS.map((control) => (
                 <div
-                  key={control.id}
-                  className={`time-control-card ${selectedTimeControl === control.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedTimeControl(control.id)}
+                  key={control.value}
+                  className={`time-control-card ${selectedTimeControl === control.value ? 'selected' : ''}`}
+                  onClick={() => setSelectedTimeControl(control.value)}
                 >
-                  <div className='time-control-name'>{control.name}</div>
-                  <div className='time-control-time'>{control.time}</div>
+                  <div className='time-control-name'>{control.category}</div>
+                  <div className='time-control-time'>{control.label}</div>
                   <div className='time-control-increment'>
                     +{control.increment}
                   </div>

@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
+import {
+  DEFAULT_RATING,
+  ONLINE_THRESHOLD_MS,
+} from '../../../convex/lib/constants'
 import './Header.css'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -208,7 +212,8 @@ const Header: React.FC = () => {
                       <div className='user-list-empty'>No users found.</div>
                     )}
                     {allUsers.map((u) => {
-                      const isOnline = Date.now() - u.lastActive < 5 * 60 * 1000
+                      const isOnline =
+                        Date.now() - u.lastActive < ONLINE_THRESHOLD_MS
 
                       return (
                         <div className='user-list-item' key={u._id}>
@@ -355,7 +360,7 @@ const Header: React.FC = () => {
                         </span>
                         <span className='user-rating-expanded'>
                           <span className='rating-value'>
-                            {profile?.rating || 1200}
+                            {profile?.rating || DEFAULT_RATING}
                           </span>
                           <span className='rating-label'>ELO</span>
                         </span>

@@ -4,6 +4,8 @@ import { Chess } from 'chess.js'
 import { useAuth } from '../../context/AuthContext'
 import ChessboardControls from './ChessboardControls'
 import useChessSounds from '../../hooks/useChessSounds'
+import { DEFAULT_RATING } from '../../../convex/lib/constants'
+import { BOT_MOVE_DELAY_MS, BOT_RATING_TIERS } from '../../lib/gameConfig'
 import './ChessboardSection.css'
 
 /*
@@ -35,8 +37,6 @@ interface ChessboardSectionProps {
   onExitBotMode?: () => void
 }
 
-const DEFAULT_RATING = 1200
-const BOT_MOVE_DELAY_MS = 500
 const CENTER_SQUARES = new Set(['e4', 'e5', 'd4', 'd5', 'c4', 'c5', 'f4', 'f5'])
 
 const pickBotMove = (game: Chess, rating: number) => {
@@ -48,11 +48,11 @@ const pickBotMove = (game: Chess, rating: number) => {
   const checks = moves.filter((move) => move.san.includes('+'))
   const central = moves.filter((move) => CENTER_SQUARES.has(move.to))
   const preferred =
-    rating < 1000
+    rating < BOT_RATING_TIERS.random
       ? moves
-      : rating < 1300
+      : rating < BOT_RATING_TIERS.captures
         ? [...captures, ...moves]
-        : rating < 1600
+        : rating < BOT_RATING_TIERS.capturesAndChecks
           ? [...captures, ...checks, ...moves]
           : [...captures, ...checks, ...central, ...moves]
   return (

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { DEFAULT_RATING } from '../../convex/lib/constants'
 import { useAuth } from '../context/AuthContext'
 import { toast } from 'react-toastify'
 import Header from '../components/Header/Header'
@@ -143,7 +144,11 @@ const Settings: React.FC = () => {
 
                 <div className='settings-group'>
                   <label>Rating</label>
-                  <input type='text' value={profile?.rating || 1200} disabled />
+                  <input
+                    type='text'
+                    value={profile?.rating || DEFAULT_RATING}
+                    disabled
+                  />
                   <small>Rating is calculated based on your game results</small>
                 </div>
 
