@@ -5,7 +5,7 @@ import { useQuery, useMutation } from 'convex/react'
 import { Chess, type Square } from 'chess.js'
 import { api } from '../../convex/_generated/api'
 import type { Id } from '../../convex/_generated/dataModel'
-import { PieceColor, GameStatus } from '../../convex/lib/domain'
+import { PieceColor, GameStatus, GameResult } from '../../convex/lib/domain'
 import { useAuth } from '../context/AuthContext'
 import { PIECE_SYMBOLS } from '../lib/gameConfig'
 import './Game.css'
@@ -45,7 +45,45 @@ const Game = () => {
     api.games.get,
     gameId ? { gameId: gameId as Id<'games'> } : 'skip',
   )
-  const submitMove = useMutation(api.moves.make)
+  const submitMove = useMutation(api.moves.make).withOptimisticUpdate(
+    (localStore, args) => {
+      const current = localStore.getQuery(api.games.get, {
+        gameId: args.gameId,
+      })
+      if (!current || current.game.status !== GameStatus.InProgress) {
+        return
+      }
+      const nextTurn =
+        current.game.currentTurn === PieceColor.White
+          ? PieceColor.Black
+          : PieceColor.White
+      const optimisticMove = {
+        _id: `optimistic-${current.moves.length}` as Id<'moves'>,
+        _creationTime: Date.now(),
+        gameId: args.gameId,
+        moveNumber: current.moves.length + 1,
+        playerColor: current.game.currentTurn,
+        san: args.san,
+        fen: args.fen,
+        timeTaken: 0,
+      }
+      localStore.setQuery(
+        api.games.get,
+        { gameId: args.gameId },
+        {
+          ...current,
+          game: {
+            ...current.game,
+            boardState: args.fen,
+            currentTurn: nextTurn,
+            status: args.result ? GameStatus.Completed : current.game.status,
+            result: args.result ?? current.game.result,
+          },
+          moves: [...current.moves, optimisticMove],
+        },
+      )
+    },
+  )
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
   const [possibleMoves, setPossibleMoves] = useState<string[]>([])
   const [now, setNow] = useState(() => Date.now())
@@ -86,7 +124,19 @@ const Game = () => {
           to: square,
           promotion: 'q',
         })
-        void submitMove({ gameId: game._id, san: move.san, fen: chess.fen() })
+        const result = chess.isGameOver()
+          ? chess.isCheckmate()
+            ? chess.turn() === 'w'
+              ? GameResult.BlackWins
+              : GameResult.WhiteWins
+            : GameResult.Draw
+          : null
+        void submitMove({
+          gameId: game._id,
+          san: move.san,
+          fen: chess.fen(),
+          result,
+        })
       } catch {
         // Illegal attempts are ignored; the board stays on authoritative server state.
       }
@@ -192,7 +242,17 @@ const Game = () => {
               })
             })}
           </div>
-          {isMyTurn && <div className='turn-indicator'>Your Turn</div>}
+          {game.status === GameStatus.Completed ? (
+            <div className='game-result-banner'>
+              {game.result === GameResult.Draw
+                ? 'Game drawn'
+                : game.winnerId === user?.id
+                  ? 'You won!'
+                  : 'You lost'}
+            </div>
+          ) : (
+            isMyTurn && <div className='turn-indicator'>Your Turn</div>
+          )}
         </div>
       </div>
     </div>

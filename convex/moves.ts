@@ -4,7 +4,8 @@ import { ConvexError } from 'convex/values'
 import { zQuery, zMutation } from './lib/functions'
 import { requireAuthUserId } from './lib/identity'
 import { clockAfterTurn } from './lib/time'
-import { GameStatus, PieceColor } from './lib/domain'
+import { GameStatus, PieceColor, zGameResult } from './lib/domain'
+import { finalizeGame } from './lib/completion'
 
 /*
 (1.) `make` records a half-move and advances the game in ONE transaction: it appends the move
@@ -39,7 +40,12 @@ export const listByGame = zQuery({
 })
 
 export const make = zMutation({
-  args: { gameId: zid('games'), san: z.string(), fen: z.string() },
+  args: {
+    gameId: zid('games'),
+    san: z.string(),
+    fen: z.string(),
+    result: z.union([zGameResult, z.null()]),
+  },
   returns: z.null(),
   handler: async (ctx, args) => {
     const userId = await requireAuthUserId(ctx)
@@ -95,6 +101,12 @@ export const make = zMutation({
       whiteTimeRemaining: moverIsWhite ? newRemaining : game.whiteTimeRemaining,
       blackTimeRemaining: moverIsWhite ? game.blackTimeRemaining : newRemaining,
     })
+
+    // A move that ends the game finalizes it in this same transaction, so the
+    // decisive move and the completion (result + Elo) are atomic.
+    if (args.result !== null) {
+      await finalizeGame(ctx, game, args.result)
+    }
     return null
   },
 })

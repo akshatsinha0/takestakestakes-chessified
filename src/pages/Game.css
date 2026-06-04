@@ -196,6 +196,17 @@
   animation: pulse 2s infinite;
 }
 
+.game-result-banner {
+  position: absolute;
+  bottom: -50px;
+  background: color-mix(in srgb, var(--color-accent) 25%, transparent);
+  color: var(--color-accent);
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
 .game-loading {
   display: flex;
   align-items: center;

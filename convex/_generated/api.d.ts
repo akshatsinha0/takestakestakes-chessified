@@ -13,6 +13,7 @@ import type * as challenges from "../challenges.js";
 import type * as friends from "../friends.js";
 import type * as games from "../games.js";
 import type * as http from "../http.js";
+import type * as lib_completion from "../lib/completion.js";
 import type * as lib_constants from "../lib/constants.js";
 import type * as lib_domain from "../lib/domain.js";
 import type * as lib_elo from "../lib/elo.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   friends: typeof friends;
   games: typeof games;
   http: typeof http;
+  "lib/completion": typeof lib_completion;
   "lib/constants": typeof lib_constants;
   "lib/domain": typeof lib_domain;
   "lib/elo": typeof lib_elo;

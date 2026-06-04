@@ -6,6 +6,7 @@ import GameOptions from '../components/GameOptions/GameOptions'
 import ChallengeNotification from '../components/ChallengeNotification/ChallengeNotification'
 import { useAuth } from '../context/AuthContext'
 import { useUserPresence } from '../hooks/useUserPresence'
+import { useActiveGameRedirect } from '../hooks/useActiveGameRedirect'
 import './Dashboard.css'
 
 const Dashboard: React.FC = () => {
@@ -17,6 +18,8 @@ const Dashboard: React.FC = () => {
 
   // Track user presence
   useUserPresence(user?.id)
+  // Join a game the moment a sent challenge is accepted (or matchmaking pairs).
+  useActiveGameRedirect(Boolean(user))
 
   const handlePlayYourself = () => setPlayYourselfMode(true)
   const handleExitPlayYourself = () => setPlayYourselfMode(false)
