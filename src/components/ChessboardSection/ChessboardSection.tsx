@@ -231,13 +231,22 @@ const ChessboardSection = ({
           </div>
           <div className='game-analysis-container'>
             <div className='analysis-panel'>
+              <div className='analysis-header'>
+                <span className='analysis-title'>Moves</span>
+              </div>
               <div className='moves-container' ref={movesContainerRef}>
-                {moves.map((san, index) => (
-                  <span key={`${index}-${san}`} className='move-notation'>
-                    {index % 2 === 0 ? `${Math.floor(index / 2) + 1}. ` : ''}
-                    {san}{' '}
-                  </span>
-                ))}
+                {moves.length === 0 ? (
+                  <div className='moves-empty'>
+                    No moves yet. Start a game to see the move list here.
+                  </div>
+                ) : (
+                  moves.map((san, index) => (
+                    <span key={`${index}-${san}`} className='move-notation'>
+                      {index % 2 === 0 ? `${Math.floor(index / 2) + 1}. ` : ''}
+                      {san}{' '}
+                    </span>
+                  ))
+                )}
               </div>
               {gameStatus && <div className='game-status'>{gameStatus}</div>}
             </div>

@@ -162,14 +162,26 @@
   margin: 0;
   height: auto;
   min-height: 400px;
-  background-color: var(--overlay-board-amber);
+  background-color: var(--color-surface);
   color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 20px
-    color-mix(in srgb, var(--color-danger) 30%, transparent);
+  box-shadow: 0 4px 20px var(--shadow-strong);
   display: flex;
   flex-direction: column;
+}
+
+.analysis-title {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.moves-empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 .analysis-panel {

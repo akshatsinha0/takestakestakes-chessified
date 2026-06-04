@@ -44,7 +44,7 @@ const NetworkBackground = () => {
     containerRef.current.appendChild(renderer.domElement)
 
     // Nodes and connections
-    const nodeCount = 100
+    const nodeCount = 60
     const nodes: NodeObject[] = []
     const nodeGeometry = new THREE.SphereGeometry(0.03, 8, 8)
     const nodeMaterial = new THREE.MeshBasicMaterial({ color: 0x3a85ff })
@@ -110,8 +110,9 @@ const NetworkBackground = () => {
     window.addEventListener('mousemove', onMouseMove)
 
     // Animation loop
+    let animationId = 0
     const animate = () => {
-      requestAnimationFrame(animate)
+      animationId = requestAnimationFrame(animate)
 
       // Convert mouse position to 3D coordinates
       const mouseVector = new THREE.Vector3(
@@ -153,10 +154,22 @@ const NetworkBackground = () => {
         }
       })
 
-      // Update connections
+      // Update connections in place (no per-frame buffer allocation)
       connections.forEach(({ nodeA, nodeB, geometry }) => {
-        geometry.setFromPoints([nodeA.position, nodeB.position])
-        geometry.attributes.position.needsUpdate = true
+        const positions = geometry.attributes.position
+        positions.setXYZ(
+          0,
+          nodeA.position.x,
+          nodeA.position.y,
+          nodeA.position.z,
+        )
+        positions.setXYZ(
+          1,
+          nodeB.position.x,
+          nodeB.position.y,
+          nodeB.position.z,
+        )
+        positions.needsUpdate = true
       })
 
       renderer.render(scene, camera)
@@ -174,18 +187,21 @@ const NetworkBackground = () => {
     window.addEventListener('resize', handleResize)
 
     // Cleanup
+    const mountedContainer = containerRef.current
     return () => {
+      cancelAnimationFrame(animationId)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('resize', handleResize)
-      if (containerRef.current) {
-        containerRef.current.removeChild(renderer.domElement)
+      if (mountedContainer) {
+        mountedContainer.removeChild(renderer.domElement)
       }
 
-      // Dispose of geometries and materials
+      // Dispose of geometries, materials, and the renderer
       nodeGeometry.dispose()
       nodeMaterial.dispose()
       lineMaterial.dispose()
       connections.forEach(({ geometry }) => geometry.dispose())
+      renderer.dispose()
     }
   }, [])
 
