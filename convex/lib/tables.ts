@@ -54,6 +54,7 @@ export const gameFields = {
   status: zGameStatus,
   result: z.union([zGameResult, z.null()]),
   winnerId: nullableString,
+  drawOfferedBy: nullableString,
   timeControl: z.string(),
   boardState: z.string(),
   currentTurn: zPieceColor,

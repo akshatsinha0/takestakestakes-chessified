@@ -6,14 +6,14 @@ import type { Doc } from '../_generated/dataModel'
 
 /*
 (1.) Single, reusable game-finalization routine shared by the move mutation (when a move ends
-     the game) and the explicit completion mutation (resignation/timeout/abort). Centralizing it
+     the game) and the `gameLifecycle` resignation and draw-agreement mutations. Centralizing it
      guarantees a game ends identically no matter how it ends, and prevents the rating/stat logic
-     from being duplicated between the two call sites.
+     from being duplicated between the call sites.
 (2.) `finalizeGame` runs inside the caller's transaction: it stamps the game completed with its
      result, winner, and finish time, then exchanges Elo for both players from their pre-game
      ratings and updates each player's stats. Because it shares the caller's transaction, recording
-     the final move and completing the game are atomic when invoked from `moves.make`, so the
-     decisive move can never be lost to a race with a separate completion call.
+     the final move and completing the game are atomic when invoked from `moves.make`, and a
+     resignation or accepted draw likewise completes in one transaction with no intermediate state.
 (3.) `applyPlayerOutcome` upserts a player's stats: it seeds a default row on first completion,
      extends or resets the win streak by whether that player won, and tracks the longest streak and
      highest rating reached. A null-winner draw resets both streaks.

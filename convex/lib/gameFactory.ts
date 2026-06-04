@@ -12,8 +12,8 @@ import type { Doc } from '../_generated/dataModel'
      position, and `turnStartedAt` is set to the supplied `now` so white's clock begins the
      instant the game exists.
 (3.) Every nullable slot that only becomes meaningful later (`result`, `winnerId`,
-     `finishedAt`) is initialized to explicit `null` rather than left absent, so the returned
-     object is a fully determined document shape with no optional fields.
+     `drawOfferedBy`, `finishedAt`) is initialized to explicit `null` rather than left absent,
+     so the returned object is a fully determined document shape with no optional fields.
 
 This helper centralizes game construction so that the rules for seeding colors, clocks, and the
 starting position live in exactly one place. Returning a plain field object rather than
@@ -41,6 +41,7 @@ export const buildActiveGame = (
     status: GameStatus.IN_PROGRESS,
     result: null,
     winnerId: null,
+    drawOfferedBy: null,
     timeControl,
     boardState: INITIAL_FEN,
     currentTurn: PieceColor.WHITE,

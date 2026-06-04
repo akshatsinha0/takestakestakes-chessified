@@ -68,6 +68,7 @@ export const quickMatch = zMutation({
       status: GameStatus.WAITING,
       result: null,
       winnerId: null,
+      drawOfferedBy: null,
       timeControl: args.timeControl,
       boardState: INITIAL_FEN,
       currentTurn: PieceColor.WHITE,

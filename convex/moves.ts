@@ -100,6 +100,9 @@ export const make = zMutation({
       turnStartedAt: now,
       whiteTimeRemaining: moverIsWhite ? newRemaining : game.whiteTimeRemaining,
       blackTimeRemaining: moverIsWhite ? game.blackTimeRemaining : newRemaining,
+      // Playing a move withdraws any standing draw offer, matching the
+      // convention that a move is an implicit decline.
+      drawOfferedBy: null,
     })
 
     // A move that ends the game finalizes it in this same transaction, so the

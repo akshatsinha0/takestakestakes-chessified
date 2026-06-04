@@ -5,7 +5,11 @@ import { useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import type { Doc, Id } from '../../../convex/_generated/dataModel'
 import { PieceColor, GameStatus, GameResult } from '../../../convex/lib/domain'
-import { DEFAULT_RATING } from '../../../convex/lib/constants'
+import {
+  DEFAULT_RATING,
+  SECONDS_PER_MINUTE,
+} from '../../../convex/lib/constants'
+import { sanToPieceGlyph, sanWithoutPieceLetter } from '../../lib/gameConfig'
 import { useAuth } from '../../context/AuthContext'
 import './ChessboardSection.css'
 
@@ -19,16 +23,19 @@ import './ChessboardSection.css'
      player's board advances instantly while the authoritative result reconciles, and the opponent's
      board updates from the same reactive query. A move that ends the game carries its result so the
      completion is recorded atomically with the move.
-(3.) Dragging is gated to the local player's own pieces on their turn, and the board is oriented to
-     the player's color, so each side sees the position from their perspective and cannot move out of
-     turn or move the opponent's pieces.
-(4.) A one-second ticker drives the on-screen clocks by subtracting elapsed time since `turnStartedAt`
-     from the active side's stored seconds; the authoritative debit happens server-side on the next
-     move, so the display stays live without per-tick writes.
+(3.) Resignation and draw agreement are driven through the `gameLifecycle` mutations rather than the
+     board: a player resigns or offers a draw from the action bar, and the single `drawOfferedBy`
+     seat on the game decides whether the panel shows the offer-pending state to the offerer or the
+     accept/decline prompt to the opponent, so the handshake is read straight from game data.
+(4.) The move list pairs half-moves into numbered rows in the chess.com layout, deriving each move's
+     piece glyph and notation from SAN through the shared `gameConfig` helpers and labeling each with
+     the time that half-move consumed (`timeTaken`), while a one-second ticker drives the live clocks
+     by subtracting elapsed time since `turnStartedAt` from the side to move.
 
 This component is the online-game surface embedded in the dashboard. Co-locating the optimistic update
-with the move submission keeps the board responsive, and reading the single `currentForUser` query
-means the game appears and disappears on the dashboard purely from data, with no navigation.
+with the move submission keeps the board responsive, reading the single `currentForUser` query means
+the game appears and disappears on the dashboard purely from data, and routing endings through the
+lifecycle mutations keeps every way a game can finish converging on the same authoritative completion.
 */
 
 interface GameComposite {
@@ -38,14 +45,64 @@ interface GameComposite {
   blackPlayer: Doc<'profiles'> | null
 }
 
+interface MoveRow {
+  number: number
+  white: Doc<'moves'>
+  black: Doc<'moves'> | null
+}
+
 const formatClock = (seconds: number): string => {
   const safe = Math.max(0, seconds)
-  return `${Math.floor(safe / 60)}:${(safe % 60).toString().padStart(2, '0')}`
+  const minutes = Math.floor(safe / SECONDS_PER_MINUTE)
+  const remainder = safe % SECONDS_PER_MINUTE
+  return `${minutes}:${remainder.toString().padStart(2, '0')}`
 }
+
+// Per-move elapsed time for the move list: sub-minute moves read as seconds
+// ("4s"), longer thinks switch to minute:second so a long think is unambiguous.
+const formatMoveTime = (seconds: number): string => {
+  if (seconds < SECONDS_PER_MINUTE) {
+    return `${seconds}s`
+  }
+  const minutes = Math.floor(seconds / SECONDS_PER_MINUTE)
+  const remainder = seconds % SECONDS_PER_MINUTE
+  return `${minutes}:${remainder.toString().padStart(2, '0')}`
+}
+
+const toMoveRows = (moves: Doc<'moves'>[]): MoveRow[] => {
+  const rows: MoveRow[] = []
+  for (let index = 0; index < moves.length; index += 2) {
+    rows.push({
+      number: index / 2 + 1,
+      white: moves[index],
+      black: moves[index + 1] ?? null,
+    })
+  }
+  return rows
+}
+
+const MoveCell = ({
+  move,
+  colorKey,
+}: {
+  move: Doc<'moves'>
+  colorKey: 'w' | 'b'
+}) => (
+  <span className='move-cell'>
+    <span className='move-san'>
+      <span className='piece-symbol'>
+        {sanToPieceGlyph(move.san, colorKey)}
+      </span>
+      {sanWithoutPieceLetter(move.san)}
+    </span>
+    <span className='move-time'>{formatMoveTime(move.timeTaken)}</span>
+  </span>
+)
 
 const MultiplayerBoard = ({ data }: { data: GameComposite }) => {
   const { user } = useAuth()
   const [now, setNow] = useState(() => Date.now())
+  const [confirmingResign, setConfirmingResign] = useState(false)
 
   const makeMove = useMutation(api.moves.make).withOptimisticUpdate(
     (localStore, args) => {
@@ -78,12 +135,17 @@ const MultiplayerBoard = ({ data }: { data: GameComposite }) => {
             currentTurn: nextTurn,
             status: args.result ? GameStatus.COMPLETED : current.game.status,
             result: args.result ?? current.game.result,
+            drawOfferedBy: null,
           },
           moves: [...current.moves, optimisticMove],
         },
       )
     },
   )
+
+  const resign = useMutation(api.gameLifecycle.resign)
+  const offerDraw = useMutation(api.gameLifecycle.offerDraw)
+  const respondDraw = useMutation(api.gameLifecycle.respondDraw)
 
   useEffect(() => {
     const ticker = setInterval(() => setNow(Date.now()), 1000)
@@ -141,6 +203,21 @@ const MultiplayerBoard = ({ data }: { data: GameComposite }) => {
   const opponentClock = myColor === PieceColor.WHITE ? liveBlack : liveWhite
   const myClock = myColor === PieceColor.WHITE ? liveWhite : liveBlack
   const isCompleted = game.status === GameStatus.COMPLETED
+  const drawOfferedByMe =
+    game.drawOfferedBy !== null && game.drawOfferedBy === user?.id
+  const drawOfferedToMe =
+    game.drawOfferedBy !== null && game.drawOfferedBy !== user?.id
+  const moveRows = toMoveRows(moves)
+
+  const statusText = isCompleted
+    ? game.result === GameResult.DRAW
+      ? 'Game drawn'
+      : game.winnerId === user?.id
+        ? 'You won'
+        : 'You lost'
+    : isMyTurn
+      ? 'Your move'
+      : "Opponent's move"
 
   return (
     <div className='chessboard-section theater-mode-active'>
@@ -196,30 +273,105 @@ const MultiplayerBoard = ({ data }: { data: GameComposite }) => {
           <div className='game-analysis-container'>
             <div className='analysis-panel'>
               <div className='analysis-header'>
-                <span className='analysis-title'>
-                  {isCompleted
-                    ? game.result === GameResult.DRAW
-                      ? 'Game drawn'
-                      : game.winnerId === user?.id
-                        ? 'You won!'
-                        : 'You lost'
-                    : isMyTurn
-                      ? 'Your move'
-                      : "Opponent's move"}
+                <span className='analysis-title'>Moves</span>
+                <span
+                  className={`game-status-pill ${isCompleted ? 'completed' : ''}`}
+                >
+                  {statusText}
                 </span>
               </div>
-              <div className='moves-container'>
-                {moves.length === 0 ? (
-                  <div className='moves-empty'>No moves yet.</div>
+
+              <div className='moves-list'>
+                {moveRows.length === 0 ? (
+                  <div className='moves-empty'>
+                    No moves yet. Drag a piece to begin.
+                  </div>
                 ) : (
-                  moves.map((move, index) => (
-                    <span key={move._id} className='move-notation'>
-                      {index % 2 === 0 ? `${Math.floor(index / 2) + 1}. ` : ''}
-                      {move.san}{' '}
-                    </span>
+                  moveRows.map((row) => (
+                    <div key={row.number} className='move-row'>
+                      <span className='move-number'>{row.number}.</span>
+                      <MoveCell move={row.white} colorKey='w' />
+                      {row.black ? (
+                        <MoveCell move={row.black} colorKey='b' />
+                      ) : (
+                        <span className='move-cell empty' />
+                      )}
+                    </div>
                   ))
                 )}
               </div>
+
+              {!isCompleted && (
+                <div className='game-action-bar'>
+                  {drawOfferedToMe ? (
+                    <div className='action-prompt'>
+                      <span className='action-prompt-text'>
+                        Opponent offers a draw
+                      </span>
+                      <div className='action-buttons'>
+                        <button
+                          className='action-btn accept'
+                          onClick={() =>
+                            void respondDraw({ gameId: game._id, accept: true })
+                          }
+                        >
+                          Accept
+                        </button>
+                        <button
+                          className='action-btn'
+                          onClick={() =>
+                            void respondDraw({
+                              gameId: game._id,
+                              accept: false,
+                            })
+                          }
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    </div>
+                  ) : confirmingResign ? (
+                    <div className='action-prompt'>
+                      <span className='action-prompt-text'>
+                        Resign this game?
+                      </span>
+                      <div className='action-buttons'>
+                        <button
+                          className='action-btn resign'
+                          onClick={() => {
+                            void resign({ gameId: game._id })
+                            setConfirmingResign(false)
+                          }}
+                        >
+                          Yes, resign
+                        </button>
+                        <button
+                          className='action-btn'
+                          onClick={() => setConfirmingResign(false)}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='action-buttons'>
+                      <button
+                        className='action-btn'
+                        disabled={drawOfferedByMe}
+                        onClick={() => void offerDraw({ gameId: game._id })}
+                      >
+                        {drawOfferedByMe ? 'Draw offered' : 'Offer draw'}
+                      </button>
+                      <button
+                        className='action-btn resign'
+                        onClick={() => setConfirmingResign(true)}
+                      >
+                        Resign
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

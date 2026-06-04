@@ -10,7 +10,9 @@
      value strings are the same format `parseTimeControl` on the backend expects.
 (3.) `PIECE_SYMBOLS` maps a `${color}${type}` key (e.g. "wq") to its Unicode glyph, the exact
      keying both the live board and the game review build from chess.js output, so the rendering
-     of pieces is defined once.
+     of pieces is defined once. `sanToPieceGlyph` and `sanWithoutPieceLetter` derive a half-move's
+     piece icon and its remaining notation from SAN using that same map, keeping the move-list
+     rendering rules co-located with the glyph table instead of restated in a component.
 (4.) `BOT_RATING_TIERS` names the rating thresholds that grade bot move selection, replacing bare
      numbers with intention-revealing constants, and `BOT_MOVE_DELAY_MS` centralizes the reply
      delay.
@@ -52,6 +54,28 @@ export const PIECE_SYMBOLS: Record<string, string> = {
   bq: '♛',
   bk: '♚',
 }
+
+// Leading SAN letter to PIECE_SYMBOLS type key. A SAN with no leading piece
+// letter is a pawn move, and castling ("O-O"/"O-O-O") is rendered with the king
+// glyph, so the move list shows a piece icon for every half-move from SAN alone.
+const SAN_PIECE_KEYS: Record<string, string> = {
+  K: 'k',
+  Q: 'q',
+  R: 'r',
+  B: 'b',
+  N: 'n',
+}
+
+export const sanToPieceGlyph = (san: string, colorKey: 'w' | 'b'): string => {
+  const type = san.startsWith('O-O') ? 'k' : (SAN_PIECE_KEYS[san[0]] ?? 'p')
+  return PIECE_SYMBOLS[`${colorKey}${type}`]
+}
+
+// SAN with its leading piece letter removed so the glyph carries the piece and
+// the text carries only the destination and decorators (e.g. "Nf3" -> "f3",
+// "Qxd5" -> "xd5"); pawn moves and castling are returned unchanged.
+export const sanWithoutPieceLetter = (san: string): string =>
+  SAN_PIECE_KEYS[san[0]] === undefined ? san : san.slice(1)
 
 export const BOT_RATING_TIERS = {
   random: 1000,
