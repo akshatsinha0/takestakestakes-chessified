@@ -52,7 +52,17 @@ export function useAuthActions() {
     if (error) {
       return { error: messageFrom(error, 'Sign up failed.') }
     }
-    await ensureProfile({ username })
+    // Best-effort immediate profile creation. The Convex client may not have
+    // attached the new session token yet, in which case this throws
+    // UNAUTHENTICATED; that is non-fatal because the AuthProvider effect
+    // provisions the profile (with this same username) once the session is
+    // active. Swallowing it here keeps sign-up succeeding and routing to the
+    // dashboard rather than surfacing a spurious error for a created account.
+    try {
+      await ensureProfile({ username })
+    } catch {
+      // Provisioning falls back to the authenticated effect in AuthContext.
+    }
     return { error: null }
   }
 
