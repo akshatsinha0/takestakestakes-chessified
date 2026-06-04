@@ -34,47 +34,60 @@ const messageFrom = (
 
 const callbackURL = (): string => `${window.location.origin}/dashboard`
 
+type AuthCall = () => Promise<{ error: { message?: string } | null }>
+
+// Runs a Better Auth client call and ALWAYS resolves to a normalized result,
+// never throwing. A thrown error (network failure, blocked request, CSP) is
+// caught and logged with its real cause so the UI surfaces what actually
+// happened instead of hanging on a pending promise.
+const runAuth = async (context: string, fallback: string, call: AuthCall) => {
+  try {
+    const { error } = await call()
+    if (error) {
+      console.error(`[auth] ${context} returned an error:`, error)
+      return { error: messageFrom(error, fallback) }
+    }
+    return { error: null }
+  } catch (cause) {
+    console.error(`[auth] ${context} threw:`, cause)
+    const message = cause instanceof Error ? cause.message : fallback
+    return { error: message }
+  }
+}
+
 export function useAuthActions() {
   const ensureProfile = useMutation(api.profiles.ensureProfile)
   const updateProfileMutation = useMutation(api.profiles.updateProfile)
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await authClient.signIn.email({ email, password })
-    return { error: error ? messageFrom(error, 'Sign in failed.') : null }
-  }
+  const signIn = (email: string, password: string) =>
+    runAuth('signIn', 'Sign in failed.', () =>
+      authClient.signIn.email({ email, password }),
+    )
 
   const signUp = async (email: string, password: string, username: string) => {
-    const { error } = await authClient.signUp.email({
-      email,
-      password,
-      name: username,
-    })
-    if (error) {
-      return { error: messageFrom(error, 'Sign up failed.') }
+    const result = await runAuth('signUp', 'Sign up failed.', () =>
+      authClient.signUp.email({ email, password, name: username }),
+    )
+    if (result.error) {
+      return result
     }
     // Best-effort immediate profile creation. The Convex client may not have
     // attached the new session token yet, in which case this throws
     // UNAUTHENTICATED; that is non-fatal because the AuthProvider effect
     // provisions the profile (with this same username) once the session is
-    // active. Swallowing it here keeps sign-up succeeding and routing to the
-    // dashboard rather than surfacing a spurious error for a created account.
+    // active.
     try {
       await ensureProfile({ username })
-    } catch {
-      // Provisioning falls back to the authenticated effect in AuthContext.
+    } catch (cause) {
+      console.error('[auth] post-signup ensureProfile deferred:', cause)
     }
     return { error: null }
   }
 
-  const socialSignIn = async (provider: SocialProvider) => {
-    const { error } = await authClient.signIn.social({
-      provider,
-      callbackURL: callbackURL(),
-    })
-    return {
-      error: error ? messageFrom(error, 'Social sign in failed.') : null,
-    }
-  }
+  const socialSignIn = (provider: SocialProvider) =>
+    runAuth(`socialSignIn(${provider})`, 'Social sign in failed.', () =>
+      authClient.signIn.social({ provider, callbackURL: callbackURL() }),
+    )
 
   return {
     signIn,

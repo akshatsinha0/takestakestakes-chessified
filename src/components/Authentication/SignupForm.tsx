@@ -64,19 +64,27 @@ const SignupForm = ({ onClose }: { onClose: () => void }) => {
       return
     }
     setIsSubmitting(true)
-    const { error } = await signUp(
-      formData.email,
-      formData.password,
-      formData.username,
-    )
-    setIsSubmitting(false)
-    if (error) {
-      toast.error(error)
-      return
+    try {
+      const { error } = await signUp(
+        formData.email,
+        formData.password,
+        formData.username,
+      )
+      if (error) {
+        toast.error(error)
+        return
+      }
+      toast.success('Account created successfully!')
+      onClose()
+      navigate('/dashboard', { replace: true })
+    } catch (cause) {
+      console.error('[signup] unexpected failure:', cause)
+      toast.error(
+        'Something went wrong creating your account. Please try again.',
+      )
+    } finally {
+      setIsSubmitting(false)
     }
-    toast.success('Account created successfully!')
-    onClose()
-    navigate('/dashboard', { replace: true })
   }
 
   const handleGeneratedPassword = (password: string) => {

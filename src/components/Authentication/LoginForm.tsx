@@ -42,15 +42,21 @@ const LoginForm = ({ onClose }: { onClose: () => void }) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setIsSubmitting(true)
-    const { error } = await signIn(formData.email, formData.password)
-    setIsSubmitting(false)
-    if (error) {
-      toast.error(error)
-      return
+    try {
+      const { error } = await signIn(formData.email, formData.password)
+      if (error) {
+        toast.error(error)
+        return
+      }
+      toast.success('Welcome back, Grandmaster!')
+      onClose()
+      navigate('/dashboard', { replace: true })
+    } catch (cause) {
+      console.error('[login] unexpected failure:', cause)
+      toast.error('Something went wrong signing in. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
-    toast.success('Welcome back, Grandmaster!')
-    onClose()
-    navigate('/dashboard', { replace: true })
   }
 
   const handleGoogleLogin = async () => {
