@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useQuery } from 'convex/react'
 import { Chess } from 'chess.js'
 import { api } from '../../../convex/_generated/api'
@@ -16,6 +17,10 @@ import './GameViewer.css'
 (3.) A `position` state string is updated alongside the move index purely to trigger re-render
      after the in-place chess instance mutates, keeping the board and the active move highlight in
      sync as the user steps through the game.
+
+(4.) The overlay is mounted through a portal onto the document body so its fixed positioning resolves
+     against the viewport rather than the element it was opened from, which keeps the review centered
+     and on screen regardless of any transformed or clipped ancestor in the trigger's subtree.
 
 This component is a self-contained game review. Sourcing moves from a query keyed by game id means
 the only input it needs is the game document, and replaying from SAN keeps the reconstruction
@@ -51,7 +56,7 @@ const GameViewer = ({
 
   const board = chess.board()
 
-  return (
+  return createPortal(
     <div className='game-viewer-overlay' onClick={onClose}>
       <div
         className='game-viewer-modal'
@@ -69,13 +74,14 @@ const GameViewer = ({
               {board.map((row, rankIndex) =>
                 row.map((square, fileIndex) => {
                   const isLight = (rankIndex + fileIndex) % 2 === 0
-                  const piece = square ? `${square.color}${square.type}` : null
+                  const piece =
+                    square === null ? '' : `${square.color}${square.type}`
                   return (
                     <div
                       key={`${rankIndex}-${fileIndex}`}
                       className={`square ${isLight ? 'light' : 'dark'}`}
                     >
-                      {piece && (
+                      {piece !== '' && (
                         <div className={`piece ${piece}`}>
                           {PIECE_SYMBOLS[piece]}
                         </div>
@@ -132,7 +138,8 @@ const GameViewer = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

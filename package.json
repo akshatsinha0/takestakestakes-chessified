@@ -33,6 +33,7 @@
     "convex": "^1.40.0",
     "convex-helpers": "^0.1.118",
     "kysely": "0.28.17",
+    "lucide-react": "^1.17.0",
     "react": "^18.3.1",
     "react-chessboard": "^4.7.3",
     "react-dom": "^18.3.1",

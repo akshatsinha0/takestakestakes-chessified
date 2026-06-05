@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import './App.css'
 
 import { AuthProvider, useAuth } from './context/AuthContext'
+import LoadingScreen from './components/LoadingScreen/LoadingScreen'
 
 // Lazy load components
 const Sidebar = lazy(() => import('./components/Sidebar/Sidebar'))
@@ -50,21 +51,8 @@ const PublicRoute = ({ children }: { children: React.ReactElement }) => {
   return children
 }
 
-// Loading component for Suspense fallback
-const LoadingFallback = () => (
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      backgroundColor: 'var(--primary-dark)',
-      color: 'var(--text-light)',
-    }}
-  >
-    <div>Loading...</div>
-  </div>
-)
+// Loading component for Suspense fallback and auth gating
+const LoadingFallback = () => <LoadingScreen />
 
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false)

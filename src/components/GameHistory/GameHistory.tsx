@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import type { Doc } from '../../../convex/_generated/dataModel'
@@ -11,12 +12,17 @@ import './GameHistory.css'
 (1.) Lists the signed-in player's completed games from the reactive `games.historyForUser`
      query and lets them open any game in the move-by-move viewer. The list updates
      automatically as new games finish, with no manual reload.
-(2.) Opponent and self usernames are resolved from the `profiles.directory` query through a
+(2.) The overlay is mounted through a portal onto the document body so its fixed positioning is
+     measured against the viewport itself, not against whichever menu it was triggered from; a
+     transformed or clipped ancestor would otherwise become the positioning context and push the
+     dialog off-screen. This keeps the dialog centered and fully on screen wherever it is opened.
+(3.) Opponent and self usernames are resolved from the `profiles.directory` query through a
      `nameOf` lookup, because the history query returns raw games keyed by player id; pairing the
      two queries keeps each one simple and index-driven rather than embedding a join.
-(3.) The result label is computed relative to the viewer's color from the stored `result` enum,
-     so the same completed game reads as "Win" or "Loss" correctly for whichever side the user
-     played, and a missing finish time renders empty rather than an invalid date.
+(4.) The selected game is tracked by id and resolved back to its record from the already-loaded
+     list, so opening the review carries no separate copy of the game and an empty id is the single
+     unambiguous representation of "nothing selected". The result label is computed relative to the
+     viewer's color so the same game reads as "Win" or "Loss" correctly for whichever side they had.
 
 This modal is a reactive history view composed from two focused queries. Deriving result and
 opponent display on the client from authoritative game and profile data keeps the backend
@@ -30,7 +36,7 @@ const GameHistory = ({ onClose }: { onClose: () => void }) => {
     user ? { userId: user.id } : 'skip',
   )
   const directory = useQuery(api.profiles.directory, {}) ?? []
-  const [selectedGame, setSelectedGame] = useState<Doc<'games'> | null>(null)
+  const [selectedGameId, setSelectedGameId] = useState('')
 
   const nameOf = (userId: string | null): string =>
     directory.find((profile) => profile.userId === userId)?.username ??
@@ -56,13 +62,15 @@ const GameHistory = ({ onClose }: { onClose: () => void }) => {
   const resultClass = (game: Doc<'games'>): string =>
     resultFor(game).toLowerCase()
 
-  if (selectedGame) {
+  const selectedGame = (games ?? []).find((game) => game._id === selectedGameId)
+
+  if (selectedGame !== undefined) {
     return (
-      <GameViewer game={selectedGame} onClose={() => setSelectedGame(null)} />
+      <GameViewer game={selectedGame} onClose={() => setSelectedGameId('')} />
     )
   }
 
-  return (
+  return createPortal(
     <div className='game-history-overlay' onClick={onClose}>
       <div
         className='game-history-modal'
@@ -86,7 +94,7 @@ const GameHistory = ({ onClose }: { onClose: () => void }) => {
                   <div
                     key={game._id}
                     className='game-item'
-                    onClick={() => setSelectedGame(game)}
+                    onClick={() => setSelectedGameId(game._id)}
                   >
                     <div className='game-players'>
                       <div className='player white'>
@@ -117,7 +125,8 @@ const GameHistory = ({ onClose }: { onClose: () => void }) => {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
