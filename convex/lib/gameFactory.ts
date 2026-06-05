@@ -11,7 +11,7 @@ import type { Doc } from '../_generated/dataModel'
      from the parsed time control for both sides, the board starts from the canonical opening
      position, and `turnStartedAt` is set to the supplied `now` so white's clock begins the
      instant the game exists.
-(3.) Every nullable slot that only becomes meaningful later (`result`, `winnerId`,
+(3.) Every nullable slot that only becomes meaningful later (`result`, `endReason`, `winnerId`,
      `drawOfferedBy`, `finishedAt`) is initialized to explicit `null` rather than left absent,
      so the returned object is a fully determined document shape with no optional fields.
 
@@ -40,6 +40,7 @@ export const buildActiveGame = (
     opponentId,
     status: GameStatus.IN_PROGRESS,
     result: null,
+    endReason: null,
     winnerId: null,
     drawOfferedBy: null,
     timeControl,

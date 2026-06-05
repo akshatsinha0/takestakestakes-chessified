@@ -4,6 +4,7 @@ import {
   zPieceColor,
   zGameStatus,
   zGameResult,
+  zGameEndReason,
   zRequestStatus,
   zFriendStatus,
 } from './domain'
@@ -53,6 +54,7 @@ export const gameFields = {
   opponentId: nullableString,
   status: zGameStatus,
   result: z.union([zGameResult, z.null()]),
+  endReason: z.union([zGameEndReason, z.null()]),
   winnerId: nullableString,
   drawOfferedBy: nullableString,
   timeControl: z.string(),

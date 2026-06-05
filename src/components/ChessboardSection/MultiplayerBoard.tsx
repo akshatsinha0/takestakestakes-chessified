@@ -1,15 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import { useMutation } from 'convex/react'
+import { toast } from 'react-toastify'
 import { api } from '../../../convex/_generated/api'
 import type { Doc, Id } from '../../../convex/_generated/dataModel'
-import { PieceColor, GameStatus, GameResult } from '../../../convex/lib/domain'
+import {
+  PieceColor,
+  GameStatus,
+  GameResult,
+  GameEndReason,
+} from '../../../convex/lib/domain'
 import {
   DEFAULT_RATING,
   SECONDS_PER_MINUTE,
 } from '../../../convex/lib/constants'
 import { sanToPieceGlyph, sanWithoutPieceLetter } from '../../lib/gameConfig'
+import useChessSounds from '../../hooks/useChessSounds'
 import { useAuth } from '../../context/AuthContext'
 import './ChessboardSection.css'
 
@@ -81,6 +88,68 @@ const toMoveRows = (moves: Doc<'moves'>[]): MoveRow[] => {
   return rows
 }
 
+// Inspects a completed position to produce the result and the precise reason it
+// ended, so the completion records, for example, a stalemate draw distinctly
+// from a draw by repetition rather than collapsing every draw into one label.
+const readGameEnd = (
+  probe: Chess,
+): { result: GameResult; endReason: GameEndReason } | null => {
+  if (!probe.isGameOver()) {
+    return null
+  }
+  if (probe.isCheckmate()) {
+    return {
+      result:
+        probe.turn() === 'w' ? GameResult.BLACK_WINS : GameResult.WHITE_WINS,
+      endReason: GameEndReason.CHECKMATE,
+    }
+  }
+  if (probe.isStalemate()) {
+    return { result: GameResult.DRAW, endReason: GameEndReason.STALEMATE }
+  }
+  if (probe.isThreefoldRepetition()) {
+    return {
+      result: GameResult.DRAW,
+      endReason: GameEndReason.THREEFOLD_REPETITION,
+    }
+  }
+  if (probe.isInsufficientMaterial()) {
+    return {
+      result: GameResult.DRAW,
+      endReason: GameEndReason.INSUFFICIENT_MATERIAL,
+    }
+  }
+  return { result: GameResult.DRAW, endReason: GameEndReason.FIFTY_MOVE_RULE }
+}
+
+// Human-readable outcome shown in the status pill, phrased from the viewer's
+// perspective so the loser of a resignation reads "You resigned" while the
+// opponent reads that they won by it.
+const describeOutcome = (
+  result: Doc<'games'>['result'],
+  endReason: Doc<'games'>['endReason'],
+  viewerWon: boolean,
+): string => {
+  if (result === GameResult.DRAW) {
+    if (endReason === GameEndReason.DRAW_AGREEMENT) return 'Draw by agreement'
+    if (endReason === GameEndReason.STALEMATE) return 'Draw by stalemate'
+    if (endReason === GameEndReason.THREEFOLD_REPETITION)
+      return 'Draw by repetition'
+    if (endReason === GameEndReason.INSUFFICIENT_MATERIAL)
+      return 'Draw, insufficient material'
+    if (endReason === GameEndReason.FIFTY_MOVE_RULE)
+      return 'Draw, fifty-move rule'
+    return 'Game drawn'
+  }
+  if (endReason === GameEndReason.RESIGNATION) {
+    return viewerWon ? 'Opponent resigned, you win' : 'You resigned'
+  }
+  if (endReason === GameEndReason.CHECKMATE) {
+    return viewerWon ? 'Checkmate, you win' : 'Checkmate, you lost'
+  }
+  return viewerWon ? 'You won' : 'You lost'
+}
+
 const MoveCell = ({
   move,
   colorKey,
@@ -101,8 +170,14 @@ const MoveCell = ({
 
 const MultiplayerBoard = ({ data }: { data: GameComposite }) => {
   const { user } = useAuth()
+  const { playForSan } = useChessSounds()
   const [now, setNow] = useState(() => Date.now())
   const [confirmingResign, setConfirmingResign] = useState(false)
+  // Tracks how many half-moves have already sounded and which finished game has
+  // already been announced, so a cue fires once per new move and the end-of-game
+  // toast fires once rather than on every reactive update.
+  const soundedMoveCountRef = useRef(data.moves.length)
+  const announcedGameRef = useRef<string | null>(null)
 
   const makeMove = useMutation(api.moves.make).withOptimisticUpdate(
     (localStore, args) => {
@@ -135,6 +210,7 @@ const MultiplayerBoard = ({ data }: { data: GameComposite }) => {
             currentTurn: nextTurn,
             status: args.result ? GameStatus.COMPLETED : current.game.status,
             result: args.result ?? current.game.result,
+            endReason: args.endReason ?? current.game.endReason,
             drawOfferedBy: null,
           },
           moves: [...current.moves, optimisticMove],
@@ -170,18 +246,13 @@ const MultiplayerBoard = ({ data }: { data: GameComposite }) => {
         to: targetSquare,
         promotion: 'q',
       })
-      const result = probe.isGameOver()
-        ? probe.isCheckmate()
-          ? probe.turn() === 'w'
-            ? GameResult.BLACK_WINS
-            : GameResult.WHITE_WINS
-          : GameResult.DRAW
-        : null
+      const ending = readGameEnd(probe)
       void makeMove({
         gameId: game._id,
         san: move.san,
         fen: probe.fen(),
-        result,
+        result: ending?.result ?? null,
+        endReason: ending?.endReason ?? null,
       })
       return true
     } catch {
@@ -189,7 +260,13 @@ const MultiplayerBoard = ({ data }: { data: GameComposite }) => {
     }
   }
 
-  const elapsed = Math.floor((now - game.turnStartedAt) / 1000)
+  // The clock freezes the instant the game completes: a finished game debits no
+  // further time, so both displayed clocks hold at their stored remaining values
+  // rather than continuing to count down past the end.
+  const elapsed =
+    game.status === GameStatus.COMPLETED
+      ? 0
+      : Math.floor((now - game.turnStartedAt) / 1000)
   const liveWhite =
     game.currentTurn === PieceColor.WHITE
       ? game.whiteTimeRemaining - elapsed
@@ -208,13 +285,38 @@ const MultiplayerBoard = ({ data }: { data: GameComposite }) => {
   const drawOfferedToMe =
     game.drawOfferedBy !== null && game.drawOfferedBy !== user?.id
   const moveRows = toMoveRows(moves)
+  const viewerWon = game.winnerId === user?.id
+
+  // Sound every newly-arrived half-move, whether it was played here or by the
+  // opponent, since both reach this board only as a longer `moves` array from the
+  // reactive query; the SAN of the latest move selects the cue.
+  useEffect(() => {
+    if (moves.length > soundedMoveCountRef.current) {
+      const latest = moves[moves.length - 1]
+      if (latest !== undefined) {
+        playForSan(latest.san)
+      }
+    }
+    soundedMoveCountRef.current = moves.length
+  }, [moves, playForSan])
+
+  // Announce the game's end once. Resignation and an agreed draw are surfaced as a
+  // toast because, unlike a checkmate visible on the board, the opponent would
+  // otherwise have no clear signal that the game ended off the board.
+  useEffect(() => {
+    if (!isCompleted || announcedGameRef.current === game._id) {
+      return
+    }
+    announcedGameRef.current = game._id
+    if (game.endReason === GameEndReason.RESIGNATION && viewerWon) {
+      toast.info('Your opponent resigned. You win!')
+    } else if (game.endReason === GameEndReason.DRAW_AGREEMENT) {
+      toast.info('Draw agreed.')
+    }
+  }, [isCompleted, game._id, game.endReason, viewerWon])
 
   const statusText = isCompleted
-    ? game.result === GameResult.DRAW
-      ? 'Game drawn'
-      : game.winnerId === user?.id
-        ? 'You won'
-        : 'You lost'
+    ? describeOutcome(game.result, game.endReason, viewerWon)
     : isMyTurn
       ? 'Your move'
       : "Opponent's move"

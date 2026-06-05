@@ -67,6 +67,7 @@ export const quickMatch = zMutation({
       opponentId: null,
       status: GameStatus.WAITING,
       result: null,
+      endReason: null,
       winnerId: null,
       drawOfferedBy: null,
       timeControl: args.timeControl,

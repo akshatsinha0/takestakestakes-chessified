@@ -50,6 +50,16 @@ export const GameResult = {
   ABANDONED: 'abandoned',
 } as const
 
+export const GameEndReason = {
+  CHECKMATE: 'checkmate',
+  STALEMATE: 'stalemate',
+  THREEFOLD_REPETITION: 'threefold_repetition',
+  INSUFFICIENT_MATERIAL: 'insufficient_material',
+  FIFTY_MOVE_RULE: 'fifty_move_rule',
+  RESIGNATION: 'resignation',
+  DRAW_AGREEMENT: 'draw_agreement',
+} as const
+
 export const RequestStatus = {
   PENDING: 'pending',
   ACCEPTED: 'accepted',
@@ -71,11 +81,13 @@ const valuesOf = <T extends Record<string, string>>(
 export const zPieceColor = z.enum(valuesOf(PieceColor))
 export const zGameStatus = z.enum(valuesOf(GameStatus))
 export const zGameResult = z.enum(valuesOf(GameResult))
+export const zGameEndReason = z.enum(valuesOf(GameEndReason))
 export const zRequestStatus = z.enum(valuesOf(RequestStatus))
 export const zFriendStatus = z.enum(valuesOf(FriendStatus))
 
 export type PieceColor = z.infer<typeof zPieceColor>
 export type GameStatus = z.infer<typeof zGameStatus>
 export type GameResult = z.infer<typeof zGameResult>
+export type GameEndReason = z.infer<typeof zGameEndReason>
 export type RequestStatus = z.infer<typeof zRequestStatus>
 export type FriendStatus = z.infer<typeof zFriendStatus>

@@ -1,5 +1,6 @@
 import { computeNewRating } from './elo'
 import { GameStatus, GameResult } from './domain'
+import type { GameEndReason } from './domain'
 import { DEFAULT_RATING, SCORE_WIN, SCORE_DRAW, SCORE_LOSS } from './constants'
 import type { MutationCtx } from '../_generated/server'
 import type { Doc } from '../_generated/dataModel'
@@ -10,7 +11,7 @@ import type { Doc } from '../_generated/dataModel'
      guarantees a game ends identically no matter how it ends, and prevents the rating/stat logic
      from being duplicated between the call sites.
 (2.) `finalizeGame` runs inside the caller's transaction: it stamps the game completed with its
-     result, winner, and finish time, then exchanges Elo for both players from their pre-game
+     result, the reason it ended, winner, and finish time, then exchanges Elo from their pre-game
      ratings and updates each player's stats. Because it shares the caller's transaction, recording
      the final move and completing the game are atomic when invoked from `moves.make`, and a
      resignation or accepted draw likewise completes in one transaction with no intermediate state.
@@ -75,6 +76,7 @@ export const finalizeGame = async (
   ctx: MutationCtx,
   game: Doc<'games'>,
   result: GameResult,
+  endReason: GameEndReason,
 ) => {
   const whiteId = game.whitePlayerId
   const blackId = game.blackPlayerId
@@ -105,6 +107,7 @@ export const finalizeGame = async (
   await ctx.db.patch(game._id, {
     status: GameStatus.COMPLETED,
     result,
+    endReason,
     winnerId,
     finishedAt: Date.now(),
   })

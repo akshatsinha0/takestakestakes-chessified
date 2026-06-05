@@ -3,7 +3,7 @@ import { zid } from 'convex-helpers/server/zod'
 import { ConvexError } from 'convex/values'
 import { zMutation } from './lib/functions'
 import { requireAuthUserId } from './lib/identity'
-import { GameStatus, GameResult, PieceColor } from './lib/domain'
+import { GameStatus, GameResult, GameEndReason } from './lib/domain'
 import { finalizeGame } from './lib/completion'
 import type { MutationCtx } from './_generated/server'
 import type { Doc } from './_generated/dataModel'
@@ -65,7 +65,7 @@ export const resign = zMutation({
     const result = resignerIsWhite
       ? GameResult.BLACK_WINS
       : GameResult.WHITE_WINS
-    await finalizeGame(ctx, game, result)
+    await finalizeGame(ctx, game, result, GameEndReason.RESIGNATION)
     return null
   },
 })
@@ -103,7 +103,12 @@ export const respondDraw = zMutation({
       })
     }
     if (args.accept) {
-      await finalizeGame(ctx, game, GameResult.DRAW)
+      await finalizeGame(
+        ctx,
+        game,
+        GameResult.DRAW,
+        GameEndReason.DRAW_AGREEMENT,
+      )
     } else {
       await ctx.db.patch(game._id, { drawOfferedBy: null })
     }

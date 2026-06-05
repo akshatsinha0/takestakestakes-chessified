@@ -4,7 +4,13 @@ import { ConvexError } from 'convex/values'
 import { zQuery, zMutation } from './lib/functions'
 import { requireAuthUserId } from './lib/identity'
 import { clockAfterTurn } from './lib/time'
-import { GameStatus, PieceColor, zGameResult } from './lib/domain'
+import {
+  GameStatus,
+  PieceColor,
+  GameEndReason,
+  zGameResult,
+  zGameEndReason,
+} from './lib/domain'
 import { finalizeGame } from './lib/completion'
 
 /*
@@ -45,6 +51,7 @@ export const make = zMutation({
     san: z.string(),
     fen: z.string(),
     result: z.union([zGameResult, z.null()]),
+    endReason: z.union([zGameEndReason, z.null()]),
   },
   returns: z.null(),
   handler: async (ctx, args) => {
@@ -106,9 +113,16 @@ export const make = zMutation({
     })
 
     // A move that ends the game finalizes it in this same transaction, so the
-    // decisive move and the completion (result + Elo) are atomic.
+    // decisive move and the completion (result + Elo) are atomic. The decisive
+    // move always reports its precise reason; a null reason defaults to checkmate
+    // since that is the only decisive board ending a move produces.
     if (args.result !== null) {
-      await finalizeGame(ctx, game, args.result)
+      await finalizeGame(
+        ctx,
+        game,
+        args.result,
+        args.endReason ?? GameEndReason.CHECKMATE,
+      )
     }
     return null
   },
